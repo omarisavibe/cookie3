@@ -32,10 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Assumes images are in the ROOT folder of cookie3 repo. Check case/spaces!
     const IMAGE_PATHS = {
         classic: 'classic.webp',
-        thick: 'thick_and_gooey.webp',
-        thin: 'thin and crispy.webp', // Watch space! Rename recommended -> thin-and-crispy.webp
-        comparison: '3_cookie_types.jpg',
-        stuffed: 'stuffed_cookie.webp'
+        thick: 'thick-and-gooey.webp',
+        thin: 'thin-and-crispy.webp', // Watch space! Rename recommended -> thin-and-crispy.webp
+        comparison: '3-cookie-types.jpg',
+        stuffed: 'stuffe-cookie.webp'
     };
 
 
