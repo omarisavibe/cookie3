@@ -1,26 +1,21 @@
 <!DOCTYPE html>
-<html lang="en"> <!-- Language set by JS -->
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Title updated by JS -->
     <title>🍪 Omar's Insanely Good Cookie Guide! 🍪</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Caveat:wght@500&display=swap" rel="stylesheet">
-    <!-- Link to the REFINED CSS file -->
+    <!-- Link to the ORIGINAL CSS file -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body dir="ltr"> <!-- Direction and loaded class managed by JS -->
 
-    <!-- Main content container -->
     <div class="container">
-
-        <!-- Header Section -->
         <header class="main-header">
             <h1 id="main-title-h1" data-lang-key="mainTitle"><span class="emoji">🍪</span> Omar's Insanely Good Cookie Guide! <span class="emoji">🍪</span></h1>
 
-            <!-- Controls Area -->
             <div class="controls-master">
                 <div class="language-selector">
                     <button class="lang-btn active" data-lang="en">🌍 English</button>
@@ -50,7 +45,7 @@
          </div>
 
          <!-- == Recipe Scaler Section (Static HTML Structure) == -->
-         <section class="details-section recipe-scaler" id="recipe-scaler">
+         <section class="recipe-scaler">
              <h3 data-lang-key="scalerTitle">🧈 Customize Your Batch Size!</h3>
              <p data-lang-key="scalerDesc">Enter your starting butter amount (grams) to scale the metric recipe.</p>
              <div class="scaler-input-group">
@@ -69,13 +64,13 @@
                  <div class="button-group">
                      <!-- Buttons trigger JS to show content -->
                      <button class="selector-btn" data-type="classic">
-                         <span class="emoji">⚖️</span> <span data-lang-key="typeClassic">Classic Balanced</span>
+                         <span class="emoji">⚖️</span> <span data-lang-key="typeClassic">Classic Balanced</span> <!-- Use combined key -->
                      </button>
                      <button class="selector-btn" data-type="thick">
-                         <span class="emoji">🧱</span> <span data-lang-key="typeThick">Thick & Gooey</span>
+                         <span class="emoji">🧱</span> <span data-lang-key="typeThick">Thick & Gooey</span> <!-- Use combined key -->
                      </button>
                      <button class="selector-btn" data-type="thin">
-                         <span class="emoji">🧇</span> <span data-lang-key="typeThin">Thin & Crispy</span>
+                         <span class="emoji">🧇</span> <span data-lang-key="typeThin">Thin & Crispy</span> <!-- Use combined key -->
                      </button>
                   </div>
                   <!-- Omar's Fave Text (Visibility controlled by JS) -->
@@ -84,7 +79,8 @@
         </div>
 
         <!-- Key Differences Area (Container static, content & visibility controlled by JS) -->
-        <section id="key-differences" class="details-section key-differences-container visually-hidden">
+        <!-- Removed .details-section class as it's not in the original CSS -->
+        <div id="key-differences" class="key-differences-container visually-hidden">
              <!-- Static Title Structure (Text & Name updated by JS) -->
              <h3 data-lang-key="keyDifferencesTitleBase">🔑 Key Differences for <span class="dynamic-cookie-name">Cookie</span>:</h3>
              <!-- Static Points Structure (Content injected by JS) -->
@@ -93,37 +89,38 @@
                  <div class="diff-point chilling-diff"><h4><span class="emoji">🥶</span> <span data-lang-key="chillingTitle">Chilling Method</span></h4><p></p></div>
                  <div class="diff-point other-diff"><h4><span class="emoji">📝</span> <span data-lang-key="otherNotesTitle">Other Key Notes</span></h4><p></p></div>
              </div>
-        </section>
+        </div>
 
         <!-- Recipe Details Area (Container static, content & visibility controlled by JS) -->
-        <section id="recipe-details" class="details-section recipe-container visually-hidden">
+         <!-- Removed .details-section class -->
+        <div id="recipe-details" class="recipe-container visually-hidden">
              <!-- JS will replace this with recipe content or keep it updated -->
              <div class="placeholder visible" data-lang-key="placeholderSelect">👆 Select a cookie style above to load the recipe! ✨</div>
-        </section>
+        </div>
 
         <!-- Easter Egg Area (Container static, content & visibility controlled by JS) -->
-        <section id="easter-egg-container" class="details-section easter-egg visually-hidden">
+         <!-- Removed .details-section class -->
+        <div id="easter-egg-container" class="easter-egg visually-hidden">
              <!-- Easter egg content injected here by JS when needed -->
-        </section>
+        </div>
 
         <!-- Tips Section -->
-        <section class="tip-section"> <!-- Use class from refined CSS -->
+        <div class="lower-sections"> <!-- Keep this wrapper -->
             <div class="tip-box">
                 <h3 data-lang-key="tipsTitle"><span class="emoji">💡</span> Omar's Pro Tips! (Level Up Your Cookie Game) <span class="emoji">🔬</span></h3>
                 <ul id="tips-list">
                     <!-- Tips injected here by JS -->
                 </ul>
             </div>
-        </section>
+        </div>
 
         <!-- Final Shoutout -->
-        <footer class="final-shoutout"> <!-- Use footer element for semantics -->
+        <div class="final-shoutout"> <!-- Keep this wrapper -->
             <p data-lang-key="finalTag">Nailed it? Show off! Tag me! @omarisavibe 😄<br><a href="https://www.instagram.com/omarisavibe/" target="_blank" rel="noopener noreferrer">@omarisavibe on Insta!</a></p>
-        </footer>
+        </div>
 
     </div> <!-- End Container -->
 
-    <!-- Link to the CORRECTED Hybrid JS file -->
     <script src="script.js"></script>
 </body>
 </html>
