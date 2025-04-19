@@ -345,6 +345,8 @@ document.addEventListener('DOMContentLoaded', () => { // <<<< START OF MAIN BLOC
     // --- RUN INITIALIZATION ---
     initialize();
 
-}); // <<<< END OF MAIN BLOCK (This should be the final line)
+// }); // <<<< END OF MAIN BLOCK (This should be the final line) <<<< ERROR IS HERE: Missing closing brace for the DOMContentLoaded callback
+
+}); // <<<< Corrected: This closes the DOMContentLoaded callback function started on line 3.
 
 // ==== END OF SCRIPT.JS ====
