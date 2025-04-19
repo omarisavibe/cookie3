@@ -21,6 +21,11 @@
     /* Color for Omar's Fave Tag */
     --fav-tag-color: var(--primary-color);
     --fav-tag-bg: rgba(138, 90, 68, 0.1);
+    /* Added */
+    --input-border-color: #ccc;
+    --input-focus-border: var(--secondary-color);
+    --button-scale-bg: var(--primary-color);
+    --button-scale-hover-bg: #85623e;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
@@ -29,7 +34,7 @@ body {
     line-height: 1.7;
     color: var(--text-color);
     background-color: var(--background-color);
-    padding: 0; /* Remove body padding */
+    padding: 0;
     margin: 0;
     opacity: 0;
     transition: opacity 0.7s ease-in-out;
@@ -38,16 +43,15 @@ body.loaded { opacity: 1; }
 
 /* Structure & Typography */
 .container {
-    /* REMOVED max-width */
-    width: 100%; /* Ensure it takes full width */
-    min-height: 100vh; /* Ensure it takes at least full height */
-    margin: 0 auto; /* Still center if somehow width constrained */
+    width: 100%;
+    min-height: 100vh;
+    margin: 0 auto;
     background-color: var(--card-background);
-    padding: 30px 5vw; /* Responsive padding (5% of viewport width) */
-    border-radius: 0; /* No radius for full width */
-    box-shadow: none; /* No shadow needed for full page */
-    border: none; /* No border needed */
-    display: flex; /* Use flexbox for better potential centering/layout control if needed */
+    padding: 30px 5vw;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    display: flex;
     flex-direction: column;
 }
 .main-header {
@@ -55,7 +59,7 @@ body.loaded { opacity: 1; }
     border-bottom: 3px double var(--border-color);
     margin-bottom: 30px;
     padding-bottom: 20px;
-    width: 100%; /* Take full width within container */
+    width: 100%;
 }
 h1 { color: var(--primary-color); margin-bottom: 15px; font-size: 2.6em; font-weight: 700; line-height: 1.2; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 5px 10px; }
 h1 .emoji { vertical-align: middle; font-size: 0.85em; display: inline-block; }
@@ -76,25 +80,87 @@ body[dir="rtl"] .ingredient-list li::before { inset-inline-start: auto; inset-in
 body[dir="rtl"] .steps-list li::before { inset-inline-start: auto; inset-inline-end: 0; }
 body[dir="rtl"] #tips-list li::before { inset-inline-start: auto; inset-inline-end: 0; }
 body[dir="rtl"] .note { padding-inline-start: initial; padding-inline-end: 40px; }
+body[dir="rtl"] .scaling-controls label { margin-left: 8px; margin-right: 0; }
 
 /* Controls */
-.controls-master { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-top: 20px; gap: 15px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-color);}
+.controls-master { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-top: 20px; gap: 15px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-color); }
 .language-selector { margin-bottom: 10px; }
 .lang-btn { background-color: #fff; border: 2px solid var(--border-color); color: var(--secondary-color); padding: 8px 18px; border-radius: 20px; cursor: pointer; font-size: 0.9em; font-weight: 600; margin: 0 4px; transition: all 0.3s ease; }
 .lang-btn:hover { background-color: var(--highlight-bg); border-color: var(--secondary-color); transform: translateY(-2px); }
 .lang-btn.active { background-color: var(--lang-active-bg); color: white; border-color: var(--lang-active-bg); transform: translateY(0); }
-.yield-info { font-style: italic; color: #777; font-size: 0.95em; text-align: center; flex-basis: 100%; order: 3; }
+.yield-info { font-style: italic; color: #777; font-size: 0.95em; text-align: center; flex-basis: 100%; order: 3; /* Default order for mobile */ }
 @media (min-width: 600px) { .yield-info { flex-basis: auto; order: 0; text-align: right; margin-left: auto; } }
 
-/* Unit Toggles (Integrated Look - Adjusted) */
-.unit-toggle-wrapper {
+/* --- Recipe Scaling Controls --- */
+.scaling-controls {
+    padding: 20px 0 15px 0;
+    margin-bottom: 25px;
     text-align: center;
-    padding: 0px 0px 10px 0px; /* Reduced padding */
-    margin-bottom: 20px; /* Space before ingredients */
-    border-bottom: none; /* Removed border */
-    transition: all 0.4s ease-out;
-    opacity: 1;
-    margin-top: 10px; /* Add some space after recipe title */
+    border-bottom: 1px dashed var(--border-color);
+    display: flex; /* Use flex for better alignment */
+    justify-content: center; /* Center items */
+    align-items: center; /* Align vertically */
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+    gap: 10px 15px; /* Space between items */
+}
+.scaling-controls label {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 1em;
+    margin-right: 8px; /* Space between label and input */
+}
+.scaling-controls input[type="number"] {
+    padding: 8px 12px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 6px;
+    font-size: 1em;
+    width: 100px; /* Fixed width for the input */
+    text-align: center;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+.scaling-controls input[type="number"]:focus {
+    outline: none;
+    border-color: var(--input-focus-border);
+    box-shadow: 0 0 0 2px rgba(160, 82, 45, 0.2); /* Use secondary color with alpha */
+}
+/* Hide spinner arrows */
+.scaling-controls input[type=number]::-webkit-outer-spin-button,
+.scaling-controls input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.scaling-controls input[type=number] {
+    -moz-appearance: textfield; /* Firefox */
+}
+.scaling-controls button {
+    padding: 9px 20px;
+    font-size: 0.95em;
+    font-weight: 600;
+    color: white;
+    background-color: var(--button-scale-bg);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 2px 4px var(--shadow-light);
+}
+.scaling-controls button:hover {
+    background-color: var(--button-scale-hover-bg);
+    transform: translateY(-1px);
+}
+.scale-feedback {
+    flex-basis: 100%; /* Take full width on next line */
+    text-align: center;
+    font-size: 0.9em;
+    color: #666;
+    font-style: italic;
+    margin-top: 5px; /* Space above feedback text */
+}
+
+/* Unit Toggles (Integrated Look) */
+.unit-toggle-wrapper {
+    text-align: center; padding: 0px 0px 10px 0px; margin-bottom: 20px;
+    border-bottom: none; transition: all 0.4s ease-out; opacity: 1; margin-top: 10px;
 }
 .unit-toggle-wrapper.hidden { opacity: 0; max-height: 0; padding: 0 !important; margin: 0 !important; border: none !important; overflow: hidden; }
 .unit-selector { display: inline-block; margin: 0 10px; opacity: 1; transition: opacity 0.3s ease; }
@@ -118,33 +184,23 @@ body[dir="rtl"] .note { padding-inline-start: initial; padding-inline-end: 40px;
 .selector-btn[data-type="thin"].active { background-color: var(--accent-thin); border-color: var(--accent-thin); }
 
 /* Omar's Fave Text Styling */
-.omars-fav-text { font-family: var(--font-handwriting); font-size: 1.15em; color: var(--fav-tag-color); font-weight: 500; background-color: var(--fav-tag-bg); padding: 5px 12px; border-radius: 15px 15px 15px 0; border: 1px dashed var(--fav-tag-color); position: absolute; top: -10px; /* Adjusted from -22px based on Thick button location */ right: 5%; /* Adjust if needed for thick button centering */ transform: rotate(8deg) scale(0.8); transform-origin: bottom right; z-index: 10; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; white-space: nowrap; pointer-events: none; }
+.omars-fav-text { font-family: var(--font-handwriting); font-size: 1.15em; color: var(--fav-tag-color); font-weight: 500; background-color: var(--fav-tag-bg); padding: 5px 12px; border-radius: 15px 15px 15px 0; border: 1px dashed var(--fav-tag-color); position: absolute; top: -10px; right: 5%; transform: rotate(8deg) scale(0.8); transform-origin: bottom right; z-index: 10; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; white-space: nowrap; pointer-events: none; }
 .omars-fav-text.visible { opacity: 1; top: -22px; transform: rotate(10deg) scale(1); }
-/* Position adjustments for the tag - Might need fine-tuning based on Thick button exact position */
 
-/* Header Image Section (Adjusted Size) */
-#cookie-image-header { text-align: center; margin: 0 auto 30px auto; min-height: 150px; /* Keep min height */ transition: opacity 0.5s ease-out; background: none; }
-#selected-cookie-image {
-    max-width: 100%; /* Take full width available within padding */
-    /* width: 500px; --- REMOVED fixed width --- */
-    height: auto;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px var(--shadow-light), 0 2px 5px rgba(0,0,0,0.05) inset;
-    display: block;
-    margin: 0 auto;
-    transition: opacity 0.4s ease-in-out, box-shadow 0.3s;
-    border: 1px solid rgba(0,0,0,0.05);
-    background: none;
-}
+/* --- Header Image Section (DIFFERENT SIZES!) --- */
+#cookie-image-header { text-align: center; margin: 0 auto 30px auto; min-height: 150px; transition: opacity 0.5s ease-out; background: none; overflow: hidden; }
+/* Default state (Large - Comparison Image) */
+#selected-cookie-image { display: block; margin: 0 auto; width: 100%; max-width: min(90vw, 1000px); height: auto; border-radius: 12px; box-shadow: 0 5px 15px var(--shadow-light), 0 2px 5px rgba(0,0,0,0.05) inset; border: 1px solid rgba(0,0,0,0.05); background: none; opacity: 1; transition: max-width 0.4s ease-in-out, opacity 0.4s ease-in-out, box-shadow 0.3s; }
+/* Smaller state (When a specific cookie type is selected) */
+#selected-cookie-image.selected-type-image { max-width: 500px; }
 #selected-cookie-image[src=""] { opacity: 0; }
-
 
 /* Key Differences Section */
 .key-differences-container { background-color: var(--key-diff-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 25px; margin-bottom: 30px; max-height: 0; opacity: 0; overflow: hidden; transition: all 0.6s ease-out; border-style: dashed; border-color: transparent; }
 .key-differences-container.visible { max-height: 600px; opacity: 1; padding: 25px; margin-bottom: 30px; border-color: var(--secondary-color); }
 .key-differences-container h3 { text-align: center; margin-bottom: 25px; font-size: 1.4em; }
-.key-differences-container h3 .dynamic-cookie-name { font-style: italic; color: var(--secondary-color); } /* Style the inserted name */
-.diff-points { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); /* Slightly wider base */ gap: 25px; }
+.key-differences-container h3 .dynamic-cookie-name { font-style: italic; color: var(--secondary-color); }
+.diff-points { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 25px; }
 .diff-point { background-color: var(--card-background); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 4px 10px var(--shadow-light); transition: transform 0.3s ease, box-shadow 0.3s ease; }
 .diff-point:hover { transform: translateY(-4px); box-shadow: 0 7px 15px var(--shadow-medium); }
 .diff-point h4 { color: var(--secondary-color); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; border: none; padding: 0; font-size: 1.15em;}
@@ -160,22 +216,35 @@ body[dir="rtl"] .note { padding-inline-start: initial; padding-inline-end: 40px;
 /* Inner content area for recipe text */
 .recipe-content-area { padding: 30px; opacity: 1; transition: opacity 0.4s ease-in-out 0.1s; }
 .recipe-content-area.hidden { opacity: 0; }
-.recipe-content-area > h3 { /* Title styling */
-    margin-top: 0px;
-    margin-bottom: 15px; /* Reduced margin before unit toggles */
+.recipe-content-area > h3 { margin-top: 0px; margin-bottom: 15px; text-align: center; font-size: 1.6em; }
+/* Display scaling info */
+.recipe-content-area .scaling-info {
+    font-size: 0.9em;
     text-align: center;
-    font-size: 1.6em;
+    color: #555;
+    margin-bottom: 10px;
+    margin-top: -10px; /* Pull up slightly closer to title */
+    font-style: italic;
+}
+.recipe-content-area .scaling-info.hidden {
+    display: none;
 }
 .placeholder { text-align: center; color: #888; font-size: 1.2em; padding: 70px 15px; font-style: italic; transition: opacity 0.4s ease; }
-h4.list-header { border-bottom: 2px dotted var(--border-color); padding-bottom: 8px; margin-top: 30px; margin-bottom: 20px; font-size: 1.3em; color: var(--secondary-color); }
-/* --- Removed .how-to-toast rules as it's no longer generated dynamically --- */
+h4.list-header { border-bottom: 2px dotted var(--border-color); padding-bottom: 8px; margin-top: 25px; /* Slightly reduce top margin */ margin-bottom: 20px; font-size: 1.3em; color: var(--secondary-color); }
 
 
 /* Lists (Ingredients & Steps) */
-.ingredient-list, .steps-list { list-style: none; padding: 0; margin: 25px 0; }
+.ingredient-list, .steps-list { list-style: none; padding: 0; margin: 20px 0; } /* Reduced margin */
 .ingredient-list li, .steps-list li { margin-bottom: 16px; padding-inline-start: 40px; position: relative; font-size: 1.05em; line-height: 1.65; }
 .ingredient-list li::before { content: attr(data-emoji); position: absolute; inset-inline-start: 5px; top: 3px; font-size: 1.4em; width: 25px; text-align: center; }
 .ingredient-list .note { display: block; font-size: 0.85em; color: #777; padding-inline-start: 0; font-style: italic; margin-top: 4px; line-height: 1.4; }
+/* Adding Imperial reference style */
+.ingredient-list .imperial-ref {
+    font-size: 0.8em;
+    color: #888;
+    margin-left: 5px;
+    font-style: italic;
+}
 .steps-list { counter-reset: step-counter; }
 .steps-list li::before { content: counter(step-counter); counter-increment: step-counter; background-color: var(--secondary-color); color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; justify-content: center; align-items: center; font-size: 0.9em; font-weight: 700; position: absolute; inset-inline-start: 0; top: 4px; box-shadow: 0 2px 5px var(--shadow-light); }
 .ingredient-list .highlight, .steps-list .highlight { background-color: rgba(244, 162, 97, 0.25); color: #c26c1a; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
@@ -194,7 +263,7 @@ h4.list-header { border-bottom: 2px dotted var(--border-color); padding-bottom: 
 .easter-egg-content { display: flex; flex-direction: column; align-items: center; gap: 18px; }
 .easter-egg-content p, .easter-egg-content strong { font-size: 1.1em; color: #6d4c41; line-height: 1.7; }
 .easter-egg-content strong { font-weight: 700; color: var(--primary-color); display: block; margin-bottom: 5px; }
-.easter-egg-content img { max-width: 90%; width: 300px; height: auto; border-radius: 8px; margin-top: 12px; box-shadow: 0 4px 12px var(--shadow-medium); }
+.easter-egg-content img#stuffed-cookie-image { max-width: 90%; width: 400px; height: auto; border-radius: 8px; margin-top: 12px; box-shadow: 0 4px 12px var(--shadow-medium); }
 .easter-egg-content ul { list-style: none; padding: 0; margin: 15px 0 0 0; }
 .easter-egg-content ul li { margin-bottom: 10px; padding-inline-start: 35px; position: relative; text-align: start; }
 .easter-egg-content ul li::before { content: '💎'; position: absolute; inset-inline-start: 0; top: 0; font-size: 1.1em; }
@@ -205,11 +274,7 @@ h4.list-header { border-bottom: 2px dotted var(--border-color); padding-bottom: 
 .tip-box { background-color: #f0f4f8; border: 1px solid #d6e2f0; padding: 25px; border-radius: 10px; box-shadow: 0 4px 12px rgba(214, 226, 240, 0.5); }
 .tip-box h3 { color: #1e3a56; margin-bottom: 25px; text-align: center; font-size: 1.6em; border: none; padding: 0; font-weight: 600; display: flex; justify-content: center; align-items: center; gap: 8px;}
 .tip-box h3 .emoji { vertical-align: middle;}
-#tips-list {
-    list-style: none; padding: 0;
-    column-count: 2; /* Keep 2 columns for wider screens */
-    column-gap: 40px; /* Increase gap */
-}
+#tips-list { list-style: none; padding: 0; column-count: 2; column-gap: 40px; }
 #tips-list li { padding-inline-start: 35px; position: relative; margin-bottom: 18px; font-size: 1em; line-height: 1.65; break-inside: avoid; }
 #tips-list li::before { content: attr(data-emoji); position: absolute; inset-inline-start: 0; top: 1px; font-size: 1.5em; width: 25px; text-align: center; }
 
@@ -221,27 +286,28 @@ h4.list-header { border-bottom: 2px dotted var(--border-color); padding-bottom: 
 /* Utility */
 .visually-hidden { border: 0 !important; clip: rect(1px, 1px, 1px, 1px) !important; clip-path: inset(50%) !important; height: 1px !important; margin: -1px !important; overflow: hidden !important; padding: 0 !important; position: absolute !important; width: 1px !important; white-space: nowrap !important; opacity: 0 !important; }
 .key-differences-container.visually-hidden, .easter-egg.visually-hidden { max-height: 0 !important; opacity: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; margin-top: 0 !important; margin-bottom: 0 !important; border-width: 0 !important; overflow: hidden !important; position: static !important; pointer-events: none; }
-.omars-fav-text.visually-hidden { opacity: 0 !important; transform: rotate(8deg) scale(0.8) !important; pointer-events: none; /* Keep position absolute from its own styles */ }
-
+.omars-fav-text.visually-hidden { opacity: 0 !important; transform: rotate(8deg) scale(0.8) !important; pointer-events: none; }
 
 /* Media Queries */
-@media (max-width: 900px) {
-    #tips-list { column-count: 1; } /* Stack tips earlier */
-}
+@media (max-width: 1024px) { #selected-cookie-image { max-width: min(90vw, 800px); } }
+@media (max-width: 900px) { #tips-list { column-count: 1; } }
 @media (max-width: 768px) {
-    h1 { font-size: 2.2em; }
-    h2 { font-size: 1.6em; }
-    .container { padding: 25px 4vw; }
-    .diff-points { grid-template-columns: 1fr; } /* Stack diff points */
+    h1 { font-size: 2.2em; } h2 { font-size: 1.6em; } .container { padding: 25px 4vw; }
+    .diff-points { grid-template-columns: 1fr; }
+     #selected-cookie-image { max-width: min(95vw, 600px); }
+     #selected-cookie-image.selected-type-image { max-width: 450px; }
 }
 @media (max-width: 480px) {
-    h1 { font-size: 1.9em; }
-    h2 { font-size: 1.4em; }
-    .container { padding: 20px 3vw; }
-    .button-group { flex-direction: column; align-items: center;} /* Stack cookie buttons */
-    .omars-fav-text { /* Adjust tag pos maybe */
-        right: 15%;
-    }
+    h1 { font-size: 1.9em; } h2 { font-size: 1.4em; } .container { padding: 20px 3vw; }
+    .scaling-controls { flex-direction: column; align-items: stretch; /* Stack scaling vertically */}
+    .scaling-controls input[type="number"] { width: 100%; /* Full width input */}
+    .scaling-controls button { width: 100%; }
+    .button-group { flex-direction: column; align-items: center;}
+    .omars-fav-text { right: 15%; top: -15px;}
+     #selected-cookie-image { max-width: 95vw; }
+    #selected-cookie-image.selected-type-image { max-width: 90%; }
+    .easter-egg-content img#stuffed-cookie-image { width: 90%; }
+    #tips-list { column-count: 1; } /* Already there from 900px */
 }
 
 /* ==== CSS STYLES END HERE ==== */
