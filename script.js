@@ -267,4 +267,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // Run initialization
     initialize();
 
-}); // <<< End of DOMContentLoaded Listener (THIS IS LINE 683 or close to it)
+});
