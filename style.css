@@ -75,6 +75,8 @@ body[dir="rtl"] .ingredient-list li::before { inset-inline-start: auto; inset-in
 body[dir="rtl"] .steps-list li::before { inset-inline-start: auto; inset-inline-end: 0; }
 body[dir="rtl"] #tips-list li::before { inset-inline-start: auto; inset-inline-end: 0; }
 body[dir="rtl"] .note { padding-inline-start: initial; padding-inline-end: 40px; }
+/* Adjust scaler alignment for RTL */
+body[dir="rtl"] .recipe-scaler label { margin-inline-start: initial; margin-inline-end: 10px;}
 
 /* Controls */
 .controls-master { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-top: 20px; gap: 15px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-color);}
@@ -85,11 +87,91 @@ body[dir="rtl"] .note { padding-inline-start: initial; padding-inline-end: 40px;
 .yield-info { font-style: italic; color: #777; font-size: 0.95em; text-align: center; flex-basis: 100%; order: 3; }
 @media (min-width: 600px) { .yield-info { flex-basis: auto; order: 0; text-align: right; margin-left: auto; } }
 
+
+/* --- NEW: Recipe Scaler Section --- */
+.recipe-scaler {
+    background-color: var(--highlight-bg);
+    border: 1px dashed var(--secondary-color);
+    border-radius: 8px;
+    padding: 20px 25px;
+    margin: 25px auto 30px auto; /* Center it */
+    max-width: 600px; /* Limit width */
+    text-align: center;
+    box-shadow: 0 2px 8px var(--shadow-light);
+}
+.recipe-scaler h3 {
+    font-size: 1.3em;
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+.recipe-scaler p {
+    font-size: 0.95em;
+    color: #555;
+    margin-bottom: 18px;
+    line-height: 1.5;
+}
+.scaler-input-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap; /* Allow wrap on small screens */
+    gap: 10px 15px; /* Spacing between elements */
+}
+.recipe-scaler label {
+    font-weight: 600;
+    margin-inline-end: 10px;
+    font-size: 1em;
+}
+.recipe-scaler input[type="number"] {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 1em;
+    width: 100px; /* Fixed width for number input */
+    text-align: right;
+    box-shadow: inset 0 1px 3px var(--shadow-light);
+}
+/* Optional: remove spinner arrows */
+.recipe-scaler input[type="number"]::-webkit-inner-spin-button,
+.recipe-scaler input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.recipe-scaler input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+}
+
+.recipe-scaler button {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 9px 20px;
+    border-radius: 5px;
+    font-size: 0.95em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 5px var(--shadow-medium);
+}
+.recipe-scaler button:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-1px);
+}
+.scaler-note {
+    font-size: 0.85em;
+    font-style: italic;
+    color: #777;
+    margin-top: 15px;
+    display: block; /* Make sure it takes full width */
+}
+
 /* Unit Toggles (Integrated Look) */
 .unit-toggle-wrapper {
     text-align: center; padding: 0px 0px 10px 0px; margin-bottom: 20px;
     border-bottom: none; transition: all 0.4s ease-out; opacity: 1; margin-top: 10px;
 }
+/* ... (rest of unit toggle styles unchanged) ... */
 .unit-toggle-wrapper.hidden { opacity: 0; max-height: 0; padding: 0 !important; margin: 0 !important; border: none !important; overflow: hidden; }
 .unit-selector { display: inline-block; margin: 0 10px; opacity: 1; transition: opacity 0.3s ease; }
 .unit-selector[style*="display: none"] { opacity: 0; pointer-events: none; }
@@ -98,7 +180,9 @@ body[dir="rtl"] .note { padding-inline-start: initial; padding-inline-end: 40px;
 .unit-btn:hover { background-color: var(--highlight-bg); border-color: var(--secondary-color); transform: translateY(-1px); box-shadow: 0 2px 4px var(--shadow-medium); }
 .unit-btn.active { background-color: var(--secondary-color); color: white; border-color: var(--secondary-color); font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15); }
 
+
 /* Cookie Selection */
+/* ... (styles unchanged) ... */
 .cookie-type-selector { background-color: transparent; padding: 15px 0; border: none; margin-bottom: 30px; }
 .cookie-type-selector h2 { font-size: 1.5em; margin-bottom: 25px; text-align: center; border: none;}
 .button-group-container { position: relative; }
@@ -110,41 +194,27 @@ body[dir="rtl"] .note { padding-inline-start: initial; padding-inline-end: 40px;
 .selector-btn[data-type="classic"].active { background-color: var(--accent-classic); border-color: var(--accent-classic); }
 .selector-btn[data-type="thick"].active { background-color: var(--accent-thick); border-color: var(--accent-thick); }
 .selector-btn[data-type="thin"].active { background-color: var(--accent-thin); border-color: var(--accent-thin); }
-
-/* Omar's Fave Text Styling */
 .omars-fav-text { font-family: var(--font-handwriting); font-size: 1.15em; color: var(--fav-tag-color); font-weight: 500; background-color: var(--fav-tag-bg); padding: 5px 12px; border-radius: 15px 15px 15px 0; border: 1px dashed var(--fav-tag-color); position: absolute; top: -10px; right: 5%; transform: rotate(8deg) scale(0.8); transform-origin: bottom right; z-index: 10; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; white-space: nowrap; pointer-events: none; }
 .omars-fav-text.visible { opacity: 1; top: -22px; transform: rotate(10deg) scale(1); }
 
 
-/* --- Header Image Section (DIFFERENT SIZES!) --- */
-#cookie-image-header { text-align: center; margin: 0 auto 30px auto; min-height: 150px; transition: opacity 0.5s ease-out; background: none; overflow: hidden; /* Prevent layout shifts during size change */ }
-
-/* Default state (Large - Comparison Image) */
+/* Header Image Section */
+/* ... (styles unchanged from previous version with size classes) ... */
+#cookie-image-header { text-align: center; margin: 0 auto 30px auto; min-height: 150px; transition: opacity 0.5s ease-out; background: none; overflow: hidden; }
 #selected-cookie-image {
-    display: block;
-    margin: 0 auto;
-    width: 100%; /* Try to fill container horizontally */
-    max-width: min(90vw, 1000px); /* L A R G E: Use 90% of viewport width, up to 1000px */
-    height: auto;
-    border-radius: 12px;
+    display: block; margin: 0 auto; width: 100%;
+    max-width: min(90vw, 1000px); /* L A R G E default */
+    height: auto; border-radius: 12px;
     box-shadow: 0 5px 15px var(--shadow-light), 0 2px 5px rgba(0,0,0,0.05) inset;
-    border: 1px solid rgba(0,0,0,0.05);
-    background: none;
-    opacity: 1;
-    /* Smooth Transitions */
+    border: 1px solid rgba(0,0,0,0.05); background: none; opacity: 1;
     transition: max-width 0.4s ease-in-out, opacity 0.4s ease-in-out, box-shadow 0.3s;
 }
-
-/* Smaller state (When a specific cookie type is selected) */
-#selected-cookie-image.selected-type-image {
-    max-width: 500px; /* S M A L L: Constrain width for individual shots */
-    /* width: 100% or auto might be adjusted if needed, but max-width dominates */
-}
-
-#selected-cookie-image[src=""] { opacity: 0; } /* Hide if no src */
+#selected-cookie-image.selected-type-image { max-width: 500px; /* S M A L L when selected */ }
+#selected-cookie-image[src=""] { opacity: 0; }
 
 
 /* Key Differences Section */
+/* ... (styles unchanged) ... */
 .key-differences-container { background-color: var(--key-diff-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 25px; margin-bottom: 30px; max-height: 0; opacity: 0; overflow: hidden; transition: all 0.6s ease-out; border-style: dashed; border-color: transparent; }
 .key-differences-container.visible { max-height: 600px; opacity: 1; padding: 25px; margin-bottom: 30px; border-color: var(--secondary-color); }
 .key-differences-container h3 { text-align: center; margin-bottom: 25px; font-size: 1.4em; }
@@ -156,20 +226,18 @@ body[dir="rtl"] .note { padding-inline-start: initial; padding-inline-end: 40px;
 .diff-point h4 .emoji { font-size: 1.3em; }
 .diff-point p { font-size: 1em; color: #555; }
 
-/* Recipe Details Container */
+
+/* Recipe Details Container & Content */
+/* ... (styles mostly unchanged) ... */
 .recipe-container { padding: 0; margin-top: 0px; border-radius: 12px; border: 1px solid var(--border-color); background-color: var(--card-background); transition: background-color 0.5s ease, border-color 0.5s ease; box-shadow: 0 5px 15px var(--shadow-light); min-height: 250px; position: relative; overflow: hidden; }
 .recipe-container.classic-theme { background-color: #fff8f0; border-color: var(--accent-classic); }
 .recipe-container.thick-theme { background-color: #feedeb; border-color: var(--accent-thick); }
 .recipe-container.thin-theme { background-color: #fefcf3; border-color: var(--accent-thin); }
-
-/* Inner content area for recipe text */
 .recipe-content-area { padding: 30px; opacity: 1; transition: opacity 0.4s ease-in-out 0.1s; }
 .recipe-content-area.hidden { opacity: 0; }
 .recipe-content-area > h3 { margin-top: 0px; margin-bottom: 15px; text-align: center; font-size: 1.6em; }
 .placeholder { text-align: center; color: #888; font-size: 1.2em; padding: 70px 15px; font-style: italic; transition: opacity 0.4s ease; }
 h4.list-header { border-bottom: 2px dotted var(--border-color); padding-bottom: 8px; margin-top: 30px; margin-bottom: 20px; font-size: 1.3em; color: var(--secondary-color); }
-
-/* Lists (Ingredients & Steps) */
 .ingredient-list, .steps-list { list-style: none; padding: 0; margin: 25px 0; }
 .ingredient-list li, .steps-list li { margin-bottom: 16px; padding-inline-start: 40px; position: relative; font-size: 1.05em; line-height: 1.65; }
 .ingredient-list li::before { content: attr(data-emoji); position: absolute; inset-inline-start: 5px; top: 3px; font-size: 1.4em; width: 25px; text-align: center; }
@@ -178,94 +246,68 @@ h4.list-header { border-bottom: 2px dotted var(--border-color); padding-bottom: 
 .steps-list li::before { content: counter(step-counter); counter-increment: step-counter; background-color: var(--secondary-color); color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; justify-content: center; align-items: center; font-size: 0.9em; font-weight: 700; position: absolute; inset-inline-start: 0; top: 4px; box-shadow: 0 2px 5px var(--shadow-light); }
 .ingredient-list .highlight, .steps-list .highlight { background-color: rgba(244, 162, 97, 0.25); color: #c26c1a; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
 .ingredient-list .critical, .steps-list .critical { font-weight: bold; color: var(--accent-thick); border-bottom: 2px dotted var(--accent-thick); padding-bottom: 1px; background: transparent; }
-
-/* Custom Science Notes */
 .science-note { background-color: #f8f9fa; border: 1px solid #eee; border-radius: 8px; padding: 20px; margin: 30px 0 10px 0; }
 .science-note h4 { margin-bottom: 12px; color: var(--primary-color); font-size: 1.25em; text-align: center; border: none; padding: 0; display: flex; justify-content: center; align-items: center; gap: 8px;}
 .science-note h4 .emoji { vertical-align: middle; }
 .science-note p { font-size: 1em; color: #444; line-height: 1.7;}
 
+
 /* Easter Egg Section */
+/* ... (styles unchanged, stuffed cookie size already limited) ... */
 .easter-egg { background: var(--easter-egg-bg); border: 3px dashed #fbc02d; border-radius: 10px; padding: 25px; margin-top: 30px; text-align: center; box-shadow: 0 6px 25px rgba(251, 192, 45, 0.3); max-height: 0; opacity: 0; overflow: hidden; transition: all 0.7s ease-out; }
 .easter-egg.visible { max-height: 1000px; opacity: 1; padding: 25px; margin-top: 30px; }
 .easter-egg h3 { color: #c04f16; margin-bottom: 18px; font-size: 1.6em; font-family: var(--font-handwriting); font-weight: 500; }
 .easter-egg-content { display: flex; flex-direction: column; align-items: center; gap: 18px; }
 .easter-egg-content p, .easter-egg-content strong { font-size: 1.1em; color: #6d4c41; line-height: 1.7; }
 .easter-egg-content strong { font-weight: 700; color: var(--primary-color); display: block; margin-bottom: 5px; }
-/* --- Limit stuffed cookie image size --- */
-.easter-egg-content img#stuffed-cookie-image {
-    max-width: 90%;
-    width: 400px; /* Adjusted width limit */
-    height: auto;
-    border-radius: 8px;
-    margin-top: 12px;
-    box-shadow: 0 4px 12px var(--shadow-medium);
-}
+.easter-egg-content img#stuffed-cookie-image { max-width: 90%; width: 400px; height: auto; border-radius: 8px; margin-top: 12px; box-shadow: 0 4px 12px var(--shadow-medium); }
 .easter-egg-content ul { list-style: none; padding: 0; margin: 15px 0 0 0; }
 .easter-egg-content ul li { margin-bottom: 10px; padding-inline-start: 35px; position: relative; text-align: start; }
 .easter-egg-content ul li::before { content: '💎'; position: absolute; inset-inline-start: 0; top: 0; font-size: 1.1em; }
 
 
 /* Tips Section */
+/* ... (styles unchanged) ... */
 .lower-sections { margin-top: 40px; }
 .tip-box { background-color: #f0f4f8; border: 1px solid #d6e2f0; padding: 25px; border-radius: 10px; box-shadow: 0 4px 12px rgba(214, 226, 240, 0.5); }
 .tip-box h3 { color: #1e3a56; margin-bottom: 25px; text-align: center; font-size: 1.6em; border: none; padding: 0; font-weight: 600; display: flex; justify-content: center; align-items: center; gap: 8px;}
 .tip-box h3 .emoji { vertical-align: middle;}
-#tips-list {
-    list-style: none; padding: 0;
-    column-count: 2;
-    column-gap: 40px;
-}
+#tips-list { list-style: none; padding: 0; column-count: 2; column-gap: 40px; }
 #tips-list li { padding-inline-start: 35px; position: relative; margin-bottom: 18px; font-size: 1em; line-height: 1.65; break-inside: avoid; }
 #tips-list li::before { content: attr(data-emoji); position: absolute; inset-inline-start: 0; top: 1px; font-size: 1.5em; width: 25px; text-align: center; }
 
 /* Final Shoutout */
- .final-shoutout { margin-top: 40px; padding-top: 30px; border-top: 2px dotted var(--border-color); text-align: center; font-family: var(--font-handwriting); font-size: 2.3em; color: var(--primary-color); line-height: 1.4; }
-  .final-shoutout a { border-bottom: 1px dashed currentColor; font-weight: 500; color: var(--secondary-color); transition: color 0.3s ease; }
-  .final-shoutout a:hover { color: var(--primary-color); border-bottom-style: solid; }
+/* ... (styles unchanged) ... */
+.final-shoutout { margin-top: 40px; padding-top: 30px; border-top: 2px dotted var(--border-color); text-align: center; font-family: var(--font-handwriting); font-size: 2.3em; color: var(--primary-color); line-height: 1.4; }
+.final-shoutout a { border-bottom: 1px dashed currentColor; font-weight: 500; color: var(--secondary-color); transition: color 0.3s ease; }
+.final-shoutout a:hover { color: var(--primary-color); border-bottom-style: solid; }
 
 /* Utility */
+/* ... (styles unchanged) ... */
 .visually-hidden { border: 0 !important; clip: rect(1px, 1px, 1px, 1px) !important; clip-path: inset(50%) !important; height: 1px !important; margin: -1px !important; overflow: hidden !important; padding: 0 !important; position: absolute !important; width: 1px !important; white-space: nowrap !important; opacity: 0 !important; }
 .key-differences-container.visually-hidden, .easter-egg.visually-hidden { max-height: 0 !important; opacity: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; margin-top: 0 !important; margin-bottom: 0 !important; border-width: 0 !important; overflow: hidden !important; position: static !important; pointer-events: none; }
 .omars-fav-text.visually-hidden { opacity: 0 !important; transform: rotate(8deg) scale(0.8) !important; pointer-events: none; }
 
 /* Media Queries */
-@media (max-width: 1024px) { /* Adjust large image max width earlier if needed */
-    #selected-cookie-image {
-        max-width: min(90vw, 800px); /* Slightly smaller cap */
-    }
-}
-@media (max-width: 900px) {
-    #tips-list { column-count: 1; }
-}
+/* ... (styles unchanged from previous version) ... */
+@media (max-width: 1024px) { #selected-cookie-image { max-width: min(90vw, 800px); } }
+@media (max-width: 900px) { #tips-list { column-count: 1; } }
 @media (max-width: 768px) {
-    h1 { font-size: 2.2em; }
-    h2 { font-size: 1.6em; }
-    .container { padding: 25px 4vw; }
+    h1 { font-size: 2.2em; } h2 { font-size: 1.6em; } .container { padding: 25px 4vw; }
     .diff-points { grid-template-columns: 1fr; }
-     #selected-cookie-image {
-         max-width: min(95vw, 600px); /* Adjust comparison size for tablets */
-     }
-     #selected-cookie-image.selected-type-image {
-        max-width: 450px; /* Adjust selected size for tablets */
-    }
+    #selected-cookie-image { max-width: min(95vw, 600px); }
+    #selected-cookie-image.selected-type-image { max-width: 450px; }
+    .recipe-scaler { max-width: 90%; } /* Allow scaler to take more width */
 }
 @media (max-width: 480px) {
-    h1 { font-size: 1.9em; }
-    h2 { font-size: 1.4em; }
-    .container { padding: 20px 3vw; }
+    h1 { font-size: 1.9em; } h2 { font-size: 1.4em; } .container { padding: 20px 3vw; }
     .button-group { flex-direction: column; align-items: center;}
-    .omars-fav-text { right: 15%; top: -15px;} /* Adjust tag pos */
-     #selected-cookie-image {
-         max-width: 95vw; /* Allow comparison image to be wide on mobile */
-     }
-    #selected-cookie-image.selected-type-image {
-        max-width: 90%; /* Allow selected cookie to be reasonably large on mobile too */
-        /* Or a pixel value like max-width: 300px; */
-    }
-    .easter-egg-content img#stuffed-cookie-image {
-       width: 90%; /* Make stuffed cookie responsive on mobile */
-    }
+    .omars-fav-text { right: 15%; top: -15px;}
+    #selected-cookie-image { max-width: 95vw; }
+    #selected-cookie-image.selected-type-image { max-width: 90%; }
+    .easter-egg-content img#stuffed-cookie-image { width: 90%; }
+    .recipe-scaler { padding: 15px 20px; } /* Reduce padding slightly */
+    .scaler-input-group { flex-direction: column; } /* Stack scaler inputs */
 }
 
 /* ==== CSS STYLES END HERE ==== */
