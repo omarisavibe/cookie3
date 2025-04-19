@@ -7,114 +7,139 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Caveat:wght@500&display=swap" rel="stylesheet">
+    <!-- Link to the REFINED CSS file -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body dir="ltr">
 
-    <div class="container">
-        <header class="main-header">
-            <h1 id="main-title-h1" data-lang-key="mainTitle"><span class="emoji">🍪</span> Omar's Insanely Good Cookie Guide! <span class="emoji">🍪</span></h1>
-
-            <div class="controls-master">
-                <div class="language-selector">
-                    <button class="lang-btn active" data-lang="en">🌍 English</button>
-                    <button class="lang-btn" data-lang="ar">🌍 العربية (مصر)</button>
-                </div>
-                <div id="unit-toggles-template" style="display: none;">
-                     <div class="unit-selector" data-lang="en">
-                          <span class="unit-label" data-lang-key="unitLabelEn">Units:</span>
-                          <button class="unit-btn" data-unit-type="imperial">Imperial (Cups)</button>
-                          <button class="unit-btn" data-unit-type="metric">Metric (Grams)</button>
-                     </div>
-                      <div class="unit-selector" data-lang="ar">
-                          <span class="unit-label" data-lang-key="unitLabelAr">الوحدات:</span>
-                          <button class="unit-btn" data-unit-type="cups">أكواب</button>
-                          <button class="unit-btn" data-unit-type="grams">جرامات</button>
-                      </div>
-                 </div>
-                 <p class="yield-info" data-lang-key="yieldInfo">Whips up about 18-24 cookies 🍪</p>
-             </div>
-        </header>
-
-         <!-- Header Image Area -->
-         <div id="cookie-image-header">
-             <img id="selected-cookie-image" src="" alt="Cookie comparison or selected cookie type">
-         </div>
-
-         <!-- == NEW: Recipe Scaler Section == -->
-         <section class="recipe-scaler">
-             <h3 data-lang-key="scalerTitle">🧈 Customize Your Batch Size!</h3>
-             <p data-lang-key="scalerDesc">Enter your starting butter amount (grams) to scale the metric recipe.</p>
-             <div class="scaler-input-group">
-                 <label for="butter-amount-input" data-lang-key="scalerLabel">Starting Butter (g):</label>
-                 <input type="number" id="butter-amount-input" name="butter-amount" min="50" step="1" placeholder="226" value="226">
-                 <button id="update-scale-btn" data-lang-key="scalerButton">Update Scale</button>
-             </div>
-             <span class="scaler-note" data-lang-key="scalerNote">Note: Only metric (gram) values are scaled. Imperial (cup) units are approximate.</span>
-         </section>
-         <!-- ================================ -->
-
-        <!-- Cookie Selection Buttons -->
-        <div class="cookie-type-selector">
-            <h2 data-lang-key="chooseStyle">Alright, Cookie Boss! Pick Your Poison (aka Style!):</h2>
-             <div class="button-group-container">
-                 <div class="button-group">
-                     <button class="selector-btn" data-type="classic">
-                         <span class="emoji">⚖️</span> <span data-lang-key="typeClassic">Classic: The Crowd-Pleaser</span>
-                     </button>
-                     <button class="selector-btn" data-type="thick">
-                         <span class="emoji">🧱</span> <span data-lang-key="typeThick">Thick & Gooey: The Big Softie</span>
-                     </button>
-                     <button class="selector-btn" data-type="thin">
-                         <span class="emoji">🧇</span> <span data-lang-key="typeThin">Thin & Crispy: The Snapper</span>
-                     </button>
-                  </div>
-                  <span class="omars-fav-text visually-hidden" data-lang-key="omarsFavText">Omar's Fave!</span>
-             </div>
-        </div>
-
-        <!-- Key Differences Area -->
-        <div id="key-differences" class="key-differences-container visually-hidden">
-             <h3 data-lang-key="keyDifferencesTitleBase">🔑 Key Differences for <span class="dynamic-cookie-name">Cookie</span></h3>
-             <div class="diff-points">
-                 <div class="diff-point butter-diff"><h4><span class="emoji">🧈</span> <span data-lang-key="butterTitle">Brown Butter State & Mixing</span></h4><p></p></div>
-                 <div class="diff-point chilling-diff"><h4><span class="emoji">🥶</span> <span data-lang-key="chillingTitle">Chilling Method</span></h4><p></p></div>
-                 <div class="diff-point other-diff"><h4><span class="emoji">📝</span> <span data-lang-key="otherNotesTitle">Other Key Notes</span></h4><p></p></div>
-             </div>
-        </div>
-
-        <!-- Recipe Details Area -->
-        <div id="recipe-details" class="recipe-container">
-             <div class="placeholder" data-lang-key="placeholderSelect">👈 Click a cookie style above! ✨</div>
-        </div>
-
-        <!-- Easter Egg Area -->
-        <div id="easter-egg-container" class="easter-egg visually-hidden">
-             <h3 data-lang-key="easterEggTitle">🏆 You Legend! Picked GOOEY! 🏆</h3>
-             <div class="easter-egg-content">
-                 <p data-lang-key="easterEggIntro">Okay, you've got taste! Ready for the Level 2 Boss?</p>
-                 <strong data-lang-key="easterEggIdea">🔥 STUFFED COOKIES! 🔥</strong>
-                 <p data-lang-key="easterEggDesc">Dead easy: Make a dent in your THICK cookie dough ball, plop in ~1 tsp Nutella/Lotus/Pistachio cream, seal it up like a secret treasure, then bake as usual!</p>
-                 <img id="stuffed-cookie-image" src="" alt="Delicious stuffed cookie example">
-                  <p data-lang-key="easterEggPistachioTip">Seriously, TRUST the pistachio! It's a game-changer.</p>
-                  <ul><li><span data-lang-key="pistachioReco">Best Spread IMHO:</span> <a href="https://www.amazon.eg/-/en/Pistachio-spread-Irresistible-Luxurious-Goodness/dp/B0D9C3BDV2/" target="_blank">ASMACUP Pistachio Cream</a> <span data-lang-key="pistachioLinkSource">(Amazon EG link)</span></li></ul>
-             </div>
-        </div>
-
-        <!-- Tips Section -->
-        <div class="lower-sections">
-            <div class="tip-box">
-                <h3 data-lang-key="tipsTitle"><span class="emoji">💡</span> Omar's Pro Tips! (Level Up Your Cookie Game) <span class="emoji">🔬</span></h3>
-                <ul id="tips-list"></ul>
+    <!-- Overall Page Header (Can be made sticky) -->
+    <header class="page-header">
+        <div class="controls-master">
+            <div class="language-selector">
+                <button class="lang-btn active" data-lang="en">🌍 English</button>
+                <button class="lang-btn" data-lang="ar">🌍 العربية (مصر)</button>
             </div>
+             <!-- Unit Toggles Template (Hidden) -->
+             <div id="unit-toggles-template" style="display: none;">
+                 <div class="unit-selector" data-lang="en">
+                      <span class="unit-label" data-lang-key="unitLabelEn">Units:</span>
+                      <button class="unit-btn" data-unit-type="imperial">Imperial (Cups)</button>
+                      <button class="unit-btn" data-unit-type="metric">Metric (Grams)</button>
+                 </div>
+                  <div class="unit-selector" data-lang="ar">
+                      <span class="unit-label" data-lang-key="unitLabelAr">الوحدات:</span>
+                      <button class="unit-btn" data-unit-type="cups">أكواب</button>
+                      <button class="unit-btn" data-unit-type="grams">جرامات</button>
+                  </div>
+             </div>
+            <p class="yield-info" data-lang-key="yieldInfo">Whips up about 18-24 cookies 🍪</p>
         </div>
+    </header>
 
-        <!-- Final Shoutout -->
-        <div class="final-shoutout">
-            <p data-lang-key="finalTag">Nailed it? Wanna show off? Tag me! <a href="https://www.instagram.com/omarisavibe/" target="_blank">@omarisavibe</a> 😄</p>
-        </div>
-    </div>
+    <!-- Main Content Area Wrapper -->
+    <div class="master-container">
+        <div class="content-area">
 
+            <!-- Hero Section -->
+            <section class="hero-section">
+                 <!-- Image will be set by JS -->
+                 <img id="hero-cookie-image" src="images/3-cookie-types.jpg" alt="Delicious chocolate chip cookies">
+                 <div class="hero-text">
+                     <h1 id="main-title-h1" data-lang-key="mainTitle"><span class="emoji">🍪</span> Omar's Insanely Good Cookie Guide! <span class="emoji">🍪</span></h1>
+                     <p class="hero-subtitle" data-lang-key="heroSubtitle">Select your ultimate cookie style below!</p>
+                 </div>
+             </section>
+
+            <!-- Cookie Selection Hub (Cards) -->
+             <section class="cookie-selector-hub-section">
+                 <h2 class="hub-title" data-lang-key="chooseStyle">Pick Your Cookie Destiny:</h2>
+                 <div class="cookie-selector-hub">
+                     <!-- Classic Card -->
+                     <button class="cookie-card" data-type="classic" aria-label="Select Classic Cookies">
+                         <img src="images/classic_thumb.webp" alt="Classic balanced cookie thumbnail">
+                         <h3 data-lang-key="typeClassicShort">Classic</h3>
+                         <p class="card-description" data-lang-key="typeClassicDesc">The balanced crowd-pleaser.</p>
+                         <span class="card-cta"><span class="emoji">👉</span> View Recipe</span>
+                     </button>
+                     <!-- Thick Card -->
+                     <button class="cookie-card" data-type="thick" aria-label="Select Thick and Gooey Cookies">
+                         <img src="images/thick_thumb.webp" alt="Thick and gooey cookie thumbnail">
+                         <h3 data-lang-key="typeThickShort">Thick & Gooey</h3>
+                         <p class="card-description" data-lang-key="typeThickDesc">The big softie, ultra decadent.</p>
+                         <span class="card-cta"><span class="emoji">👉</span> View Recipe</span>
+                         <!-- Omar's Fave Badge -->
+                         <span class="omars-fav-badge visually-hidden" data-lang-key="omarsFavText">Omar's Fave!</span>
+                     </button>
+                      <!-- Thin Card -->
+                      <button class="cookie-card" data-type="thin" aria-label="Select Thin and Crispy Cookies">
+                          <img src="images/thin_thumb.webp" alt="Thin and crispy cookie thumbnail">
+                          <h3 data-lang-key="typeThinShort">Thin & Crispy</h3>
+                          <p class="card-description" data-lang-key="typeThinDesc">Maximum snap, buttery delight.</p>
+                          <span class="card-cta"><span class="emoji">👉</span> View Recipe</span>
+                      </button>
+                 </div>
+             </section>
+
+             <!-- == Recipe Scaler Section (Static) == -->
+             <section class="details-section recipe-scaler" id="recipe-scaler">
+                 <h3 data-lang-key="scalerTitle">🧈 Customize Your Batch Size!</h3>
+                 <p data-lang-key="scalerDesc">Enter your starting butter amount (grams) to scale the metric recipe.</p>
+                 <div class="scaler-input-group">
+                     <label for="butter-amount-input" data-lang-key="scalerLabel">Starting Butter (g):</label>
+                     <input type="number" id="butter-amount-input" name="butter-amount" min="50" step="1" placeholder="226" value="226">
+                     <button type="button" id="update-scale-btn" data-lang-key="scalerButton">Update Scale</button>
+                 </div>
+                 <span class="scaler-note" data-lang-key="scalerNote">Note: Only metric (gram) values are scaled. Imperial (cup) units are approximate.</span>
+             </section>
+             <!-- ================================ -->
+
+             <!-- == Dynamic Content Wrapper == -->
+             <div class="dynamic-content-wrapper">
+
+                 <!-- Key Differences Area -->
+                 <section id="key-differences" class="details-section key-differences-container visually-hidden">
+                      <!-- Title H3 -->
+                      <h3 data-lang-key="keyDifferencesTitleBase">🔑 Key Differences for <span class="dynamic-cookie-name">Cookie</span>:</h3>
+                      <!-- Points Container -->
+                      <div class="diff-points">
+                          <!-- Points will be injected here by JS -->
+                      </div>
+                 </section>
+
+                 <!-- Recipe Details Area -->
+                 <section id="recipe-details" class="details-section recipe-container visually-hidden">
+                     <!-- Placeholder or recipe content injected here -->
+                     <div class="content-placeholder visible" data-lang-key="placeholderSelect">👆 Select a cookie style above to load the recipe! ✨</div>
+                 </section>
+
+                  <!-- Easter Egg Area -->
+                  <section id="easter-egg-container" class="details-section easter-egg visually-hidden">
+                      <!-- Easter egg content injected here -->
+                  </section>
+
+             </div>
+             <!-- == End Dynamic Content Wrapper == -->
+
+
+             <!-- Tips Section -->
+             <section class="tip-section">
+                 <div class="tip-box">
+                     <h3 data-lang-key="tipsTitle"><span class="emoji">💡</span> Omar's Pro Tips! (Level Up Your Cookie Game) <span class="emoji">🔬</span></h3>
+                     <ul id="tips-list">
+                         <!-- Tips injected here -->
+                     </ul>
+                 </div>
+             </section>
+
+            <!-- Final Shoutout -->
+             <footer class="final-shoutout">
+                 <p data-lang-key="finalTag">Nailed it? Show off! Tag me! @omarisavibe 😄<br><a href="https://www.instagram.com/omarisavibe/" target="_blank" rel="noopener noreferrer">@omarisavibe on Insta!</a></p>
+             </footer>
+
+        </div> <!-- End content-area -->
+    </div> <!-- End master-container -->
+
+    <!-- Link to the CORRECTED Hybrid JS file -->
     <script src="script.js"></script>
 </body>
 </html>
