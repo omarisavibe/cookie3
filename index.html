@@ -3,32 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🍪 Omar's Ultimate Cookie Guide! 🍪</title> <!-- Updated Title -->
+    <title>🍪 Omar's Insanely Good Cookie Guide! 🍪</title> <!-- Title updated by JS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Caveat:wght@500&display=swap" rel="stylesheet">
-    <!-- Link the SINGLE final CSS file -->
+    <!-- Link the FINAL CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body dir="ltr"> <!-- Direction set by JS -->
 
     <div class="master-container">
 
-        <!-- Sticky Header for Language/Yield -->
+        <!-- Sticky Header -->
         <header class="page-header sticky fade-in-on-scroll">
             <div class="controls-master">
                 <div class="language-selector">
                     <button class="lang-btn active" data-lang="en">🌍 English</button>
                     <button class="lang-btn" data-lang="ar">🌍 العربية (مصر)</button>
                 </div>
-                <!-- Dynamic Yield Display -->
-                <p class="yield-info" id="yield-info-display">Calculating yield...</p>
-                <!-- Unit Toggles TEMPLATE (Hidden) -->
+                 {/* Yield Info - Updated dynamically */}
+                <p class="yield-info" id="yield-info-display">Whips up about 18-24 cookies 🍪</p>
+                 {/* Unit Toggle Template (Hidden) */}
                 <div id="unit-toggles-template" style="display: none;">
                      <div class="unit-selector" data-lang="en">
                           <span class="unit-label" data-lang-key="unitLabelEn">Units:</span>
-                          <button class="unit-btn" data-unit-type="imperial">Imperial (Cups)</button>
-                          <button class="unit-btn" data-unit-type="metric">Metric (Grams)</button>
+                          <button class="unit-btn" data-unit-type="imperial">Imperial</button>
+                          <button class="unit-btn" data-unit-type="metric">Metric</button>
                      </div>
                       <div class="unit-selector" data-lang="ar">
                           <span class="unit-label" data-lang-key="unitLabelAr">الوحدات:</span>
@@ -40,100 +40,114 @@
         </header>
 
         <main class="content-area">
-            <!-- Main Title (Non-Sticky) -->
-            <div class="main-title-area fade-in-on-scroll">
-                 <h1 id="main-title-h1" data-lang-key="mainTitle"><span class="emoji">🍪</span> Omar's Insanely Good Cookie Guide! <span class="emoji">🍪</span></h1>
-            </div>
 
-            <!-- Hero Image Area -->
-            <section id="cookie-image-header" class="hero-image-section fade-in-on-scroll">
-                 <img id="selected-cookie-image" src="3-cookie-types.jpg" alt="Comparison of classic, thick, and thin cookies">
-            </section>
-
-             <!-- Recipe Scaler Section -->
-             <section class="recipe-scaler fade-in-on-scroll">
-                 <h3 data-lang-key="scalerTitle">🧈 Customize Your Batch Size!</h3>
-                 <p data-lang-key="scalerDesc">Enter your starting butter amount (grams) to scale the metric recipe.</p>
-                 <div class="scaler-input-group">
-                     <label for="butter-amount-input" data-lang-key="scalerLabel">Starting Butter (g):</label>
-                     <input type="number" id="butter-amount-input" name="butter-amount" min="50" step="1" placeholder="226" value="226">
-                     <button id="update-scale-btn" data-lang-key="scalerButton">Update Scale</button>
-                 </div>
-                 <span class="scaler-note" data-lang-key="scalerNote">Note: Only metric (gram) values are scaled. Imperial (cup) units are approximate.</span>
-             </section>
-
-            <!-- Cookie Selection Buttons -->
-            <section class="cookie-type-selector fade-in-on-scroll">
-                <h2 data-lang-key="chooseStyle">Pick Your Cookie Destiny:</h2>
-                 <div class="button-group-container">
-                     <div class="button-group">
-                         <button class="selector-btn" data-type="classic">
-                             <span class="emoji">⚖️</span> <span data-lang-key="typeClassic">Classic Balanced</span>
-                         </button>
-                         <button class="selector-btn" data-type="thick">
-                             {/*<!-- Omar's Fave indicator handled purely by CSS on .active -->*/}
-                             <span class="emoji">🧱</span> <span data-lang-key="typeThick">Thick & Gooey</span>
-                         </button>
-                         <button class="selector-btn" data-type="thin">
-                             <span class="emoji">🧇</span> <span data-lang-key="typeThin">Thin & Crispy</span>
-                         </button>
-                      </div>
+            {/* === HERO SECTION === */}
+            <section class="hero-section fade-in-on-scroll">
+                {/* Image starts large, shrinks via JS class */}
+                <img id="hero-cookie-image" src="3-cookie-types.jpg" alt="Comparison of cookie types">
+                <div class="hero-text">
+                    <h1 id="main-title-h1" data-lang-key="mainTitle"><span class="emoji">🍪</span> Omar's Insanely Good Cookie Guide! <span class="emoji">🍪</span></h1>
+                    <p class="hero-subtitle" data-lang-key="heroSubtitle">Discover your perfect chocolate chip cookie!</p>
                  </div>
             </section>
 
-            <!-- DYNAMIC CONTENT SECTIONS -->
+            {/* === SCALER SECTION === */}
+            <section id="recipe-scaler-section" class="recipe-scaler fade-in-on-scroll">
+                <h3 data-lang-key="scalerTitle">🧈 Customize Your Batch Size!</h3>
+                <p data-lang-key="scalerDesc">Enter your starting butter amount (grams) to scale the metric recipe.</p>
+                <div class="scaler-input-group">
+                    <label for="butter-amount-input" data-lang-key="scalerLabel">Starting Butter (g):</label>
+                    <input type="number" id="butter-amount-input" value="226" min="50" step="1">
+                    <button id="update-scale-btn" data-lang-key="scalerButton">Update Scale</button>
+                </div>
+                <span class="scaler-note" data-lang-key="scalerNote">Note: Only metric (gram) values are scaled. Imperial (cup) units are approximate.</span>
+            </section>
+
+            {/* === SELECTION HUB === */}
+            <section class="cookie-selector-hub fade-in-on-scroll">
+                 <h2 class="hub-title" data-lang-key="chooseStyle">Pick Your Cookie Destiny:</h2>
+                 {/* CLASSIC CARD */}
+                <div class="cookie-card" data-type="classic" tabindex="0" role="button" aria-pressed="false">
+                    <img src="classic.webp" alt="Classic balanced cookie thumbnail">
+                    <h3 data-lang-key="typeClassic">Classic Balanced</h3>
+                     <p class="card-description" data-lang-key="typeClassicDesc">The reliable, chewy crowd-pleaser.</p>
+                    <span class="card-cta"><span class="emoji">⚖️</span> Explore Recipe</span>
+                </div>
+                 {/* THICK CARD */}
+                <div class="cookie-card" data-type="thick" tabindex="0" role="button" aria-pressed="false">
+                    {/* Omar's Fav Badge - Positioned absolutely */}
+                    <span class="omars-fav-badge visually-hidden" data-lang-key="omarsFavText">Omar's Fave! 😉</span>
+                    <img src="thick_and_gooey.webp" alt="Thick and gooey cookie thumbnail">
+                     <h3 data-lang-key="typeThick">Thick & Gooey</h3>
+                     <p class="card-description" data-lang-key="typeThickDesc">Big, soft, ultra decadent centre.</p>
+                    <span class="card-cta"><span class="emoji">🧱</span> Explore Recipe</span>
+                </div>
+                 {/* THIN CARD */}
+                <div class="cookie-card" data-type="thin" tabindex="0" role="button" aria-pressed="false">
+                    <img src="thin-and-crispy.webp" alt="Thin and crispy cookie thumbnail">
+                     <h3 data-lang-key="typeThin">Thin & Crispy</h3>
+                     <p class="card-description" data-lang-key="typeThinDesc">Maximum snap, buttery delight.</p>
+                    <span class="card-cta"><span class="emoji">🧇</span> Explore Recipe</span>
+                </div>
+            </section>
+
+            {/* === DYNAMIC CONTENT AREA === */}
             <div class="dynamic-content-wrapper">
-                <!-- Placeholder - Initially visible -->
-                 <div class="content-placeholder visible" data-lang-key="placeholderSelect">
+                {/* Placeholder is initially active, sections are visually hidden */}
+                <div class="content-placeholder visible" data-lang-key="placeholderSelect">
                      👆 Select a cookie style above to load the recipe and details! ✨
-                 </div>
+                </div>
 
-                <!-- Key Differences Area -->
+                {/* Key Differences */}
                 <section id="key-differences" class="details-section key-differences-container visually-hidden">
                     <h3 data-lang-key="keyDifferencesTitleBase">🔑 Key Differences for <span class="dynamic-cookie-name">Cookie</span></h3>
                     <div class="diff-points">
-                         {/*<!-- Difference Points injected by JS -->*/}
+                        {/* Populated by JS */}
+                        <div class="diff-point butter-diff"><h4><span class="emoji">🧈</span> <span data-lang-key="butterTitle">Brown Butter State & Mixing</span></h4><p></p></div>
+                        <div class="diff-point chilling-diff"><h4><span class="emoji">🥶</span> <span data-lang-key="chillingTitle">Chilling Method</span></h4><p></p></div>
+                        <div class="diff-point other-diff"><h4><span class="emoji">📝</span> <span data-lang-key="otherNotesTitle">Other Key Notes</span></h4><p></p></div>
                     </div>
                 </section>
 
-                <!-- Recipe Details Area -->
+                 {/* Recipe Details */}
                 <section id="recipe-details" class="details-section recipe-container visually-hidden">
-                     {/*<!-- Content injected by JS: Toggles, Title, Ingredients, Steps, Notes -->*/}
+                     {/* Unit Toggles and Recipe Content populated by JS */}
                 </section>
 
-                <!-- Easter Egg Area -->
+                {/* Easter Egg */}
                 <section id="easter-egg-container" class="details-section easter-egg visually-hidden">
-                    <h3 data-lang-key="easterEggTitle">🏆 You Legend! Picked GOOEY! 🏆</h3>
-                    <div class="easter-egg-content">
-                        <p data-lang-key="easterEggIntro">Okay, you've got taste! Ready for the Level 2 Boss?</p>
-                        <strong data-lang-key="easterEggIdea">🔥 STUFFED COOKIES! 🔥</strong>
-                        <p data-lang-key="easterEggDesc">Dead easy: Make a dent in your THICK cookie dough ball, plop in ~1 tsp Nutella/Lotus/Pistachio cream, seal it up like a secret treasure, then bake as usual!</p>
-                        <img id="stuffed-cookie-image" src="" alt="Delicious stuffed cookie example">
-                         <p data-lang-key="easterEggPistachioTip">Seriously, TRUST the pistachio! It's a game-changer.</p>
-                         <ul><li><span data-lang-key="pistachioReco">Best Spread IMHO:</span> <a href="https://www.amazon.eg/-/en/Pistachio-spread-Irresistible-Luxurious-Goodness/dp/B0D9C3BDV2/" target="_blank" rel="noopener noreferrer">ASMACUP Pistachio Cream</a> <span data-lang-key="pistachioLinkSource">(Amazon EG link)</span></li></ul>
+                     {/* Content populated by JS */}
+                     <h3 data-lang-key="easterEggTitle"></h3>
+                     <div class="easter-egg-content">
+                         <p data-lang-key="easterEggIntro"></p>
+                         <strong data-lang-key="easterEggIdea"></strong>
+                         <p data-lang-key="easterEggDesc"></p>
+                         <img id="stuffed-cookie-image" src="" alt="">
+                         <p data-lang-key="easterEggPistachioTip"></p>
+                         <ul><li><span data-lang-key="pistachioReco"></span> <a href="https://www.amazon.eg/-/en/Pistachio-spread-Irresistible-Luxurious-Goodness/dp/B0D9C3BDV2/" target="_blank">ASMACUP Pistachio Cream</a> <span data-lang-key="pistachioLinkSource"></span></li></ul>
                     </div>
-                </section>
-            </div> {/* End Dynamic Content Wrapper */}
+                 </section>
+            </div>
 
-            <!-- Tips Section -->
+            {/* === TIPS SECTION === */}
             <section class="lower-sections tip-section fade-in-on-scroll">
-                <div class="tip-box">
-                    <h3 data-lang-key="tipsTitle"><span class="emoji">💡</span> Omar's Pro Tips! <span class="emoji">🔬</span></h3>
-                    <ul id="tips-list">
-                        {/*<!-- Tips populated by JS -->*/}
-                    </ul>
-                </div>
+                  <div class="tip-box">
+                      <h3 data-lang-key="tipsTitle"><span class="emoji">💡</span> Omar's Pro Tips! <span class="emoji">🔬</span></h3>
+                      <ul id="tips-list">
+                          {/* Tips populated by JS */}
+                      </ul>
+                  </div>
              </section>
 
-            <!-- Final Shoutout -->
+            {/* === FINAL SHOUTOUT === */}
              <footer class="final-shoutout fade-in-on-scroll">
-                 <p data-lang-key="finalTag">Nailed it? Wanna show off? Tag me! <a href="https://www.instagram.com/omarisavibe/" target="_blank" rel="noopener noreferrer">@omarisavibe</a> 😄</p>
+                 <p data-lang-key="finalTag">Nailed it? Show off! Tag me! <a href="https://www.instagram.com/omarisavibe/" target="_blank">@omarisavibe</a> 😄</p>
              </footer>
 
-        </main> <!-- End content-area -->
-    </div> <!-- End master-container -->
+        </main> {/* End content-area */}
+    </div> {/* End master-container */}
 
-    <!-- Final Merged JavaScript -->
+    {/* Link the FINAL JavaScript */}
     <script src="script.js"></script>
 
 </body>
