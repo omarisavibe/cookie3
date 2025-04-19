@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍪 Omar's Insanely Good Cookie Guide! 🍪</title> <!-- Title set initially, JS can override if needed -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Caveat:wght@500&display=swap" rel="stylesheet">
+
+    <!-- Link to your external CSS file -->
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body dir="ltr"> <!-- Direction & loaded class managed by JS -->
+
+    <div class="container">
+        <header class="main-header">
+            <h1 data-lang-key="mainTitle"><span class="emoji">🍪</span> Omar's Insanely Good Cookie Guide! <span class="emoji">🍪</span></h1>
+            <div class="controls-master">
+                <div class="language-selector">
+                    <button class="lang-btn active" data-lang="en">🌍 English</button>
+                    <button class="lang-btn" data-lang="ar">🌍 العربية (مصر)</button>
+                </div>
+                <p class="yield-info" data-lang-key="yieldInfo">Whips up about 18-24 cookies 🍪</p>
+             </div>
+        </header>
+
+         <!-- Header Cookie Image -->
+         <div id="cookie-image-header"> <!-- Initially hidden via CSS, class toggled by JS -->
+             <img id="selected-cookie-image" src="" alt="Selected cookie appearance">
+         </div>
+
+        <div class="cookie-type-selector">
+            <h2 data-lang-key="chooseStyle">Alright, Cookie Boss! Pick Your Poison (aka Style!):</h2>
+             <div class="button-group-container">
+                <div class="button-group">
+                    <button class="selector-btn" data-type="classic">
+                        <span class="emoji">⚖️</span> <span data-lang-key="typeClassic">Classic: The Crowd-Pleaser</span>
+                    </button>
+                    <button class="selector-btn" data-type="thick">
+                        <span class="emoji">🧱</span> <span data-lang-key="typeThick">Thick & Gooey: The Big Softie</span>
+                    </button>
+                    <button class="selector-btn" data-type="thin">
+                        <span class="emoji">🧇</span> <span data-lang-key="typeThin">Thin & Crispy: The Snapper</span>
+                    </button>
+                 </div>
+                  <!-- Speech Bubble - initially hidden -->
+                  <div id="omar-fav-bubble" class="speech-bubble" data-lang-key="omarsFav">Omar's Favorite! 😉</div>
+             </div>
+        </div>
+
+        <!-- Key Differences Area - initially hidden -->
+        <div id="key-differences" class="key-differences-container">
+             <h3 data-lang-key="keyDifferencesTitle">🔑 Key Differences Breakdown!</h3>
+             <div class="diff-points">
+                 <div class="diff-point butter-diff">
+                     <h4><span class="emoji">🧈</span> <span data-lang-key="butterTitle">Butter & Mixing Mojo</span></h4>
+                     <p id="butter-method-desc"></p>
+                 </div>
+                 <div class="diff-point chilling-diff">
+                      <h4><span class="emoji">🧊</span> <span data-lang-key="chillingTitle">To Chill or Not to Chill?</span></h4>
+                     <p id="chilling-method-desc"></p>
+                 </div>
+                  <div class="diff-point other-diff">
+                      <h4><span class="emoji">📝</span> <span data-lang-key="otherNotesTitle">Quick Cheat Sheet</span></h4>
+                      <p id="other-notes-desc"></p>
+                  </div>
+             </div>
+        </div>
+
+        <!-- Detailed Recipe Steps Area -->
+        <div id="recipe-details" class="recipe-container">
+            <div class="placeholder" data-lang-key="placeholderSelect">👈 Waiting for your command! Click a cookie style above... Let's bake something amazing! ✨</div>
+        </div>
+
+         <!-- Easter Egg for Thick & Gooey - initially hidden -->
+         <div id="easter-egg-container" class="easter-egg">
+             <h3 data-lang-key="easterEggTitle">🏆 You Legend! You Picked GOOEY! 🏆</h3>
+             <div class="easter-egg-content">
+                 <p data-lang-key="easterEggIntro">Okay, since you obviously have impeccable taste (like me!), ready to unlock a secret level?</p>
+                 <strong data-lang-key="easterEggIdea">🔥 STUFFED COOKIE TIME! 🔥</strong>
+                 <p data-lang-key="easterEggDesc">It's easy: Flatten a dough ball slightly, make a dent, stuff about <span class='highlight'>1 generous teaspoon</span> of Nutella OR... you guessed it... Pistachio Spread! Yep, because apparently everything needs pistachio now... but hey, it's actually <span class=\"critical\">SO GOOD</span> here! 😉 Seal it up, roll gently, bake as usual (maybe +1 min).</p>
+                 <!-- !! NOTE: Path updated to relative filename !! -->
+                 <img id="stuffed-cookie-image" src="stuffed_cookie.webp" alt="Outrageously gooey cookie stuffed with pistachio or chocolate spread">
+                  <p data-lang-key="easterEggPistachioTip">Trust the pistachio process. You won't regret it.</p>
+                  <ul>
+                      <li><span data-lang-key="pistachioReco">Best Spread I've Tried (Seriously):</span> <a href="https://www.amazon.eg/-/en/Pistachio-spread-Irresistible-Luxurious-Goodness/dp/B0D9C3BDV2/" target="_blank" rel="noopener noreferrer">This Amazing Pistachio Spread</a> <span data-lang-key="pistachioLinkSource">(Amazon EG)</span></li>
+                  </ul>
+             </div>
+         </div>
+
+
+        <!-- Common Tips Section -->
+        <div class="lower-sections">
+            <div class="tip-box">
+                <h3 data-lang-key="tipsTitle"><span class="emoji">💡</span> Omar's Top Secret Tips & Brainy Bits! <span class="emoji">🔬</span></h3>
+                <ul id="tips-list">
+                    <!-- Tips will be populated by JS -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Final Shoutout -->
+         <div class="final-shoutout">
+            <p data-lang-key="finalTag">Hope you nail it! Show me your results & tag me!<br><a href="https://www.instagram.com/omarisavibe/" target="_blank" rel="noopener noreferrer">@omarisavibe</a> on Insta! Yalla, bake happy! 😄</p>
+         </div>
+
+    </div> <!-- End Container -->
+
+    <!-- Link to your external JS file -->
+    <script src="script.js"></script>
+
+</body>
+</html>
