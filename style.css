@@ -86,8 +86,16 @@ body[dir="rtl"] .note { padding-inline-start: initial; padding-inline-end: 40px;
 .yield-info { font-style: italic; color: #777; font-size: 0.95em; text-align: center; flex-basis: 100%; order: 3; }
 @media (min-width: 600px) { .yield-info { flex-basis: auto; order: 0; text-align: right; margin-left: auto; } }
 
-/* Unit Toggles (Integrated Look) */
-.unit-toggle-wrapper { text-align: center; padding: 0px 0px 15px 0px; margin-bottom: 15px; border-bottom: 1px dashed var(--border-color); transition: all 0.4s ease-out; opacity: 1; }
+/* Unit Toggles (Integrated Look - Adjusted) */
+.unit-toggle-wrapper {
+    text-align: center;
+    padding: 0px 0px 10px 0px; /* Reduced padding */
+    margin-bottom: 20px; /* Space before ingredients */
+    border-bottom: none; /* Removed border */
+    transition: all 0.4s ease-out;
+    opacity: 1;
+    margin-top: 10px; /* Add some space after recipe title */
+}
 .unit-toggle-wrapper.hidden { opacity: 0; max-height: 0; padding: 0 !important; margin: 0 !important; border: none !important; overflow: hidden; }
 .unit-selector { display: inline-block; margin: 0 10px; opacity: 1; transition: opacity 0.3s ease; }
 .unit-selector[style*="display: none"] { opacity: 0; pointer-events: none; }
@@ -110,15 +118,26 @@ body[dir="rtl"] .note { padding-inline-start: initial; padding-inline-end: 40px;
 .selector-btn[data-type="thin"].active { background-color: var(--accent-thin); border-color: var(--accent-thin); }
 
 /* Omar's Fave Text Styling */
-.omars-fav-text { font-family: var(--font-handwriting); font-size: 1.15em; color: var(--fav-tag-color); font-weight: 500; background-color: var(--fav-tag-bg); padding: 5px 12px; border-radius: 15px 15px 15px 0; border: 1px dashed var(--fav-tag-color); position: absolute; top: -10px; right: 5%; transform: rotate(8deg) scale(0.8); transform-origin: bottom right; z-index: 10; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; white-space: nowrap; pointer-events: none; }
+.omars-fav-text { font-family: var(--font-handwriting); font-size: 1.15em; color: var(--fav-tag-color); font-weight: 500; background-color: var(--fav-tag-bg); padding: 5px 12px; border-radius: 15px 15px 15px 0; border: 1px dashed var(--fav-tag-color); position: absolute; top: -10px; /* Adjusted from -22px based on Thick button location */ right: 5%; /* Adjust if needed for thick button centering */ transform: rotate(8deg) scale(0.8); transform-origin: bottom right; z-index: 10; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; white-space: nowrap; pointer-events: none; }
 .omars-fav-text.visible { opacity: 1; top: -22px; transform: rotate(10deg) scale(1); }
-/* Position adjustments for the tag (simplified for full-width laptop focus) */
-/* Consider adding back smaller screen adjustments if needed later */
+/* Position adjustments for the tag - Might need fine-tuning based on Thick button exact position */
 
-/* Header Image Section */
-#cookie-image-header { text-align: center; margin: 0 auto 30px auto; min-height: 150px; transition: opacity 0.5s ease-out; background: none; }
-#selected-cookie-image { max-width: 90%; width: 500px; height: auto; border-radius: 12px; box-shadow: 0 5px 15px var(--shadow-light), 0 2px 5px rgba(0,0,0,0.05) inset; display: block; margin: 0 auto; transition: opacity 0.4s ease-in-out, box-shadow 0.3s; border: 1px solid rgba(0,0,0,0.05); background: none; }
+/* Header Image Section (Adjusted Size) */
+#cookie-image-header { text-align: center; margin: 0 auto 30px auto; min-height: 150px; /* Keep min height */ transition: opacity 0.5s ease-out; background: none; }
+#selected-cookie-image {
+    max-width: 100%; /* Take full width available within padding */
+    /* width: 500px; --- REMOVED fixed width --- */
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px var(--shadow-light), 0 2px 5px rgba(0,0,0,0.05) inset;
+    display: block;
+    margin: 0 auto;
+    transition: opacity 0.4s ease-in-out, box-shadow 0.3s;
+    border: 1px solid rgba(0,0,0,0.05);
+    background: none;
+}
 #selected-cookie-image[src=""] { opacity: 0; }
+
 
 /* Key Differences Section */
 .key-differences-container { background-color: var(--key-diff-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 25px; margin-bottom: 30px; max-height: 0; opacity: 0; overflow: hidden; transition: all 0.6s ease-out; border-style: dashed; border-color: transparent; }
@@ -141,12 +160,16 @@ body[dir="rtl"] .note { padding-inline-start: initial; padding-inline-end: 40px;
 /* Inner content area for recipe text */
 .recipe-content-area { padding: 30px; opacity: 1; transition: opacity 0.4s ease-in-out 0.1s; }
 .recipe-content-area.hidden { opacity: 0; }
-.recipe-content-area > h3 { margin-top: 0px; margin-bottom: 25px; text-align: center; font-size: 1.6em; }
+.recipe-content-area > h3 { /* Title styling */
+    margin-top: 0px;
+    margin-bottom: 15px; /* Reduced margin before unit toggles */
+    text-align: center;
+    font-size: 1.6em;
+}
 .placeholder { text-align: center; color: #888; font-size: 1.2em; padding: 70px 15px; font-style: italic; transition: opacity 0.4s ease; }
 h4.list-header { border-bottom: 2px dotted var(--border-color); padding-bottom: 8px; margin-top: 30px; margin-bottom: 20px; font-size: 1.3em; color: var(--secondary-color); }
-.how-to-toast { background-color: rgba(253, 245, 230, 0.8); padding: 15px; border-radius: 8px; margin: 25px 0; border-left: 4px solid var(--secondary-color); box-shadow: 0 2px 5px var(--shadow-light); }
-.how-to-toast h4 { margin-bottom: 8px; color: var(--primary-color); font-size: 1.1em; }
-.how-to-toast p { font-size: 0.95em; }
+/* --- Removed .how-to-toast rules as it's no longer generated dynamically --- */
+
 
 /* Lists (Ingredients & Steps) */
 .ingredient-list, .steps-list { list-style: none; padding: 0; margin: 25px 0; }
@@ -167,7 +190,6 @@ h4.list-header { border-bottom: 2px dotted var(--border-color); padding-bottom: 
 /* Easter Egg Section */
 .easter-egg { background: var(--easter-egg-bg); border: 3px dashed #fbc02d; border-radius: 10px; padding: 25px; margin-top: 30px; text-align: center; box-shadow: 0 6px 25px rgba(251, 192, 45, 0.3); max-height: 0; opacity: 0; overflow: hidden; transition: all 0.7s ease-out; }
 .easter-egg.visible { max-height: 1000px; opacity: 1; padding: 25px; margin-top: 30px; }
-/* ... other easter egg styles ... */
 .easter-egg h3 { color: #c04f16; margin-bottom: 18px; font-size: 1.6em; font-family: var(--font-handwriting); font-weight: 500; }
 .easter-egg-content { display: flex; flex-direction: column; align-items: center; gap: 18px; }
 .easter-egg-content p, .easter-egg-content strong { font-size: 1.1em; color: #6d4c41; line-height: 1.7; }
@@ -202,16 +224,24 @@ h4.list-header { border-bottom: 2px dotted var(--border-color); padding-bottom: 
 .omars-fav-text.visually-hidden { opacity: 0 !important; transform: rotate(8deg) scale(0.8) !important; pointer-events: none; /* Keep position absolute from its own styles */ }
 
 
-/* Media Queries (Simplified for Laptop Focus) */
-/* Keep font size adjustments */
-@media (max-width: 768px) { h1 { font-size: 2.2em; } h2 { font-size: 1.6em; } .container { padding: 25px 4vw; } }
-@media (max-width: 480px) { h1 { font-size: 1.9em; } h2 { font-size: 1.4em; } #tips-list { column-count: 1; } .container { padding: 20px 3vw; } }
-
-/* Remove or comment out rules that force stacking if not desired for laptop full width */
-/* Example:
-@media (max-width: 900px) { #tips-list { column-count: 1; } }
-@media (max-width: 768px) { .diff-points { grid-template-columns: 1fr; } }
-@media (max-width: 480px) { .button-group { flex-direction: column; } }
-*/
+/* Media Queries */
+@media (max-width: 900px) {
+    #tips-list { column-count: 1; } /* Stack tips earlier */
+}
+@media (max-width: 768px) {
+    h1 { font-size: 2.2em; }
+    h2 { font-size: 1.6em; }
+    .container { padding: 25px 4vw; }
+    .diff-points { grid-template-columns: 1fr; } /* Stack diff points */
+}
+@media (max-width: 480px) {
+    h1 { font-size: 1.9em; }
+    h2 { font-size: 1.4em; }
+    .container { padding: 20px 3vw; }
+    .button-group { flex-direction: column; align-items: center;} /* Stack cookie buttons */
+    .omars-fav-text { /* Adjust tag pos maybe */
+        right: 15%;
+    }
+}
 
 /* ==== CSS STYLES END HERE ==== */
