@@ -8,16 +8,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- DOM ELEMENTS ---
     const body = document.body;
-    // const mainTitleH1 = document.getElementById('main-title-h1'); // Not directly manipulated
     const omarsFavText = document.querySelector('.omars-fav-text');
     const langButtons = document.querySelectorAll('.lang-btn');
     const cookieTypeButtons = document.querySelectorAll('.selector-btn');
     const selectedCookieImage = document.getElementById('selected-cookie-image');
     const keyDifferencesContainer = document.getElementById('key-differences');
-    const keyDiffTitleElement = keyDifferencesContainer.querySelector('h3[data-lang-key="keyDifferencesTitleBase"] .dynamic-cookie-name'); // Target span for name
     const keyDifferencesPoints = keyDifferencesContainer.querySelector('.diff-points');
+    const keyDiffTitleH3 = keyDifferencesContainer.querySelector('h3'); // Target h3 for title update
     const recipeDetailsContainer = document.getElementById('recipe-details');
-    const unitTogglesTemplate = document.getElementById('unit-toggles-template');
+    const unitTogglesTemplate = document.getElementById('unit-toggles-template'); // Keep reference to template
     const easterEggContainer = document.getElementById('easter-egg-container');
     const stuffedCookieImage = document.getElementById('stuffed-cookie-image');
     const tipsList = document.getElementById('tips-list');
@@ -27,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentUnit = DEFAULT_UNIT;
     let selectedCookieType = null;
 
-    // --- DATA (Brown Butter & Milk Powder Integrated from Draft) ---
+    // --- DATA ---
     const langData = {
         // --- English ---
         en: {
@@ -37,153 +36,171 @@ document.addEventListener('DOMContentLoaded', () => {
             yieldInfo: "Whips up about 18-24 cookies 🍪",
             chooseStyle: "Alright, Cookie Boss! Pick Your Poison (aka Style!):",
             typeClassic: "Classic Balanced", typeThick: "Thick & Gooey", typeThin: "Thin & Crispy",
-            keyDifferencesTitleBase: "🔑 Key Differences for", // Base title, name added dynamically
-            butterTitle: "Brown Butter State & Mixing", // Updated title
+            keyDifferencesTitleBase: "🔑 Key Differences for",
+            butterTitle: "Brown Butter State & Mixing",
             chillingTitle: "Chilling Method", otherNotesTitle: "Other Key Notes",
             placeholderSelect: "👈 Click a cookie style above to witness the magic! ✨",
             ingredientsTitle: "🥣 Ingredients (The Good Stuff)", stepsTitle: "📝 Steps (Let's Bake!)",
             scienceNoteTitle: "🔬 The Science Bit! (Nerd Out!)",
-            toastNutsTitle: "Optional Power-Up: Toast Nuts?", toastNutsDesc: "Toasting nuts (pecans/walnuts are great!) at 350°F/175°C for 5-8 mins unlocks deeper, nuttier flavor dimensions. Totally worth the tiny extra step!",
+            // Removed toastNutsTitle and toastNutsDesc keys
             easterEggTitle: "🏆 You Legend! Picked GOOEY! 🏆", easterEggIntro: "Okay, you've got taste! Ready for the Level 2 Boss?", easterEggIdea: "🔥 STUFFED COOKIES! 🔥",
             easterEggDesc: "Dead easy: Make a dent in your THICK cookie dough ball, plop in ~1 tsp Nutella/Lotus/Pistachio cream, seal it up like a secret treasure, then bake as usual!",
             easterEggPistachioTip: "Seriously, TRUST the pistachio! It's a game-changer.", pistachioReco: "Best Spread IMHO:", pistachioLinkSource: "(Amazon EG link)",
-            tipsTitle: "💡 Omar's Pro Tips! (Unlock God Tier Cookies)",
+            tipsTitle: "💡 Omar's Pro Tips! (Level Up Your Cookie Game)",
             finalTag: "Nailed it? Wanna show off? Tag me! @omarisavibe 😄",
-            // Key Differences Content - Reflecting Brown Butter for All
+            // Key Differences Content
             diffs: {
                  classic: {
+                    name: "Classic Balanced",
                     butterMethod: "Use <span class='highlight'>COOLED but LIQUID</span> Brown Butter. Whisk with sugars (no heavy creaming needed).",
                     chillingMethod: "<span class='highlight'>RECOMMENDED Chill:</span> 30 mins - 24 hrs. Improves flavor and texture.",
-                    otherNotes: "Standard flour amount (~300g). Includes baking powder for a slight lift."
+                    otherNotes: "Standard flour amount (~300g). Includes baking powder for lift. Optional toasted nuts add amazing texture!"
                 },
                 thick: {
+                    name: "Thick & Gooey",
                     butterMethod: "Use <span class='critical'>CHILLED SOLID</span> Brown Butter. <span class='critical'>Cream</span> this with sugars until very light and fluffy (3-5 mins).",
                     chillingMethod: "<span class='critical'>MANDATORY Long Chill:</span> 24 - 72 hrs. The SECRET to thickness & deep flavor!",
-                    otherNotes: "Use <span class='highlight'>MORE flour</span> (~310-330g). Baking powder + optional cornstarch for softness."
+                    otherNotes: "Use <span class='highlight'>MORE flour</span> (~310-330g). Baking powder + optional cornstarch for softness. Toasted nuts highly recommended!"
                 },
                 thin: {
+                    name: "Thin & Crispy",
                     butterMethod: "Use <span class='critical'>WARM LIQUID</span> Brown Butter. Whisk with sugars.",
                     chillingMethod: "<span class='critical'>SKIP Chilling!</span> Bake immediately for maximum spread.",
                     otherNotes: "Use <span class='highlight'>LESS flour</span> (~280-300g). <span class='critical'>OMIT baking powder.</span> More white sugar aids crispness."
                 }
             },
-            // Recipes - Using Brown Butter & Milk Powder based on Draft
+            // Recipes (ALL use Brown Butter now, Milk Powder updated, Nuts added to Classic/Thick)
             recipes: {
-                classic: { // Based on Draft 'classic'
-                    name: "Classic Balanced", theme: "classic-theme",
+                classic: {
+                    title: "Classic Balanced Cookies", theme: "classic-theme",
                     ingredients: [
                         { key: 'butter', emoji: '🧈', imperial: '1 cup (2 sticks) brown butter', metric: '226g brown butter, <span class="critical note">COOLED but LIQUID</span>' },
                         { key: 'sugar', emoji: '🍬', imperial: '1 1/4 cups brown sugar, packed', metric: '250g brown sugar, packed' },
                         { key: 'sugar_gran', emoji: '🍚', imperial: '1/2 cup granulated sugar', metric: '100g granulated sugar' },
                         { key: 'flour', emoji: '🌾', imperial: '2 1/2 cups all-purpose flour', metric: '300g all-purpose flour' },
-                        { key: 'milkpowder', emoji: '🥛', imperial: '3-4 Tbsp toasted milk powder', metric: '30-40g toasted milk powder (Optional, adds chew!)' }, // Added
+                        { key: 'milkpowder', emoji: '🥛', imperial: '~1.5-2 Tbsp toasted milk powder', metric: '15-20g toasted milk powder (Optional)' }, // UPDATED Amount
                         { key: 'leavening_soda', emoji: '🥄', imperial: '1 tsp baking soda', metric: '5g baking soda' },
-                        { key: 'leavening_powder', emoji: '✨', imperial: '1/2 tsp baking powder', metric: '2g baking powder' }, // Added Powder
+                        { key: 'leavening_powder', emoji: '✨', imperial: '1/2 tsp baking powder', metric: '2g baking powder' },
                         { key: 'salt', emoji: '🧂', imperial: '1 tsp Kosher salt', metric: '6g Kosher salt (or 3g table salt)' },
                         { key: 'eggs', emoji: '🥚', imperial: '2 large eggs', metric: '2 large eggs (~100g), room temp' },
                         { key: 'vanilla', emoji: '🏺', imperial: '2 tsp vanilla extract', metric: '10ml vanilla extract' },
-                        { key: 'choco', emoji: '🍫', imperial: '1.5 - 2 cups chocolate chips/chunks', metric: '255-340g chocolate chips/chunks <span class="note">(Good MILK chocolate recommended!)</span>' },
+                        { key: 'choco', emoji: '🍫', imperial: '1.5 - 2 cups chocolate', metric: '255-340g chocolate <span class="note">(Omar recommends Dropsy MILK chocolate!)</span>' },
+                        { key: 'nuts', emoji: '🥜', imperial: '1/2 - 1 cup toasted nuts', metric: '50-100g toasted nuts (Optional - Pecans/Walnuts recommended!)' } // ADDED Nuts
                     ],
-                    steps: [ // Based on Draft 'classic' steps
-                        'Universal Prep: Brown the butter & let cool until <span class="critical">liquid but not hot</span>. Toast milk powder (if using). Whisk dry ingredients (flour, milk powder, sodas, salt).', // Merged Prep
-                        'In a large bowl, whisk <span class="highlight">liquid brown butter</span> with both sugars until combined.',
-                        'Beat in eggs one at a time, then vanilla.',
-                        'Gradually mix in dry ingredients until JUST combined. <span class="critical">Do NOT overmix!</span>',
-                        'Stir in chocolate chips/chunks.',
-                        '<span class="highlight">CHILL DOUGH (Recommended):</span> Cover & chill for <span class="highlight">at least 30 mins</span>, up to 24 hours for best results.',
-                        'Preheat oven to <span class="highlight">375°F (190°C)</span>. Line baking sheets.',
-                        'Scoop <span class="highlight">~2 Tbsp</span> balls. Optional: flaky salt on top.',
-                        'Bake <span class="highlight">10-12 minutes</span> until edges are set and golden.',
-                        'Cool on pan 5-10 mins, then transfer to wire rack. Enjoy! 🎉'
+                    steps: [
+                        'Prep: Brown the butter & let cool (liquid). Toast milk powder (if using). Whisk dry (flour, milk powder, leavening, salt). If using nuts, toast them (350°F/175°C, 5-8 min).', // Added nut toast reminder
+                        'Whisk <span class="highlight">liquid brown butter</span> & sugars.',
+                        'Beat in eggs (one by one), then vanilla.',
+                        'Gradually mix dry ingredients until JUST combined. <span class="critical">No overmixing!</span>',
+                        'Stir in chocolate chips/chunks <span class="highlight">and toasted nuts (if using).</span>', // Added nuts here
+                        '<span class="highlight">Chill Dough (Recommended):</span> Cover & chill <span class="highlight">30 mins+</span> (up to 24 hrs).',
+                        'Preheat oven <span class="highlight">375°F (190°C)</span>. Line sheets.',
+                        'Scoop <span class="highlight">~2 Tbsp</span> balls. Add flaky salt (optional).',
+                        'Bake <span class="highlight">10-12 min</span> (golden edges).',
+                        'Cool on pan 5-10 min, then rack. Enjoy! 🎉'
                     ],
-                     scienceNote: "Cooled liquid brown butter adds nutty flavor without the airiness of creaming. Chilling recommended for texture. Baking powder gives a little extra lift."
+                     scienceNote: "Cooled liquid brown butter = flavor without creaming air. Chill helps texture. Baking powder lifts slightly. Milk powder & nuts add depth/chew."
                 },
-                thick: { // Based on Draft 'thick'
-                    name: "Thick & Gooey", theme: "thick-theme",
+                thick: {
+                    title: "Thick & Gooey Cookies", theme: "thick-theme",
                     ingredients: [
                         { key: 'butter', emoji: '🧈', imperial: '1 cup (2 sticks) brown butter', metric: '226g brown butter, <span class="critical note">CHILLED SOLID (scoopable)</span>' },
                         { key: 'sugar', emoji: '🍬', imperial: '1 1/2 cups brown sugar, packed', metric: '300g brown sugar, packed (More brown!)' },
                         { key: 'sugar_gran', emoji: '🍚', imperial: '1/4 cup granulated sugar', metric: '50g granulated sugar (Less white!)' },
                         { key: 'flour', emoji: '🌾', imperial: '2 1/2 - 2 3/4 cups all-purpose flour', metric: '310-330g all-purpose flour (More flour!)' },
-                        { key: 'milkpowder', emoji: '🥛', imperial: '3-4 Tbsp toasted milk powder', metric: '30-40g toasted milk powder (Optional)' }, // Added
-                        { key: 'starch', emoji: '⭐', imperial: '1-2 Tbsp cornstarch', metric: '8-16g cornstarch (Optional, for softness)' }, // Added
+                        { key: 'milkpowder', emoji: '🥛', imperial: '~1.5-2 Tbsp toasted milk powder', metric: '15-20g toasted milk powder (Optional)' }, // UPDATED Amount
+                        { key: 'starch', emoji: '⭐', imperial: '1-2 Tbsp cornstarch', metric: '8-16g cornstarch (Optional, for softness)' },
                         { key: 'leavening_soda', emoji: '🥄', imperial: '1 tsp baking soda', metric: '5g baking soda' },
                         { key: 'leavening_powder', emoji: '✨', imperial: '1/2 tsp baking powder', metric: '2g baking powder' },
                         { key: 'salt', emoji: '🧂', imperial: '1 tsp Kosher salt', metric: '6g Kosher salt' },
                         { key: 'eggs', emoji: '🥚', imperial: '2 large eggs', metric: '2 large eggs (~100g), room temp' },
                         { key: 'vanilla', emoji: '🏺', imperial: '2 tsp vanilla extract', metric: '10ml vanilla extract' },
-                        { key: 'choco', emoji: '🍫', imperial: '2+ cups chocolate chips/chunks', metric: '340g+ chocolate chips/chunks <span class="note">(Go generous! Good MILK chocolate!)</span>' },
+                        { key: 'choco', emoji: '🍫', imperial: '2+ cups chocolate', metric: '340g+ chocolate <span class="note">(Go generous! Omar recommends Dropsy MILK chocolate!)</span>' },
+                        { key: 'nuts', emoji: '🥜', imperial: '1/2 - 1 cup toasted nuts', metric: '50-100g toasted nuts (Highly Recommended - Pecans/Walnuts!)' } // ADDED Nuts
                     ],
-                     steps: [ // Based on Draft 'thick' steps
-                        'Universal Prep: Brown the butter & <span class="critical">chill until SOLID</span> but scoopable. Toast milk powder (if using). Whisk dry ingredients (flour, milk powder, cornstarch, sodas, salt).', // Merged Prep
-                        'In a stand mixer (ideal) or with hand mixer, <span class="critical">CREAM</span> the chilled solid brown butter with both sugars until very light & fluffy (3-5 mins). Don\'t skimp!',
-                        'Beat in eggs one at a time, then vanilla.',
-                        'Gradually mix in the <span class="highlight">higher amount</span> of dry ingredients until JUST combined. <span class="critical">Do NOT overmix!</span>',
-                        'Stir in a <span class="highlight">generous</span> amount of chocolate.',
-                        '<span class="critical">CHILL DOUGH (MANDATORY):</span> Cover & chill for <span class="critical">24 - 72 hours</span>. This is non-negotiable for thickness and flavor!',
-                        'Preheat oven to <span class="highlight">375°F (190°C)</span> (can start higher like 400°F/200°C for first few mins). Line sheets.',
-                        'Scoop <span class="critical">LARGE (~3-4 Tbsp)</span> balls. <span class="highlight">Keep them TALL!</span> Don\'t flatten. Optional: flaky salt.',
-                        'Bake <span class="highlight">12-15 minutes</span>. Edges must be set, centers look <span class="critical">soft/slightly underdone</span>.',
-                        'Cool on pan <span class="critical">10-15 mins minimum</span> to set, then transfer to wire rack. The GOOEY prize awaits! 😍'
+                     steps: [
+                        'Prep: Brown butter & <span class="critical">chill solid</span>. Toast milk powder (if using). Whisk dry (flour, milk powder, cornstarch, leavening, salt). If using nuts, toast them.',
+                        '<span class="critical">CREAM</span> chilled brown butter & sugars until very light/fluffy (3-5 min). Essential!',
+                        'Beat in eggs (one by one), then vanilla.',
+                        'Gradually mix in <span class="highlight">higher amount</span> of dry ingredients until JUST combined. <span class="critical">NO OVERMIXING!</span>',
+                        'Stir in <span class="highlight">generous</span> chocolate <span class="highlight">and toasted nuts (if using).</span>', // Added nuts here
+                        '<span class="critical">CHILL DOUGH (MANDATORY):</span> Cover & chill <span class="critical">24 - 72 hours</span>. The secret!',
+                        'Preheat oven <span class="highlight">375°F (190°C)</span> (maybe start higher 400°F/200°C). Line sheets.',
+                        'Scoop <span class="critical">LARGE (~3-4 Tbsp)</span> balls. Keep <span class="highlight">TALL!</span> Don\'t flatten. Add salt (optional).',
+                        'Bake <span class="highlight">12-15 min</span>. Centers look <span class="critical">soft/slightly underdone</span>.',
+                        'Cool on pan <span class="critical">10-15 min MINIMUM</span>, then rack. GOOEY prize! 😍'
                     ],
-                     scienceNote: "Creaming SOLID chilled brown butter incorporates lots of air for thickness. The long chill is KEY for hydration and preventing spread. More flour + cornstarch = ultimate chew/softness."
+                     scienceNote: "Creaming SOLID chilled brown butter = air for thickness. LONG chill = hydration & flavor. More flour/cornstarch = soft chew. Nuts add contrast."
                 },
-                 thin: { // Based on Draft 'thin'
-                     name: "Thin & Crispy", theme: "thin-theme",
+                 thin: {
+                     title: "Thin & Crispy Cookies", theme: "thin-theme",
                      ingredients: [
                         { key: 'butter', emoji: '🧈', imperial: '1 cup (2 sticks) brown butter', metric: '226g brown butter, <span class="critical note">WARM LIQUID</span>' },
                         { key: 'sugar', emoji: '🍬', imperial: '1 1/4 cups granulated sugar', metric: '250g granulated sugar (More white!)' },
-                        { key: 'sugar_gran', emoji: '🍚', imperial: '1/2 cup brown sugar, packed', metric: '100g brown sugar, packed (Less brown!)' }, // Note: Draft had this sugar ratio
+                        { key: 'sugar_gran', emoji: '🍚', imperial: '1/2 cup brown sugar, packed', metric: '100g brown sugar, packed (Less brown!)' },
                         { key: 'flour', emoji: '🌾', imperial: '2 1/4 - 2 1/2 cups all-purpose flour', metric: '280-300g all-purpose flour (Less flour!)' },
-                        { key: 'milkpowder', emoji: '🥛', imperial: '3-4 Tbsp toasted milk powder', metric: '30-40g toasted milk powder (Optional)' }, // Added
+                        { key: 'milkpowder', emoji: '🥛', imperial: '~1.5-2 Tbsp toasted milk powder', metric: '15-20g toasted milk powder (Optional)' }, // UPDATED Amount
                         { key: 'leavening_soda', emoji: '🥄', imperial: '1 tsp baking soda', metric: '5g baking soda <span class="critical note"> (NO baking powder!)</span>' },
-                        // { key: 'leavening_powder'... OMITTED for thin/crispy as per draft logic
-                        { key: 'extra_liquid', emoji: '💧', imperial: '1-2 Tbsp milk', metric: '15-30ml milk (Optional, for extra spread)' }, // Added
+                        { key: 'extra_liquid', emoji: '💧', imperial: '1-2 Tbsp milk', metric: '15-30ml milk (Optional, for extra spread)' },
                         { key: 'salt', emoji: '🧂', imperial: '1 tsp Kosher salt', metric: '6g Kosher salt' },
-                        { key: 'eggs', emoji: '🥚', imperial: '2 large eggs', metric: '2 large eggs (~100g), room temp (+ Optional extra Yolk for chew)' }, // Added yolk option note
+                        { key: 'eggs', emoji: '🥚', imperial: '2 large eggs', metric: '2 large eggs (~100g), room temp (+ Optional extra Yolk for chew)' },
                         { key: 'vanilla', emoji: '🏺', imperial: '2 tsp vanilla extract', metric: '10ml vanilla extract' },
-                        { key: 'choco', emoji: '🍫', imperial: '1.5 cups chocolate chips/chunks', metric: '255g chocolate chips/chunks <span class="note">(Minis work well! Good MILK chocolate!)</span>' },
+                        { key: 'choco', emoji: '🍫', imperial: '1.5 cups chocolate', metric: '255g chocolate <span class="note">(Minis ok! Omar recommends Dropsy MILK chocolate!)</span>' },
+                        // NO Nuts for thin/crispy typically
                      ],
-                     steps: [ // Based on Draft 'thin' steps
-                         'Universal Prep: Brown the butter & keep it <span class="critical">warm liquid</span>. Toast milk powder (if using). Whisk dry ingredients (flour, milk powder, <span class="highlight">soda ONLY</span>, salt).', // Merged Prep
-                         'In a large bowl, whisk the <span class="highlight">warm brown butter</span> with both sugars (adjusted ratio) until combined.',
+                     steps: [
+                         'Prep: Brown butter & keep <span class="critical">warm liquid</span>. Toast milk powder (if using). Whisk dry (flour, milk powder, <span class="highlight">soda ONLY</span>, salt).',
+                         'Whisk <span class="highlight">warm brown butter</span> & sugars (adjusted ratio).',
                          'Beat in eggs (and optional yolk/milk), then vanilla.',
-                         'Gradually mix in the <span class="highlight">lower amount</span> of dry ingredients until JUST combined. <span class="critical">Do NOT overmix!</span>',
+                         'Gradually mix in <span class="highlight">lower amount</span> of dry ingredients until JUST combined. <span class="critical">NO OVERMIXING!</span>',
                          'Stir in chocolate chips/chunks.',
-                         '<span class="critical">DO NOT CHILL.</span> Bake immediately for maximum spread!',
-                         'Preheat oven lower: <span class="highlight">350°F (175°C)</span>. Line baking sheets.',
-                         'Scoop <span class="highlight">smaller (~1.5-2 Tbsp)</span> balls. Place <span class="critical">FAR APART!</span> Can flatten slightly if desired.',
-                         'Bake <span class="highlight">12-15 minutes</span> until golden brown and fully set for crispness.',
-                         'Cool on pan 5 mins, then transfer to wire rack. They will crisp up significantly as they cool completely! ✨'
+                         '<span class="critical">DO NOT CHILL.</span> Bake immediately!',
+                         'Preheat oven lower: <span class="highlight">350°F (175°C)</span>. Line sheets.',
+                         'Scoop <span class="highlight">smaller (~1.5-2 Tbsp)</span> balls. Place <span class="critical">FAR APART!</span> Can flatten slightly.',
+                         'Bake <span class="highlight">12-15 minutes</span> until golden brown & fully set.',
+                         'Cool on pan 5 min, then rack. Crisps up fully when cool! ✨'
                      ],
-                     scienceNote: "Warm liquid brown butter + more white sugar + less flour + soda only + no chill = SUPER SPREAD! Lower/longer bake time ensures they dry out for that satisfying snap."
+                     scienceNote: "Warm liquid butter + more white sugar + less flour + soda only + no chill = SUPER SPREAD! Lower/longer bake dries them out for SNAP."
                  }
             },
-            tips: [ /* ... tips data ... */ { emoji: '⚖️', text: "<span class='highlight'>Measure Flour Like a Pro:</span> Spoon & level, don't scoop! OR just use a scale (grams = KING). Avoids dry cookies." }, { emoji: '🥚', text: "<span class='highlight'>Room Temp Ingredients Rule:</span> Eggs & butter mix way better when not fridge-cold. Quick fix: warm water bath for eggs!" }, { emoji: '🧈', text: "<span class='highlight'>Brown Butter State is CRITICAL:</span> Cooled Liquid, Chilled Solid, or Warm Liquid - it dictates the texture! Pay attention!" }, { emoji: '🥶', text: "<span class='critical'>Respect the Chill Time!:</span> Seriously, for thick/gooey it's non-negotiable. Builds flavour, prevents cookie puddles. DO IT." }, { emoji: '🔥', text: "<span class='highlight'>Know Thy Oven:</span> They lie! An oven thermometer is cheap. Rotate pans if needed for even baking glory." }, { emoji: '🍪', text: "<span class='highlight'>Don't Cremate Your Cookies:</span> Pull 'em out when edges are set/golden & centers look *slightly* underdone. Carryover cooking is real!" }, { emoji: '📄', text: "<span class='highlight'>Use Parchment Paper:</span> Prevents sticking, easy cleanup, promotes even browning. Your baking BFF." }, { emoji: '🥄', text: "<span class='critical'>The Enemy: Overmixing Flour:</span> Mix JUST until flour disappears. More mixing = tough, sad cookies. Be gentle!" }, { emoji: '✨', text: "<span class='highlight'>Fancy Finish: Flaky Sea Salt:</span> A tiny sprinkle *before* baking adds magic sparkle & flavor pop. Highly recommend!" }, { emoji: '🍫', text: "<span class='highlight'>Chocolate Matters:</span> Use good stuff! Mix types (chips & chopped bars) for texture variation. It's the star!" }, { emoji: '💥', text: "<span class='highlight'>Optional: Pan-Banging:</span> For rippled edges (like fancy bakeries), lift & drop the pan mid-bake. Google it!" }, { key: 'sci1', emoji: '🔥', text: 'Brown Butter Science: Maillard reaction = nutty flavor! Universal upgrade.' }, { key: 'sci2', emoji: '🥛', text: 'Toasted Milk Powder: More Maillard! Extra chew/depth. Optional but awesome.' } ]
+            tips: [ { emoji: '⚖️', text: "<span class='highlight'>Measure Flour Like a Pro:</span> Spoon & level, don't scoop! OR just use a scale (grams = KING). Avoids dry cookies." }, { emoji: '🥚', text: "<span class='highlight'>Room Temp Ingredients Rule:</span> Eggs & butter mix way better when not fridge-cold. Quick fix: warm water bath for eggs!" }, { emoji: '🧈', text: "<span class='highlight'>Brown Butter State is CRITICAL:</span> Cooled Liquid, Chilled Solid, or Warm Liquid - it dictates the texture! Pay attention!" }, { emoji: '🥶', text: "<span class='critical'>Respect the Chill Time!:</span> Seriously, for thick/gooey it's non-negotiable. Builds flavour, prevents cookie puddles. DO IT." }, { emoji: '🔥', text: "<span class='highlight'>Know Thy Oven:</span> They lie! An oven thermometer is cheap. Rotate pans if needed for even baking glory." }, { emoji: '🍪', text: "<span class='highlight'>Don't Cremate Your Cookies:</span> Pull 'em out when edges are set/golden & centers look *slightly* underdone. Carryover cooking is real!" }, { emoji: '📄', text: "<span class='highlight'>Use Parchment Paper:</span> Prevents sticking, easy cleanup, promotes even browning. Your baking BFF." }, { emoji: '🥄', text: "<span class='critical'>The Enemy: Overmixing Flour:</span> Mix JUST until flour disappears. More mixing = tough, sad cookies. Be gentle!" }, { emoji: '✨', text: "<span class='highlight'>Fancy Finish: Flaky Sea Salt:</span> A tiny sprinkle *before* baking adds magic sparkle & flavor pop. Highly recommend!" }, { emoji: '🍫', text: "<span class='highlight'>Chocolate Matters:</span> Use good stuff! Dropsy Milk is great! Mix types (chips & chopped bars) for texture variation." }, { emoji: '🥜', text: "<span class='highlight'>Toasting Nuts = Flavor Boost:</span> Don't skip toasting nuts (if using Classic/Thick) - 350°F/175°C for 5-8 mins until fragrant. HUGE difference!" }, { key: 'sci1', emoji: '🔥', text: 'Brown Butter Science: Maillard reaction = nutty flavor! Universal upgrade.' }, { key: 'sci2', emoji: '🥛', text: 'Toasted Milk Powder: More Maillard! Extra chew/depth. Small amount makes a diff.' } ]
         },
         // --- Arabic ---
-        ar: { /* ... All Arabic translations mirroring the English structure with Brown Butter & Milk Powder ... */
+        ar: {
             mainTitle: "🍪 دليل عمر للكوكيز الخرافية! 🍪", omarsFavText: "مفضلات عمر!", unitLabelEn: "Units:", unitLabelAr: "الوحدات:",
             yieldInfo: "بتعمل حوالي 18-24 قطعة كوكيز 🍪", chooseStyle: "تمام يا معلم الكوكيز! اختار مزاجك (يعني الستايل!):", typeClassic: "كلاسيك متوازن", typeThick: "سميكة و غرقانة: البيج سوفتي!", typeThin: "رفيعة ومقرمشة: اللي بتطق",
             keyDifferencesTitleBase: "🔑 الفروقات الأساسية لكوكيز", butterTitle: "حالة الزبدة البنية والخلط", chillingTitle: "طريقة التبريد", otherNotesTitle: "الخلاصة (الغش يعني)",
             placeholderSelect: "👈 دوس على ستايل فوق عشان تشوف الحركات! ✨", ingredientsTitle: "🥣 المكونات (يا تكاته يا حركاته!)", stepsTitle: "📝 الخطوات (بالتفصيل الممل)", scienceNoteTitle: "🔬 الحتة العلمية (للفهمانين!)",
-            toastNutsTitle: "تزويدة اختيارية: تحميص مكسرات؟", toastNutsDesc: "تحميص المكسرات (بيكان/جوز تحفة!) في 175°م لـ 5-8 دقايق بيفتح نكهات أعمق. تستاهل!",
+            // Removed toastNutsTitle and toastNutsDesc keys
             easterEggTitle: "🏆 يا أسطورة! اخترت الغرقانة! 🏆", easterEggIntro: "ذوقك عالي الصراحة! جاهز للمستوى الوحش؟", easterEggIdea: "🔥 كوكيز محشية يا وحش! 🔥", easterEggDesc: "سهلة موت: اعمل حفرة في كورة عجينة الكوكيز السميكة، احشر معلقة صغيرة نوتيلا/لوتس/بستاشيو، اقفلها كويس كأنها سر حربي، واخبزها عادي!",
             easterEggPistachioTip: "بجد، جرب البستاشيو ومتخافش! عالم تاني والله.", pistachioReco: "أحسن كريمة بصراحة:", pistachioLinkSource: "(لينك أمازون مصر)",
-            tipsTitle: "💡 نصائح عمر للمحترفين! (افتح مستوى الوحش)", finalTag: "ظبطتها؟ عايز تتمنظر؟ اعملي تاج! @omarisavibe 😄",
-            diffs: { classic: { butterMethod: "استخدم زبدة بنية <span class='highlight'>مبردة لكن سائلة</span>. اخفقها بالسلك مع السكر (بدون خفق كريمي).", chillingMethod: "<span class='highlight'>تبريد مُوصى به:</span> 30 دقيقة - 24 ساعة. يحسن النكهة والقوام.", otherNotes: "كمية دقيق عادية (~300 جم). تحتوي على بيكنج بودر لرفع بسيط." }, thick: { butterMethod: "استخدم زبدة بنية <span class='critical'>مبردة وصلبة</span>. <span class='critical'>اخفقها كريمي</span> مع السكر حتى تصبح هشة جدًا (3-5 دقائق).", chillingMethod: "<span class='critical'>تبريد إلزامي طويل:</span> 24 - 72 ساعة. هو <span class='critical'>السر</span> للسمك والنكهة العميقة!", otherNotes: "استخدم <span class='highlight'>دقيق أكثر</span> (~310-330 جم). بيكنج بودر + نشا اختياري للطراوة." }, thin: { butterMethod: "استخدم زبدة بنية <span class='critical'>دافئة وسائلة</span>. اخفقها بالسلك مع السكر.", chillingMethod: "<span class='critical'>تخطَ التبريد!</span> اخبز فورًا لأقصى تمدد.", otherNotes: "استخدم <span class='highlight'>دقيق أقل</span> (~280-300 جم). <span class='critical'>لا تستخدم بيكنج بودر.</span> سكر أبيض أكثر يساعد على القرمشة." } },
+            tipsTitle: "💡 نصائح عمر للمحترفين! (ارتقِ بمستوى الكوكيز)",
+            finalTag: "ظبطتها؟ عايز تتمنظر؟ اعملي تاج! @omarisavibe 😄",
+            diffs: { classic: { name: "الكلاسيك المتوازن", butterMethod: "استخدم زبدة بنية <span class='highlight'>مبردة لكن سائلة</span>. اخفقها بالسلك مع السكر (بدون خفق كريمي).", chillingMethod: "<span class='highlight'>تبريد مُوصى به:</span> 30 دقيقة - 24 ساعة. يحسن النكهة والقوام.", otherNotes: "كمية دقيق عادية (~300 جم). فيها بيكنج بودر. مكسرات محمصة اختيارية بتضيف قوام تحفة!" }, thick: { name: "السميكة والطرية", butterMethod: "استخدم زبدة بنية <span class='critical'>مبردة وصلبة</span>. <span class='critical'>اخفقها كريمي</span> مع السكر حتى هشة جدًا (3-5 دقائق).", chillingMethod: "<span class='critical'>تبريد إلزامي طويل:</span> 24 - 72 ساعة. <span class='critical'>السر</span> للسمك والنكهة!", otherNotes: "استخدم <span class='highlight'>دقيق أكثر</span> (~310-330 جم). بيكنج بودر + نشا اختياري. المكسرات المحمصة مهمة هنا!" }, thin: { name: "الرفيعة والمقرمشة", butterMethod: "استخدم زبدة بنية <span class='critical'>دافئة وسائلة</span>. اخفقها بالسلك مع السكر.", chillingMethod: "<span class='critical'>تخطَ التبريد!</span> اخبز فورًا.", otherNotes: "استخدم <span class='highlight'>دقيق أقل</span> (~280-300 جم). <span class='critical'>بدون بيكنج بودر.</span> سكر أبيض أكثر للقرمشة." } },
             recipes: {
-                 classic: { name: "الكلاسيك المتوازن", theme: "classic-theme", ingredients: [ { key: 'butter', emoji: '🧈', cups: '1 كوب (226ج) زبدة بنية', grams: '226 جرام زبدة بنية، <span class="critical note">مبردة لكن سائلة</span>' }, { key: 'sugar', emoji: '🍬', cups: '1 1/4 كوب سكر بني', grams: '250 جرام سكر بني' }, { key: 'sugar_gran', emoji: '🍚', cups: '1/2 كوب سكر أبيض', grams: '100 جرام سكر أبيض' }, { key: 'flour', emoji: '🌾', cups: '2 1/2 كوب دقيق', grams: '300 جرام دقيق لجميع الأغراض' }, { key: 'milkpowder', emoji: '🥛', cups: '3-4 م.ك حليب بودرة محمص', grams: '30-40 جرام حليب بودرة محمص (اختياري)' }, { key: 'leavening_soda', emoji: '🥄', cups: '1 م.ص بيكنج صودا', grams: '5 جرام بيكنج صودا' }, { key: 'leavening_powder', emoji: '✨', cups: '1/2 م.ص بيكنج بودر', grams: '2 جرام بيكنج بودر' }, { key: 'salt', emoji: '🧂', cups: '1 م.ص ملح خشن', grams: '6 جرام ملح خشن (أو 3ج ناعم)' }, { key: 'eggs', emoji: '🥚', cups: '2 بيضة كبيرة', grams: '2 بيضة كبيرة (~100 جرام)' }, { key: 'vanilla', emoji: '🏺', cups: '2 م.ص فانيليا', grams: '10 مل فانيليا' }, { key: 'choco', emoji: '🍫', cups: '1.5 - 2 كوب شوكولاتة', grams: '255-340 جرام شوكولاتة <span class="note">(شوكولاتة حليب كويسة!)</span>' }, ], steps: [ 'تجهيز أساسي: حمّص الزبدة وبرّدها ل<span class="critical">سائلة غير ساخنة</span>. حمّص حليب البودرة (لو بتستخدم). اخلط الجاف (دقيق، بودرة حليب، صودا، ملح).', 'اخفق <span class="highlight">الزبدة البنية السائلة</span> مع السكرين.', 'ضيف البيض واحدة واحدة، ثم الفانيليا.', 'ضيف الجاف تدريجياً واخلط <span class="critical">بالكاد</span>.', 'قلّب الشوكولاتة.', '<span class="highlight">برّد العجينة (مفضل):</span> غطيها وبرّدها <span class="highlight">30 دقيقة</span> لـ 24 ساعة.', 'سخن الفرن <span class="highlight">190°م</span>.', 'شكّل كرات <span class="highlight">~2 م.ك</span>. رش ملح (اختياري).', 'اخبز <span class="highlight">10-12 دقيقة</span>.', 'برّدها ع الصينية 5-10 دقائق، ثم انقلها. بالهنا! 🎉' ], scienceNote: "الزبدة البنية السائلة المبردة تضيف نكهة مكسرات بدون هشاشة الخفق. التبريد يحسن القوام. البيكنج بودر يرفع قليلاً." },
-                 thick: { name: "السميكة والطرية", theme: "thick-theme", ingredients: [ { key: 'butter', emoji: '🧈', cups: '1 كوب (226ج) زبدة بنية', grams: '226 جرام زبدة بنية، <span class="critical note">مبردة وصلبة</span>' }, { key: 'sugar', emoji: '🍬', cups: '1 1/2 كوب سكر بني', grams: '300 جرام سكر بني (بني أكتر!)' }, { key: 'sugar_gran', emoji: '🍚', cups: '1/4 كوب سكر أبيض', grams: '50 جرام سكر أبيض (أبيض أقل!)' }, { key: 'flour', emoji: '🌾', cups: '2.5-2.75 كوب دقيق', grams: '310-330 جرام دقيق (دقيق أكتر!)' }, { key: 'milkpowder', emoji: '🥛', cups: '3-4 م.ك حليب بودرة محمص', grams: '30-40 جرام حليب بودرة محمص (اختياري)' }, { key: 'starch', emoji: '⭐', cups: '1-2 م.ك نشا', grams: '8-16 جرام نشا (اختياري للطراوة)' }, { key: 'leavening_soda', emoji: '🥄', cups: '1 م.ص بيكنج صودا', grams: '5 جرام بيكنج صودا' }, { key: 'leavening_powder', emoji: '✨', cups: '1/2 م.ص بيكنج بودر', grams: '2 جرام بيكنج بودر' }, { key: 'salt', emoji: '🧂', cups: '1 م.ص ملح خشن', grams: '6 جرام ملح خشن' }, { key: 'eggs', emoji: '🥚', cups: '2 بيضة كبيرة', grams: '2 بيضة كبيرة (~100 جرام)' }, { key: 'vanilla', emoji: '🏺', cups: '2 م.ص فانيليا', grams: '10 مل فانيليا' }, { key: 'choco', emoji: '🍫', cups: '2+ كوب شوكولاتة', grams: '340+ جرام شوكولاتة <span class="note">(كتر! شوكولاتة حليب كويسة!)</span>' }, ], steps: [ 'تجهيز أساسي: حمّص الزبدة وبرّدها لـ<span class="critical">صلبة</span>. حمّص حليب البودرة. اخلط الجاف (دقيق، بودرة حليب، نشا، صودا، ملح).', '<span class="critical">اخفق كريمي</span> الزبدة البنية الصلبة مع السكرين كويس (3-5 دقايق).', 'ضيف البيض واحدة واحدة، ثم الفانيليا.', 'ضيف <span class="highlight">كمية الدقيق الأكبر</span> تدريجياً واخلط <span class="critical">بالكاد</span>.', 'قلّب <span class="highlight">كمية الشوكولاتة الكبيرة</span>.', '<span class="critical">برّد العجينة (إلزامي):</span> غطيها وبرّدها <span class="critical">24 - 72 ساعة</span>.', 'سخن الفرن <span class="highlight">190°م</span> (ممكن أعلى في الأول).', 'شكّل كور <span class="critical">كبيرة (3-4 م.ك)</span> <span class="highlight">وخليها عالية</span>. رش ملح (اختياري).', 'اخبز <span class="highlight">12-15 دقيقة</span> (القلب <span class="critical">طري</span>).', 'برّدها ع الصينية <span class="critical">10-15 دقيقة</span>، ثم انقلها. استمتع بالطراوة! 😍' ], scienceNote: "خفق الزبدة البنية الصلبة يدخل هواء للسمك. التبريد الطويل ضروري للترطيب ومنع الفرش. دقيق أكثر + نشا = مضغة ونعومة." },
-                 thin: { name: "الرفيعة والمقرمشة", theme: "thin-theme", ingredients: [ { key: 'butter', emoji: '🧈', cups: '1 كوب (226ج) زبدة بنية', grams: '226 جرام زبدة بنية، <span class="critical note">دافئة سائلة</span>' }, { key: 'sugar', emoji: '🍬', cups: '1 1/4 كوب سكر أبيض', grams: '250 جرام سكر أبيض (أبيض أكتر!)' }, { key: 'sugar_gran', emoji: '🍚', cups: '1/2 كوب سكر بني', grams: '100 جرام سكر بني (بني أقل!)' }, { key: 'flour', emoji: '🌾', cups: '2.25-2.5 كوب دقيق', grams: '280-300 جرام دقيق (دقيق أقل!)' }, { key: 'milkpowder', emoji: '🥛', cups: '3-4 م.ك حليب بودرة محمص', grams: '30-40 جرام حليب بودرة محمص (اختياري)' }, { key: 'leavening_soda', emoji: '🥄', cups: '1 م.ص بيكنج صودا', grams: '5 جرام بيكنج صودا<span class="critical note">(لا بيكنج بودر!)</span>' }, { key: 'extra_liquid', emoji: '💧', cups: '1-2 م.ك حليب', grams: '15-30 مل حليب (اختياري لفرش زيادة)' }, { key: 'salt', emoji: '🧂', cups: '1 م.ص ملح خشن', grams: '6 جرام ملح خشن' }, { key: 'eggs', emoji: '🥚', cups: '2 بيضة كبيرة', grams: '2 بيضة كبيرة (~100 جرام) (+ صفار اختياري)' }, { key: 'vanilla', emoji: '🏺', cups: '2 م.ص فانيليا', grams: '10 مل فانيليا' }, { key: 'choco', emoji: '🍫', cups: '1.5 كوب شوكولاتة', grams: '255 جرام شوكولاتة <span class="note">(ميني أحسن! شوكولاتة حليب!)</span>' }, ], steps: [ 'تجهيز أساسي: حمّص الزبدة وخليها <span class="critical">دافئة سائلة</span>. حمّص حليب البودرة. اخلط الجاف (دقيق، بودرة حليب، <span class="highlight">صودا فقط</span>، ملح).', 'اخفق <span class="highlight">الزبدة البنية الدافئة</span> مع السكرين.', 'ضيف البيض (وصفار/حليب اختياري)، ثم الفانيليا.', 'ضيف <span class="highlight">كمية الدقيق الأقل</span> تدريجياً واخلط <span class="critical">بالكاد</span>.', 'قلّب الشوكولاتة.', '<span class="critical">لا تبرّد!</span> اخبز فوراً.', 'سخن الفرن <span class="highlight">175°م</span>.', 'شكّل كور <span class="highlight">صغيرة (1.5-2 م.ك)</span> <span class="critical">بعيد عن بعض!</span> ممكن تبططها.', 'اخبز <span class="highlight">12-15 دقيقة</span> حتى تحمر وتجف.', 'برّدها ع الصينية 5 دقائق، ثم انقلها. هتقرمش وهي بتبرد! ✨' ], scienceNote: "زبدة دافئة + سكر أبيض أكتر + دقيق أقل + صودا فقط + لا تبريد = فرش أقصى! حرارة أقل ووقت أطول = قرمشة." }
+                 classic: { title: "كوكيز الكلاسيك المتوازن", theme: "classic-theme", ingredients: [ { key: 'butter', emoji: '🧈', cups: '1 كوب (226ج) زبدة بنية', grams: '226 جرام زبدة بنية، <span class="critical note">مبردة لكن سائلة</span>' }, { key: 'sugar', emoji: '🍬', cups: '1 1/4 كوب سكر بني', grams: '250 جرام سكر بني' }, { key: 'sugar_gran', emoji: '🍚', cups: '1/2 كوب سكر أبيض', grams: '100 جرام سكر أبيض' }, { key: 'flour', emoji: '🌾', cups: '2 1/2 كوب دقيق', grams: '300 جرام دقيق لجميع الأغراض' }, { key: 'milkpowder', emoji: '🥛', cups: '~1.5-2 م.ك حليب بودرة محمص', grams: '15-20 جرام حليب بودرة محمص (اختياري)' }, // UPDATED Amount AR
+                   { key: 'leavening_soda', emoji: '🥄', cups: '1 م.ص بيكنج صودا', grams: '5 جرام بيكنج صودا' }, { key: 'leavening_powder', emoji: '✨', cups: '1/2 م.ص بيكنج بودر', grams: '2 جرام بيكنج بودر' }, { key: 'salt', emoji: '🧂', cups: '1 م.ص ملح خشن', grams: '6 جرام ملح خشن (أو 3ج ناعم)' }, { key: 'eggs', emoji: '🥚', cups: '2 بيضة كبيرة', grams: '2 بيضة كبيرة (~100 جرام)' }, { key: 'vanilla', emoji: '🏺', cups: '2 م.ص فانيليا', grams: '10 مل فانيليا' }, { key: 'choco', emoji: '🍫', cups: '1.5 - 2 كوب شوكولاتة', grams: '255-340 جرام شوكولاتة <span class="note">(عمر بيوصي بدروبسي حليب!)</span>' }, { key: 'nuts', emoji: '🥜', cups: '1/2 - 1 كوب مكسرات محمصة', grams: '50-100 جرام مكسرات محمصة (اختياري - بيكان/جوز تحفة!)' } // ADDED Nuts AR
+                 ],
+                 steps: [ 'تجهيز: حمّص الزبدة وبرّدها (سائلة). حمّص حليب البودرة (لو هتستخدم). اخلط الجاف (دقيق، بودرة، مواد رافعة، ملح). لو هتستخدم مكسرات، حمّصها (175°م، 5-8 د).', 'اخفق <span class="highlight">الزبدة السائلة</span> والسكرين.', 'ضيف البيض واحدة واحدة، ثم الفانيليا.', 'ضيف الجاف واخلط <span class="critical">بالكاد</span>.', 'قلّب الشوكولاتة <span class="highlight">والمكسرات المحمصة (لو هتستخدم).</span>', '<span class="highlight">برّد العجينة (مفضل):</span> غطي وبرّد <span class="highlight">30 دقيقة+</span> (لـ 24 ساعة).', 'سخن الفرن <span class="highlight">190°م</span>. جهز صواني.', 'شكّل كرات <span class="highlight">~2 م.ك</span>. رش ملح (اختياري).', 'اخبز <span class="highlight">10-12 دقيقة</span> (الحروف دهبية).', 'برّدها ع الصينية 5-10 دقائق، ثم الشبكة. بالهنا! 🎉' ],
+                 scienceNote: "زبدة سائلة = طعم بدون خفق. التبريد يحسن القوام. بودر يرفع شوية. بودرة حليب ومكسرات للعمق/المضغة." },
+                 thick: { title: "كوكيز السميكة والطرية", theme: "thick-theme", ingredients: [ { key: 'butter', emoji: '🧈', cups: '1 كوب (226ج) زبدة بنية', grams: '226 جرام زبدة بنية، <span class="critical note">مبردة وصلبة</span>' }, { key: 'sugar', emoji: '🍬', cups: '1 1/2 كوب سكر بني', grams: '300 جرام سكر بني (بني أكتر!)' }, { key: 'sugar_gran', emoji: '🍚', cups: '1/4 كوب سكر أبيض', grams: '50 جرام سكر أبيض (أبيض أقل!)' }, { key: 'flour', emoji: '🌾', cups: '2.5-2.75 كوب دقيق', grams: '310-330 جرام دقيق (دقيق أكتر!)' }, { key: 'milkpowder', emoji: '🥛', cups: '~1.5-2 م.ك حليب بودرة محمص', grams: '15-20 جرام حليب بودرة محمص (اختياري)' }, // UPDATED Amount AR
+                    { key: 'starch', emoji: '⭐', cups: '1-2 م.ك نشا', grams: '8-16 جرام نشا (اختياري للطراوة)' }, { key: 'leavening_soda', emoji: '🥄', cups: '1 م.ص بيكنج صودا', grams: '5 جرام بيكنج صودا' }, { key: 'leavening_powder', emoji: '✨', cups: '1/2 م.ص بيكنج بودر', grams: '2 جرام بيكنج بودر' }, { key: 'salt', emoji: '🧂', cups: '1 م.ص ملح خشن', grams: '6 جرام ملح خشن' }, { key: 'eggs', emoji: '🥚', cups: '2 بيضة كبيرة', grams: '2 بيضة كبيرة (~100 جرام)' }, { key: 'vanilla', emoji: '🏺', cups: '2 م.ص فانيليا', grams: '10 مل فانيليا' }, { key: 'choco', emoji: '🍫', cups: '2+ كوب شوكولاتة', grams: '340+ جرام شوكولاتة <span class="note">(كتر! عمر بيوصي بدروبسي حليب!)</span>' }, { key: 'nuts', emoji: '🥜', cups: '1/2 - 1 كوب مكسرات محمصة', grams: '50-100 جرام مكسرات محمصة (مُوصى بها بشدة - بيكان/جوز!)' } // ADDED Nuts AR
+                  ],
+                 steps: [ 'تجهيز: حمّص الزبدة و<span class="critical">برّدها صلبة</span>. حمّص حليب البودرة. اخلط الجاف (دقيق، بودرة، نشا، مواد رافعة، ملح). حمّص المكسرات.', '<span class="critical">اخفق كريمي</span> الزبدة الصلبة والسكرين كويس (3-5 دقايق). ضروري!', 'ضيف البيض واحدة واحدة، ثم الفانيليا.', 'ضيف <span class="highlight">كمية الدقيق الأكبر</span> واخلط <span class="critical">بالكاد</span>.', 'قلّب <span class="highlight">كمية الشوكولاتة الكبيرة</span> <span class="highlight">والمكسرات المحمصة (لو بتستخدم).</span>', '<span class="critical">برّد العجينة (إلزامي):</span> غطيها وبرّدها <span class="critical">24 - 72 ساعة</span>. ده السر!', 'سخن الفرن <span class="highlight">190°م</span> (ممكن أعلى في الأول). جهز صواني.', 'شكّل كور <span class="critical">كبيرة (3-4 م.ك)</span> <span class="highlight">وخليها عالية!</span> لا تبططها. رش ملح (اختياري).', 'اخبز <span class="highlight">12-15 دقيقة</span> (القلب <span class="critical">طري</span>).', 'برّدها ع الصينية <span class="critical">10-15 دقيقة ع الأقل</span>، ثم الشبكة. واستمتع بالطراوة! 😍' ],
+                  scienceNote: "خفق الزبدة الصلبة = هواء للسمك. تبريد طويل = ترطيب ونكهة. دقيق/نشا أكتر = مضغة/نعومة. المكسرات بتدي تباين." },
+                 thin: { title: "كوكيز الرفيعة والمقرمشة", theme: "thin-theme", ingredients: [ { key: 'butter', emoji: '🧈', cups: '1 كوب (226ج) زبدة بنية', grams: '226 جرام زبدة بنية، <span class="critical note">دافئة سائلة</span>' }, { key: 'sugar', emoji: '🍬', cups: '1 1/4 كوب سكر أبيض', grams: '250 جرام سكر أبيض (أبيض أكتر!)' }, { key: 'sugar_gran', emoji: '🍚', cups: '1/2 كوب سكر بني', grams: '100 جرام سكر بني (بني أقل!)' }, { key: 'flour', emoji: '🌾', cups: '2.25-2.5 كوب دقيق', grams: '280-300 جرام دقيق (دقيق أقل!)' }, { key: 'milkpowder', emoji: '🥛', cups: '~1.5-2 م.ك حليب بودرة محمص', grams: '15-20 جرام حليب بودرة محمص (اختياري)' }, // UPDATED Amount AR
+                   { key: 'leavening_soda', emoji: '🥄', cups: '1 م.ص بيكنج صودا', grams: '5 جرام بيكنج صودا<span class="critical note">(لا بيكنج بودر!)</span>' }, { key: 'extra_liquid', emoji: '💧', cups: '1-2 م.ك حليب', grams: '15-30 مل حليب (اختياري لفرش زيادة)' }, { key: 'salt', emoji: '🧂', cups: '1 م.ص ملح خشن', grams: '6 جرام ملح خشن' }, { key: 'eggs', emoji: '🥚', cups: '2 بيضة كبيرة', grams: '2 بيضة كبيرة (~100 جرام) (+ صفار اختياري)' }, { key: 'vanilla', emoji: '🏺', cups: '2 م.ص فانيليا', grams: '10 مل فانيليا' }, { key: 'choco', emoji: '🍫', cups: '1.5 كوب شوكولاتة', grams: '255 جرام شوكولاتة <span class="note">(ميني ممكن! عمر بيوصي بدروبسي حليب!)</span>' },
+                   // NO NUTS AR
+                 ],
+                 steps: [ 'تجهيز: حمّص الزبدة وخليها <span class="critical">دافئة سائلة</span>. حمّص حليب البودرة. اخلط الجاف (دقيق، بودرة حليب، <span class="highlight">صودا فقط</span>، ملح).', 'اخفق <span class="highlight">الزبدة الدافئة</span> والسكرين.', 'ضيف البيض (وصفار/حليب اختياري)، ثم الفانيليا.', 'ضيف <span class="highlight">كمية الدقيق الأقل</span> واخلط <span class="critical">بالكاد</span>.', 'قلّب الشوكولاتة.', '<span class="critical">لا تبرّد!</span> اخبز فوراً.', 'سخن الفرن <span class="highlight">175°م</span>. جهز صواني.', 'شكّل كور <span class="highlight">صغيرة (1.5-2 م.ك)</span> <span class="critical">بعيد عن بعض!</span> ممكن تبططها.', 'اخبز <span class="highlight">12-15 دقيقة</span> حتى تحمر وتجف.', 'برّدها ع الصينية 5 دقائق، ثم الشبكة. هتقرمش لما تبرد! ✨' ],
+                  scienceNote: "زبدة دافئة + سكر أبيض أكتر + دقيق أقل + صودا فقط + لا تبريد = فرش أقصى! حرارة أقل/وقت أطول = قرمشة." }
             },
-            tips: [ /* ... Arabic tips data ... */ { emoji: '⚖️', text: "<span class='highlight'>قيس الدقيق صح:</span> بالمعلقة وسوّي، أو استخدم ميزان (الجرامات ملك!). عشان متطلعش ناشفة." }, { emoji: '🥚', text: "<span class='highlight'>مكونات بحرارة الغرفة:</span> البيض والزبدة بيتخلطوا أحسن كتير. حل سريع: حمام مية دافية للبيض." }, { emoji: '🧈', text: "<span class='highlight'>حالة الزبدة البنية مهمة موت:</span> سائلة مبردة، صلبة، أو دافئة - بتحدد القوام!" }, { emoji: '🥶', text: "<span class='critical'>احترم التبريد!:</span> للسميكة بالذات، إجباري ومفيش نقاش. بيبني طعم وبيمنع السيحان. اعمله!" }, { emoji: '🔥', text: "<span class='highlight'>اعرف فرنك كويس:</span> الأفران بتكدب! ترمومتر فرن رخيص. لف الصواني لو محتاج." }, { emoji: '🍪', text: "<span class='highlight'>متولعش في الكوكيز!:</span> طلعها والحروف مستوية والقلب لسة طري *شوية*. بتكمل سوا برة." }, { emoji: '📄', text: "<span class='highlight'>ورق الزبدة صديقك الصدوق:</span> مفيش لزق، تنضيف سهل، لون موحد." }, { emoji: '🥄', text: "<span class='critical'>عدوك: الخلط الزيادة للدقيق:</span> أول ما الدقيق يختفي وقّف. خلط زيادة = كوكيز ناشفة وحزينة." }, { emoji: '✨', text: "<span class='highlight'>الفينش الشيك: ملح خشن:</span> رشة خفيفة *قبل* الخبز بتدي شكل وطعم خطير. جرب!" }, { emoji: '🍫', text: "<span class='highlight'>الشوكولاتة مهمة:</span> هات نوع نضيف! اخلط أنواع (شيبس ومقطعة) عشان القوام. هي البطل!" }, { emoji: '💥', text: "<span class='highlight'>اختياري: خبط الصينية:</span> للحروف المموجة (زي المحلات)، ارفع واخبط الصينية في نص الخبز. اسأل جوجل!" }, { key: 'sci1', emoji: '🔥', text: 'علم الزبدة البنية: تفاعل ميلارد = نكهة مكسرات! ترقية شاملة.' }, { key: 'sci2', emoji: '🥛', text: 'حليب بودرة محمص: المزيد من ميلارد! طراوة وعمق زيادة. اختياري بس جامد.' } ]
+            tips: [ { emoji: '⚖️', text: "<span class='highlight'>قيس الدقيق صح:</span> بالمعلقة وسوّي، أو ميزان (الجرامات ملك!). عشان متطلعش ناشفة." }, { emoji: '🥚', text: "<span class='highlight'>مكونات بحرارة الغرفة:</span> البيض والزبدة بيتخلطوا أحسن. حل سريع: حمام مية دافية للبيض." }, { emoji: '🧈', text: "<span class='highlight'>حالة الزبدة البنية مهمة موت:</span> سائلة مبردة، صلبة، أو دافئة - بتحدد القوام!" }, { emoji: '🥶', text: "<span class='critical'>احترم التبريد!:</span> للسميكة بالذات، إجباري. بيبني طعم وبيمنع السيحان. اعمله!" }, { emoji: '🔥', text: "<span class='highlight'>اعرف فرنك كويس:</span> الأفران بتكدب! ترمومتر فرن رخيص. لف الصواني." }, { emoji: '🍪', text: "<span class='highlight'>متولعش فيها!:</span> طلعها والحروف مستوية والقلب طري *شوية*. بتكمل سوا برة." }, { emoji: '📄', text: "<span class='highlight'>ورق الزبدة مهم:</span> مفيش لزق، تنضيف سهل، لون موحد." }, { emoji: '🥄', text: "<span class='critical'>عدوك: خلط الدقيق الزيادة:</span> أول ما الدقيق يختفي وقّف. خلط زيادة = كوكيز ناشفة." }, { emoji: '✨', text: "<span class='highlight'>الفينش الشيك: ملح خشن:</span> رشة خفيفة *قبل* الخبز بتدي شكل وطعم خطير. جرب!" }, { emoji: '🍫', text: "<span class='highlight'>الشوكولاتة مهمة:</span> هات نوع نضيف! دروبسي حليب حلوة! اخلط أنواع." }, { emoji: '🥜', text: "<span class='highlight'>تحميص المكسرات بيفرق:</span> لو بتستخدم (كلاسيك/سميكة) حمّصها (175°م، 5-8 د) لحد ما الريحة تطلع. فرق السما والأرض!" }, { key: 'sci1', emoji: '🔥', text: 'علم الزبدة البنية: تفاعل ميلارد = نكهة مكسرات!' }, { key: 'sci2', emoji: '🥛', text: 'حليب بودرة محمص: مزيد من ميلارد! طراوة وعمق. شوية بيفرقوا.' } ]
         }
     };
 
     // --- FUNCTIONS ---
 
-    // Function to update all text elements based on language
     function updateLanguage(lang) {
         currentLang = lang;
         const texts = langData[lang];
@@ -192,104 +209,157 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelectorAll('[data-lang-key]').forEach(el => {
             const key = el.dataset.langKey;
-            // Handle base key for dynamic titles
-             if (key === 'keyDifferencesTitleBase' && texts[key]) {
-                 // Set base text, name added separately in displayKeyDifferences
-                 el.firstChild.nodeValue = texts[key] + " "; // Update text node before span
+             // Exclude dynamic name span from direct replacement
+             if (key === 'keyDifferencesTitleBase') {
+                 const dynamicSpan = el.querySelector('.dynamic-cookie-name');
+                 const baseText = texts[key] ? texts[key] + ' ' : 'Key Differences for ';
+                 el.firstChild.nodeValue = baseText; // Update the text node before the span
              } else if (texts[key]) {
-                el.innerHTML = texts[key];
-            }
+                 el.innerHTML = texts[key]; // Let JS handle nested elements like emojis in buttons
+             }
         });
 
         document.title = texts.mainTitle || "Omar's Cookie Guide";
         langButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
 
         if (selectedCookieType) {
-            displayRecipe(selectedCookieType);
             displayKeyDifferences(selectedCookieType);
+            displayRecipe(selectedCookieType); // This will re-render with new language and embedded toggles
         } else {
             showPlaceholder();
         }
         displayTips();
     }
 
-     // Function to create and return unit toggles element
-     function createUnitTogglesElement() {
-        if (!unitTogglesTemplate) return null;
+     // Creates the HTML STRING for the unit toggles, now called within displayRecipeContent
+     function createUnitTogglesHTML() {
+        if (!unitTogglesTemplate) return ''; // Return empty string if template missing
+
         const toggleWrapper = document.createElement('div');
-        toggleWrapper.className = 'unit-toggle-wrapper hidden'; // Start hidden
-        const enToggleClone = unitTogglesTemplate.querySelector('.unit-selector[data-lang="en"]');
-        const arToggleClone = unitTogglesTemplate.querySelector('.unit-selector[data-lang="ar"]');
-        if (!enToggleClone || !arToggleClone) return null;
+        toggleWrapper.className = 'unit-toggle-wrapper'; // No 'hidden' class initially
 
-        toggleWrapper.appendChild(enToggleClone.cloneNode(true));
-        toggleWrapper.appendChild(arToggleClone.cloneNode(true));
-        toggleWrapper.querySelectorAll('.unit-btn').forEach(btn => btn.addEventListener('click', handleUnitChange));
+        const enToggleClone = unitTogglesTemplate.querySelector('.unit-selector[data-lang="en"]')?.cloneNode(true);
+        const arToggleClone = unitTogglesTemplate.querySelector('.unit-selector[data-lang="ar"]')?.cloneNode(true);
 
-        // Set initial display/active state
-        updateUnitToggleVisibility(toggleWrapper); // Show correct language selector
-        updateUnitButtonActiveStates(toggleWrapper); // Set correct active button
+        if (enToggleClone) toggleWrapper.appendChild(enToggleClone);
+        if (arToggleClone) toggleWrapper.appendChild(arToggleClone);
 
-        requestAnimationFrame(() => { toggleWrapper.classList.remove('hidden'); }); // Fade in
-        return toggleWrapper;
+        // Temporarily add to DOM off-screen to update visibility/active states
+        toggleWrapper.style.position = 'absolute';
+        toggleWrapper.style.left = '-9999px';
+        document.body.appendChild(toggleWrapper);
+        updateUnitToggleVisibility(toggleWrapper);
+        updateUnitButtonActiveStates(toggleWrapper);
+        const htmlString = toggleWrapper.outerHTML;
+        document.body.removeChild(toggleWrapper); // Clean up temporary element
+
+        return htmlString;
     }
 
-    // Update visibility of language-specific toggles inside a wrapper
-    function updateUnitToggleVisibility(wrapper = recipeDetailsContainer) {
+
+    // Update visibility of language-specific toggles inside a wrapper (DOM element)
+    function updateUnitToggleVisibility(wrapper) { // Needs wrapper element arg
+        if (!wrapper) return;
         const enSelector = wrapper.querySelector('.unit-selector[data-lang="en"]');
         const arSelector = wrapper.querySelector('.unit-selector[data-lang="ar"]');
         if (enSelector) enSelector.style.display = (currentLang === 'en') ? 'inline-block' : 'none';
         if (arSelector) arSelector.style.display = (currentLang === 'ar') ? 'inline-block' : 'none';
     }
 
-    // Update active state of unit buttons inside a wrapper
-    function updateUnitButtonActiveStates(wrapper = recipeDetailsContainer) {
+     // Update active state of unit buttons inside a wrapper (DOM element)
+     function updateUnitButtonActiveStates(wrapper) { // Needs wrapper element arg
+        if (!wrapper) return;
         const unitButtons = wrapper.querySelectorAll('.unit-toggle-wrapper .unit-btn');
         if (!unitButtons.length) return;
+
         unitButtons.forEach(btn => {
              const btnUnit = btn.dataset.unitType;
-             const btnLang = btn.closest('.unit-selector').dataset.lang;
+             const btnLang = btn.closest('.unit-selector')?.dataset.lang; // Use optional chaining
+             if (!btnLang) return; // Skip if lang selector not found
+
              let isActive = false;
-             if (currentUnit === 'imperial') isActive = (btnLang === 'en' && btnUnit === 'imperial') || (btnLang === 'ar' && btnUnit === 'cups');
-             else isActive = (btnLang === 'en' && btnUnit === 'metric') || (btnLang === 'ar' && btnUnit === 'grams');
+             if (currentUnit === 'imperial') {
+                 isActive = (btnLang === 'en' && btnUnit === 'imperial') || (btnLang === 'ar' && btnUnit === 'cups');
+             } else { // currentUnit is metric
+                 isActive = (btnLang === 'en' && btnUnit === 'metric') || (btnLang === 'ar' && btnUnit === 'grams');
+             }
              btn.classList.toggle('active', isActive);
         });
     }
 
-    // Handle unit button clicks
-    function handleUnitChange(event) {
-        const button = event.target;
+    // Event delegation target for unit button clicks inside #recipe-details
+    function handleUnitChangeDelegation(event) {
+        const button = event.target.closest('.unit-btn'); // Find the clicked button
+        if (!button || !event.currentTarget.contains(button)) return; // Not a unit button click
+
         const newUnitType = button.dataset.unitType;
-        const buttonLang = button.closest('.unit-selector').dataset.lang;
-        currentUnit = ((buttonLang === 'en' && newUnitType === 'imperial') || (buttonLang === 'ar' && newUnitType === 'cups')) ? 'imperial' : 'metric';
-        const wrapper = button.closest('.unit-toggle-wrapper');
-        if (wrapper) updateUnitButtonActiveStates(wrapper);
-        if (selectedCookieType) { // Re-render only content
-            const contentArea = recipeDetailsContainer.querySelector('.recipe-content-area');
-            const newContentHtml = displayRecipeContent(selectedCookieType);
-            if(contentArea) contentArea.innerHTML = newContentHtml;
+        const buttonLang = button.closest('.unit-selector')?.dataset.lang;
+        if (!buttonLang) return;
+
+        const oldUnit = currentUnit; // Store old unit before changing
+
+        // Determine the canonical unit (imperial/metric)
+        if ((buttonLang === 'en' && newUnitType === 'imperial') || (buttonLang === 'ar' && newUnitType === 'cups')) {
+            currentUnit = 'imperial';
+        } else {
+            currentUnit = 'metric';
+        }
+
+        // Only re-render if unit actually changed
+        if (oldUnit !== currentUnit && selectedCookieType) {
+            // Find the existing unit toggle wrapper within recipe details
+            const toggleWrapper = recipeDetailsContainer.querySelector('.unit-toggle-wrapper');
+            if (toggleWrapper) updateUnitButtonActiveStates(toggleWrapper); // Update JUST the buttons visually first
+
+            // Regenerate only the ingredient list for efficiency
+            const ingredientList = recipeDetailsContainer.querySelector('.ingredient-list');
+            if (ingredientList) {
+                const newIngredientsHTML = generateIngredientsHTML(selectedCookieType); // Helper function
+                ingredientList.innerHTML = newIngredientsHTML; // Replace list content
+            }
+            // Optional: Could regenerate steps too if they have unit-specific text, but likely not needed
+        } else if (oldUnit === currentUnit) {
+             // If unit didn't change (e.g., clicked already active), ensure buttons reflect state anyway
+             const toggleWrapper = recipeDetailsContainer.querySelector('.unit-toggle-wrapper');
+             if (toggleWrapper) updateUnitButtonActiveStates(toggleWrapper);
         }
     }
 
-    // Generate HTML for recipe content (ingredients, steps, notes)
+     // Helper function to generate just the HTML for the ingredient list items
+     function generateIngredientsHTML(type) {
+        const texts = langData[currentLang];
+        const recipe = texts.recipes[type];
+        if (!recipe?.ingredients) return ''; // Guard clause
+
+        const unitKey = (currentLang === 'ar')
+                          ? (currentUnit === 'imperial' ? 'cups' : 'grams')
+                          : (currentUnit === 'imperial' ? 'imperial' : 'metric');
+
+        let ingredientsHtml = '';
+        recipe.ingredients.forEach(ing => {
+            const measurement = ing[unitKey] || (unitKey === 'metric' ? ing.metric : ing.imperial) || (unitKey === 'imperial' ? ing.metric : ing.imperial) || ing.grams || ing.cups;
+            ingredientsHtml += `<li data-emoji="${ing.emoji || '🍪'}">${measurement || 'N/A'}</li>`;
+        });
+        return ingredientsHtml;
+    }
+
+    // Now includes Unit Toggles directly in the returned HTML string
     function displayRecipeContent(type) {
         const texts = langData[currentLang];
         const recipe = texts.recipes[type];
-        const unitKey = (currentLang === 'ar') ? (currentUnit === 'imperial' ? 'cups' : 'grams') : currentUnit;
-        if (!recipe) return '';
+        if (!recipe) return '<p>Error: Recipe data not found!</p>';
+
+        // Generate Unit Toggle HTML dynamically here
+        const unitTogglesHtml = createUnitTogglesHTML();
 
         let contentHtml = `<div class="recipe-content-area">`;
-        contentHtml += `<h3 data-lang-key="recipeTitle${type}">${recipe.title}</h3>`;
+        contentHtml += `<h3>${recipe.title}</h3>`; // Title
+        contentHtml += unitTogglesHtml; // **** INSERT TOGGLES HTML HERE ****
         contentHtml += `<h4 class="list-header" data-lang-key="ingredientsTitle">${texts.ingredientsTitle}</h4><ul class="ingredient-list">`;
-        recipe.ingredients.forEach(ing => {
-            const measurement = ing[unitKey] || ing.metric || ing.imperial || ing.grams || ing.cups; // Prioritize selected, then fallback
-            contentHtml += `<li data-emoji="${ing.emoji || '🍪'}">${measurement || 'N/A'}</li>`;
-        });
+        contentHtml += generateIngredientsHTML(type); // Use helper for initial list
         contentHtml += '</ul>';
 
-        if (texts.toastNutsTitle) { // Show for all types now as per draft logic
-            contentHtml += `<div class="how-to-toast"><h4 data-lang-key="toastNutsTitle">${texts.toastNutsTitle}</h4><p data-lang-key="toastNutsDesc">${texts.toastNutsDesc}</p></div>`;
-        }
+        // --- Removed 'toastNuts' div generation ---
 
         contentHtml += `<h4 class="list-header" data-lang-key="stepsTitle">${texts.stepsTitle}</h4><ol class="steps-list">`;
         recipe.steps.forEach(step => { contentHtml += `<li>${step}</li>`; });
@@ -298,105 +368,160 @@ document.addEventListener('DOMContentLoaded', () => {
         if (recipe.scienceNote) {
             contentHtml += `<div class="science-note"><h4><span class="emoji">🔬</span> ${texts.scienceNoteTitle}</h4><p>${recipe.scienceNote}</p></div>`;
         }
-        contentHtml += `</div>`;
+        contentHtml += `</div>`; // End .recipe-content-area
         return contentHtml;
     }
 
-    // Display the entire recipe section (toggles + content)
+
     function displayRecipe(type) {
         selectedCookieType = type;
-        recipeDetailsContainer.innerHTML = ''; // Clear previous
+        recipeDetailsContainer.innerHTML = ''; // Clear previous content
 
-        const toggleElement = createUnitTogglesElement(); // Create toggles
-        if (toggleElement) recipeDetailsContainer.appendChild(toggleElement); // Add toggles first
+        // Generate the full content including the embedded toggles
+        const recipeContentHtml = displayRecipeContent(type);
+        recipeDetailsContainer.innerHTML = recipeContentHtml; // Insert the whole block
 
-        const recipeContentHtml = displayRecipeContent(type); // Create content
-        recipeDetailsContainer.insertAdjacentHTML('beforeend', recipeContentHtml); // Add content after toggles
+        const theme = langData[currentLang].recipes[type]?.theme || '';
+        recipeDetailsContainer.className = `recipe-container ${theme}`; // Apply theme
 
-        recipeDetailsContainer.className = 'recipe-container'; // Reset theme
-        recipeDetailsContainer.classList.add(langData[currentLang].recipes[type].theme); // Apply theme
+        // --- OMAR'S FAVE & EASTER EGG logic NOW points to 'thick' ---
+        const isThick = (type === 'thick');
+        easterEggContainer.classList.toggle('visible', isThick);
+        easterEggContainer.classList.toggle('visually-hidden', !isThick);
+        if (isThick && stuffedCookieImage.src !== IMAGE_PATHS.stuffed) {
+            stuffedCookieImage.src = IMAGE_PATHS.stuffed;
+            stuffedCookieImage.alt = "Stuffed cookie example";
+        }
+        omarsFavText.classList.toggle('visible', isThick);
+        omarsFavText.classList.toggle('visually-hidden', !isThick);
 
-        // Easter Egg & Fav Tag
-        const showSpecialItems = (type === 'thick');
-        easterEggContainer.classList.toggle('visible', showSpecialItems);
-        easterEggContainer.classList.toggle('visually-hidden', !showSpecialItems);
-        if(showSpecialItems) stuffedCookieImage.src = IMAGE_PATHS.stuffed;
-        omarsFavText.classList.toggle('visible', showSpecialItems);
-        omarsFavText.classList.toggle('visually-hidden', !showSpecialItems);
+        // IMPORTANT: Add the delegate listener after the content is rendered
+        recipeDetailsContainer.removeEventListener('click', handleUnitChangeDelegation); // Remove old listener first
+        recipeDetailsContainer.addEventListener('click', handleUnitChangeDelegation);
     }
 
-    // Show placeholder and reset view
+
     function showPlaceholder() {
          selectedCookieType = null;
          recipeDetailsContainer.innerHTML = `<div class="placeholder" data-lang-key="placeholderSelect">${langData[currentLang].placeholderSelect}</div>`;
-         recipeDetailsContainer.className = 'recipe-container'; // Reset theme
+         recipeDetailsContainer.className = 'recipe-container';
+         recipeDetailsContainer.removeEventListener('click', handleUnitChangeDelegation); // Remove listener when no recipe shown
+
          keyDifferencesContainer.classList.remove('visible');
          keyDifferencesContainer.classList.add('visually-hidden');
          easterEggContainer.classList.add('visually-hidden');
          easterEggContainer.classList.remove('visible');
          omarsFavText.classList.add('visually-hidden');
          omarsFavText.classList.remove('visible');
-         selectedCookieImage.src = IMAGE_PATHS.comparison;
+
+         const placeholderDiv = recipeDetailsContainer.querySelector('.placeholder');
+         if (placeholderDiv) placeholderDiv.innerHTML = langData[currentLang].placeholderSelect;
+
+         if (selectedCookieImage.src !== IMAGE_PATHS.comparison){
+            selectedCookieImage.src = IMAGE_PATHS.comparison;
+         }
          selectedCookieImage.alt = "Comparison of classic, thick, and thin cookies";
          cookieTypeButtons.forEach(btn => btn.classList.remove('active'));
     }
 
-    // Display key differences
     function displayKeyDifferences(type) {
         const texts = langData[currentLang];
         const diffs = texts.diffs[type];
-        const recipeName = texts.recipes[type].name;
-        if (!diffs || !recipeName) {
-            keyDifferencesContainer.classList.add('visually-hidden'); return;
+        if (!diffs || !keyDiffTitleH3) {
+            keyDifferencesContainer.classList.add('visually-hidden');
+            keyDifferencesContainer.classList.remove('visible');
+            return;
         }
 
-        // Update dynamic name in title
-        if (keyDiffTitleElement) keyDiffTitleElement.textContent = recipeName;
+        const nameSpan = keyDiffTitleH3.querySelector('.dynamic-cookie-name');
+        if (nameSpan) nameSpan.textContent = diffs.name || 'Cookie'; // Update name span
 
-         // Populate difference points
-         const butterP = keyDifferencesContainer.querySelector('.diff-point.butter-diff p');
-         const chillingP = keyDifferencesContainer.querySelector('.diff-point.chilling-diff p');
-         const otherP = keyDifferencesContainer.querySelector('.diff-point.other-diff p');
+        const points = {
+            butterMethod: keyDifferencesPoints.querySelector('.butter-diff p'),
+            chillingMethod: keyDifferencesPoints.querySelector('.chilling-diff p'),
+            otherNotes: keyDifferencesPoints.querySelector('.other-diff p')
+        };
+        if (points.butterMethod) points.butterMethod.innerHTML = diffs.butterMethod || '';
+        if (points.chillingMethod) points.chillingMethod.innerHTML = diffs.chillingMethod || '';
+        if (points.otherNotes) points.otherNotes.innerHTML = diffs.otherNotes || '';
 
-         if(butterP) butterP.innerHTML = diffs.butterMethod || '';
-         if(chillingP) chillingP.innerHTML = diffs.chillingMethod || '';
-         if(otherP) otherP.innerHTML = diffs.otherNotes || '';
-
+        // Update static text parts if needed (mainly for language changes)
+        const baseTitleTextNode = keyDiffTitleH3.firstChild;
+        if (baseTitleTextNode && baseTitleTextNode.nodeType === Node.TEXT_NODE) {
+             baseTitleTextNode.nodeValue = texts.keyDifferencesTitleBase + ' ';
+        }
+        const headers = {
+            butterTitle: keyDifferencesPoints.querySelector('.butter-diff h4 span:not(.emoji)'),
+            chillingTitle: keyDifferencesPoints.querySelector('.chilling-diff h4 span:not(.emoji)'),
+            otherNotesTitle: keyDifferencesPoints.querySelector('.other-diff h4 span:not(.emoji)')
+        };
+        if(headers.butterTitle && texts.butterTitle) headers.butterTitle.textContent = texts.butterTitle;
+        if(headers.chillingTitle && texts.chillingTitle) headers.chillingTitle.textContent = texts.chillingTitle;
+        if(headers.otherNotesTitle && texts.otherNotesTitle) headers.otherNotesTitle.textContent = texts.otherNotesTitle;
 
         keyDifferencesContainer.classList.add('visible');
         keyDifferencesContainer.classList.remove('visually-hidden');
     }
 
-    // Populate tips
+
     function displayTips() {
         const texts = langData[currentLang];
+        if (!texts.tips || !tipsList) return;
+
         tipsList.innerHTML = '';
         texts.tips.forEach(tip => {
             const li = document.createElement('li');
-            li.dataset.emoji = tip.emoji; li.innerHTML = tip.text;
+            li.dataset.emoji = tip.emoji || '💡';
+            li.innerHTML = tip.text;
             tipsList.appendChild(li);
         });
-        const tipBoxTitle = document.querySelector('.tip-box h3[data-lang-key="tipsTitle"]');
-        if (tipBoxTitle) tipBoxTitle.innerHTML = `<span class="emoji">💡</span> ${texts.tipsTitle} <span class="emoji">🔬</span>`;
+
+        const tipBoxTitleElement = document.querySelector('.tip-box h3[data-lang-key="tipsTitle"]');
+        if(tipBoxTitleElement && texts.tipsTitle) {
+            tipBoxTitleElement.innerHTML = `<span class="emoji">💡</span> ${texts.tipsTitle} <span class="emoji">🔬</span>`;
+        }
     }
 
-    // Handle cookie type button clicks
+
     function handleCookieTypeSelect(event) {
         const button = event.currentTarget;
         const type = button.dataset.type;
+
+        if (selectedCookieType === type) return;
+
         cookieTypeButtons.forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
-        selectedCookieImage.src = IMAGE_PATHS[type];
-        selectedCookieImage.alt = langData[currentLang].recipes[type].title || `${type} cookie`;
+
+        const recipeTitle = langData[currentLang].recipes[type]?.title || `${type} cookie`;
+        if (selectedCookieImage.src !== IMAGE_PATHS[type]){
+             selectedCookieImage.src = IMAGE_PATHS[type];
+        }
+        selectedCookieImage.alt = recipeTitle;
+
         displayKeyDifferences(type);
         displayRecipe(type);
     }
 
     // --- INITIALIZATION ---
-    updateLanguage(DEFAULT_LANG); // Sets text, direction, calls showPlaceholder
-    displayTips(); // Load tips
-    langButtons.forEach(button => button.addEventListener('click', () => updateLanguage(button.dataset.lang)));
-    cookieTypeButtons.forEach(button => button.addEventListener('click', handleCookieTypeSelect));
-    body.classList.add('loaded'); // Fade in
+    function initialize() {
+        // Add base key difference title structure initially (for JS to target)
+         if (keyDiffTitleH3) keyDiffTitleH3.innerHTML = `${langData[DEFAULT_LANG].keyDifferencesTitleBase || 'Key Differences for'} <span class="dynamic-cookie-name">Cookie</span>`;
+
+
+        updateLanguage(DEFAULT_LANG);
+        displayTips();
+
+        langButtons.forEach(button => button.addEventListener('click', () => {
+            updateLanguage(button.dataset.lang);
+        }));
+        cookieTypeButtons.forEach(button => button.addEventListener('click', handleCookieTypeSelect));
+
+        selectedCookieImage.src = IMAGE_PATHS.comparison;
+        selectedCookieImage.alt = "Comparison of classic, thick, and thin cookies";
+
+        body.classList.add('loaded');
+    }
+
+    initialize();
 
 }); // End DOMContentLoaded
