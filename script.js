@@ -1,4 +1,478 @@
-// ==== START OF CORRECTED HYBRID SCRIPT.JS ====
+document.addEventListener('DOMContentLoaded', () => {
+    // --- CONFIGURATION (Unchanged) ---
+    const DEFAULT_LANG = 'en';
+    const DEFAULT_UNIT = 'metric';
+    const STANDARD_BUTTER_GRAMS = 226;
+    const BASE_YIELD_MIN = 18;
+    const BASE_YIELD_MAX = 24;
+    const TRANSITION_DURATION = 400;
+    const IMAGE_CLASS_SELECTED = 'selected-type-image';
+
+    // --- IMAGE PATHS (Unchanged) ---
+    const IMAGE_PATHS = { /* ... */ };
+
+    // --- DOM ELEMENTS (Ensure Key Differences elements are referenced) ---
+    const body = document.body;
+    const langButtons = document.querySelectorAll('.lang-btn');
+    const yieldInfoElement = document.querySelector('.yield-info');
+    const heroCookieImage = document.getElementById('selected-cookie-image'); // Assuming this ID from other HTML
+    const cookieTypeButtons = document.querySelectorAll('.selector-btn'); // Use class from cookie3 html
+    const omarsFavText = document.querySelector('.omars-fav-text'); // Use class from cookie3 html
+
+    // Dynamic Content Containers
+    const keyDifferencesContainer = document.getElementById('key-differences');
+    // --- Specific elements within Key Differences for easier update ---
+    const keyDiffTitleH3 = keyDifferencesContainer?.querySelector('h3'); // Get the H3 title
+    const keyDiffNameSpan = keyDiffTitleH3?.querySelector('.dynamic-cookie-name'); // Get the span for the name
+    const keyDiffPointsContainer = keyDifferencesContainer?.querySelector('.diff-points'); // Get the points container
+    // --- End Key Differences Elements ---
+    const recipeDetailsContainer = document.getElementById('recipe-details');
+    const easterEggContainer = document.getElementById('easter-egg-container');
+    const tipsList = document.getElementById('tips-list');
+
+    // Template
+    const unitTogglesTemplate = document.getElementById('unit-toggles-template');
+
+    // Scaler elements (Static)
+    const butterAmountInput = document.getElementById('butter-amount-input');
+    const updateScaleBtn = document.getElementById('update-scale-btn');
+
+    // --- STATE (Unchanged) ---
+    let currentLang = DEFAULT_LANG;
+    let currentUnit = DEFAULT_UNIT;
+    let selectedCookieType = null;
+    let currentScaleFactor = 1;
+
+    // --- DATA (Using the full hybrid langData from previous response) ---
+    const langData = { /* ... PASTE THE FULL langData OBJECT HERE ... */
+        en: {
+            mainTitle: "🍪 Omar's Insanely Good Cookie Guide! 🍪",
+            heroSubtitle: "Select your ultimate cookie style below!",
+            chooseStyle: "Alright, Cookie Boss! Pick Your Cookie Destiny:",
+            typeClassic: "Classic Balanced", // Used for button text
+            typeThick: "Thick & Gooey",     // Used for button text
+            typeThin: "Thin & Crispy",    // Used for button text
+            omarsFavText: "Omar's Fave! 😉",
+            unitLabelEn: "Units:", unitLabelAr: "الوحدات:",
+            yieldInfo: "Whips up about {min}-{max} cookies 🍪",
+            keyDifferencesTitleBase: "🔑 Key Differences for",
+            butterTitle: "Brown Butter State & Mixing", chillingTitle: "Chilling Method", otherNotesTitle: "Other Key Notes",
+            placeholderSelect: "👆 Select a cookie style above to load the recipe! ✨",
+            ingredientsTitle: "Ingredients (The Good Stuff)", stepsTitle: "Steps (Let's Bake!)", scienceNoteTitle: "The Science Bit! (Nerd Out!)",
+            howToToastMilkPowderTitle: "🤔 How to Toast Milk Powder?",
+            howToToastMilkPowderDesc: "Easy! Spread 3-4 Tbsp milk powder in a <span class='highlight'>dry skillet</span> over <span class='highlight'>LOW heat</span>. <span class='critical'>STIR CONSTANTLY</span> until light golden & nutty (3-5 min). Remove <span class='critical'>IMMEDIATELY</span> to prevent burning. Cool completely.",
+            easterEggTitle: "🏆 GOOEY Picked! Bonus! 🏆", easterEggIntro: "Okay, you've got taste! Ready for the Level 2 Boss?", easterEggIdea: "🔥 STUFFED COOKIES! 🔥", easterEggDesc: "Easy peasy: Dent a THICK dough ball, plop in ~1 tsp Nutella/Lotus/Pistachio cream, seal, bake!", easterEggPistachioTip: "TRUST the pistachio! It's a game-changer.", pistachioReco: "Best Spread IMHO:", pistachioLinkSource: "(Amazon EG link)",
+            tipsTitle: "💡 Omar's Pro Tips! (Level Up Your Cookie Game)",
+            finalTag: "Nailed it? Show off! Tag me! @omarisavibe 😄<br><a href=\"https://www.instagram.com/omarisavibe/\" target=\"_blank\" rel=\"noopener noreferrer\">@omarisavibe on Insta!</a>",
+            scalerTitle: "🧈 Customize Your Batch Size!", scalerDesc: "Enter starting butter (grams) to scale metric values.", scalerLabel: "Butter (g):", scalerButton: "Update Scale", scalerNote: "Note: Only metric (gram) values are scaled. Imperial (cup) units are approximate.",
+            diffs: {
+                 classic: { name: "Classic Balanced", butterMethod: "Use <span class='highlight'>COOLED but LIQUID</span> Brown Butter. Whisk with sugars (no heavy creaming needed).", chillingMethod: "<span class='highlight'>RECOMMENDED Chill:</span> 30 mins - 24 hrs. Improves flavor and texture.", otherNotes: "Standard flour (~300g). Includes baking powder. Optional toasted nuts = great texture!" },
+                 thick: { name: "Thick & Gooey", butterMethod: "Use <span class='critical'>CHILLED SOLID</span> Brown Butter. <span class='critical'>Cream</span> this with sugars until very light and fluffy (3-5 mins).", chillingMethod: "<span class='critical'>MANDATORY Long Chill:</span> 24 - 72 hrs. The SECRET to thickness & deep flavor!", otherNotes: "Use <span class='highlight'>MORE flour</span> (~310-330g). Baking powder + opt. cornstarch. <span class='highlight'>Toasted nuts highly recommended!</span>" },
+                 thin: { name: "Thin & Crispy", butterMethod: "Use <span class='critical'>WARM LIQUID</span> Brown Butter. Whisk with sugars.", chillingMethod: "<span class='critical'>SKIP Chilling!</span> Bake immediately for maximum spread.", otherNotes: "Use <span class='highlight'>LESS flour</span> (~280-300g). <span class='critical'>OMIT baking powder.</span> More white sugar aids crispness." }
+             },
+            recipes: {
+                classic: {
+                    title: "Classic Balanced Cookies", theme: "classic-theme",
+                    ingredients: [/* ... */ { key: 'nuts', emoji: '🥜', imperial: '1/2 - 1 cup toasted nuts', metric: '50-100g toasted nuts (<span class="highlight">Optional: Pecans/Walnuts!</span>)' } ],
+                    steps: [ 'Prep: ...<span class="highlight">Toast nuts (350°F/175°C, 5-8 min) if using.</span>', /* ... */ 'Stir in chocolate <span class="highlight">and toasted nuts (if using).</span>', /* ... */ ],
+                    scienceNote: "..."
+                },
+                thick: {
+                    title: "Thick & Gooey Cookies", theme: "thick-theme",
+                    ingredients: [/* ... */ { key: 'nuts', emoji: '🥜', imperial: '1/2 - 1 cup toasted nuts', metric: '50-100g toasted nuts (<span class="highlight critical">Highly Recommended: Pecans/Walnuts!</span>)' } ],
+                    steps: [ 'Prep: ...<span class="highlight critical">Toast nuts! (350°F/175°C, 5-8 mins).</span>', /* ... */ 'Stir in <span class="highlight">generous</span> chocolate <span class="highlight critical">and toasted nuts.</span>', /* ... */ ],
+                    scienceNote: "..."
+                 },
+                thin: { /* ... Thin recipe ... */ }
+             },
+            tips: [/* ... */ { emoji: '🥜', text: "<span class='highlight'>Toast Those Nuts!:</span> For Classic/Thick, toast nuts (350°F/175°C, 5-8 mins) - HUGE flavor boost!" }, /* ... */]
+        },
+        ar: { /* ... PASTE THE FULL ARABIC langData OBJECT HERE ... */ }
+    }; // --- END OF langData ---
+
+
+    // --- HELPER FUNCTIONS ---
+
+    /** Updates text content based on data-lang-key attribute */
+    function updateTextContent() {
+        const texts = langData[currentLang];
+        document.querySelectorAll('[data-lang-key]').forEach(el => {
+            const key = el.dataset.langKey;
+            // Skip elements handled specifically elsewhere
+            const skipKeys = [
+                'yieldInfo', 'keyDifferencesTitleBase', 'butterTitle', 'chillingTitle', 'otherNotesTitle',
+                'ingredientsTitle', 'stepsTitle', 'scienceNoteTitle', 'easterEggTitle', 'easterEggIntro',
+                'easterEggIdea', 'easterEggDesc', 'easterEggPistachioTip', 'pistachioReco', 'pistachioLinkSource',
+                'placeholderSelect', 'typeClassic', 'typeThick', 'typeThin' // Button text handled separately
+            ];
+            const isDynamicContent = el.closest('#recipe-details') || el.closest('#key-differences .diff-points') || el.closest('#easter-egg-container');
+
+            if (skipKeys.includes(key) || isDynamicContent) { return; }
+
+            if (texts && texts[key] !== undefined) {
+                if (key === 'tipsTitle' && el.tagName === 'H3') {
+                     el.innerHTML = `<span class="emoji">💡</span> ${texts[key]} <span class="emoji">🔬</span>`;
+                } else {
+                    el.innerHTML = texts[key];
+                }
+            }
+        });
+        // Update page title
+        document.title = texts?.mainTitle?.replace(/<[^>]*>?/gm, '') || "Omar's Cookie Guide";
+        // Update Cookie Card Text
+        cookieTypeButtons.forEach(btn => {
+            const type = btn.dataset.type;
+            const textKey = `type${type.charAt(0).toUpperCase() + type.slice(1)}`; // e.g., typeClassic
+            const buttonTextSpan = btn.querySelector('span:not(.emoji)');
+            if (buttonTextSpan && texts[textKey]) { buttonTextSpan.textContent = texts[textKey]; }
+        });
+         // Update scaler static text
+         const scalerTitle = document.querySelector('.recipe-scaler h3[data-lang-key="scalerTitle"]');
+         const scalerDesc = document.querySelector('.recipe-scaler p[data-lang-key="scalerDesc"]');
+         const scalerLabel = document.querySelector('.recipe-scaler label[data-lang-key="scalerLabel"]');
+         const scalerButton = document.querySelector('.recipe-scaler button[data-lang-key="scalerButton"]');
+         const scalerNote = document.querySelector('.recipe-scaler span[data-lang-key="scalerNote"]');
+         if(scalerTitle && texts.scalerTitle) scalerTitle.innerHTML = texts.scalerTitle;
+         if(scalerDesc && texts.scalerDesc) scalerDesc.innerHTML = texts.scalerDesc;
+         if(scalerLabel && texts.scalerLabel) scalerLabel.innerHTML = texts.scalerLabel;
+         if(scalerButton && texts.scalerButton) scalerButton.innerHTML = texts.scalerButton;
+         if(scalerNote && texts.scalerNote) scalerNote.innerHTML = texts.scalerNote;
+         // Update Key Differences static titles (Butter, Chilling, Notes)
+         updateKeyDiffTitles(texts); // NEW call
+    }
+
+    /** Updates the static titles within the key differences section */
+    function updateKeyDiffTitles(texts) {
+        if (!keyDifferencesContainer) return;
+        const butterTitleSpan = keyDifferencesContainer.querySelector('.butter-diff h4 span:not(.emoji)');
+        const chillingTitleSpan = keyDifferencesContainer.querySelector('.chilling-diff h4 span:not(.emoji)');
+        const otherNotesTitleSpan = keyDifferencesContainer.querySelector('.other-diff h4 span:not(.emoji)');
+        if (butterTitleSpan && texts.butterTitle) butterTitleSpan.textContent = texts.butterTitle;
+        if (chillingTitleSpan && texts.chillingTitle) chillingTitleSpan.textContent = texts.chillingTitle;
+        if (otherNotesTitleSpan && texts.otherNotesTitle) otherNotesTitleSpan.textContent = texts.otherNotesTitle;
+    }
+
+    /** Calculates and updates the yield info text */
+    function updateYieldDisplay() {
+        if (!yieldInfoElement) return;
+        const scaledMin = Math.max(1, Math.round(BASE_YIELD_MIN * currentScaleFactor));
+        const scaledMax = Math.max(1, Math.round(BASE_YIELD_MAX * currentScaleFactor));
+        const yieldTemplate = langData[currentLang]?.yieldInfo || "Yield: {min}-{max}";
+        yieldInfoElement.innerHTML = yieldTemplate.replace('{min}', scaledMin).replace('{max}', scaledMax);
+    }
+
+    /** Generates HTML for unit toggle controls */
+    function createUnitTogglesHTML() {
+        if (!unitTogglesTemplate) return '';
+        const wrapper = document.createElement('div');
+        wrapper.className = 'unit-toggle-wrapper';
+        const enToggle = unitTogglesTemplate.querySelector('.unit-selector[data-lang="en"]')?.cloneNode(true);
+        const arToggle = unitTogglesTemplate.querySelector('.unit-selector[data-lang="ar"]')?.cloneNode(true);
+        if (enToggle) wrapper.appendChild(enToggle);
+        if (arToggle) wrapper.appendChild(arToggle);
+        return wrapper.outerHTML;
+    }
+
+    /** Updates visibility and active state of unit toggles inside a container */
+    function updateUnitTogglesState(container) {
+        const wrapper = container?.querySelector('.unit-toggle-wrapper');
+        if (!wrapper) return;
+        const enSelector = wrapper.querySelector('.unit-selector[data-lang="en"]');
+        const arSelector = wrapper.querySelector('.unit-selector[data-lang="ar"]');
+        if (enSelector) enSelector.style.display = (currentLang === 'en') ? 'inline-block' : 'none';
+        if (arSelector) arSelector.style.display = (currentLang === 'ar') ? 'inline-block' : 'none';
+        wrapper.querySelectorAll('.unit-btn').forEach(btn => {
+            const btnUnit = btn.dataset.unitType;
+            const btnLang = btn.closest('.unit-selector')?.dataset.lang;
+            if (!btnUnit || !btnLang) return;
+            let isActive = (currentUnit === 'imperial')
+                ? (btnLang === 'en' && btnUnit === 'imperial') || (btnLang === 'ar' && btnUnit === 'cups')
+                : (btnLang === 'en' && btnUnit === 'metric') || (btnLang === 'ar' && btnUnit === 'grams');
+            btn.classList.toggle('active', isActive);
+        });
+    }
+
+     /** Generates HTML for ingredient list based on type, unit, lang, scale */
+     function generateIngredientsHTML(type) { /* (Unchanged from previous) */
+        const texts = langData[currentLang]; const recipe = texts.recipes[type]; if (!recipe?.ingredients) return '<p>Ingredients data missing!</p>';
+        const metricKey = (currentLang === 'ar') ? 'grams' : 'metric'; const imperialKey = (currentLang === 'ar') ? 'cups' : 'imperial';
+        const unitKey = (currentUnit === 'imperial') ? imperialKey : metricKey;
+        const nonScalableKeys = ['eggs','vanilla','extra_liquid','leavening_soda','leavening_powder','salt'];
+        let ingredientsHtml = '';
+        recipe.ingredients.forEach(ing => {
+            let measurement = ing[unitKey] || ing.metric || ing.grams || ing.imperial || ing.cups || 'N/A';
+            const originalMeasurement = measurement;
+            if (unitKey === metricKey && currentScaleFactor !== 1 && !nonScalableKeys.includes(ing.key)) {
+                const gramMarker = (currentLang === 'ar') ? 'جرام' : 'g'; const gramRegexBase = `(\\d+(\\.\\d+)?)\\s*${gramMarker}`;
+                 try {
+                     if (ing.key === 'butter') {
+                         const scaledButter = Math.round(STANDARD_BUTTER_GRAMS * currentScaleFactor);
+                         const standardButterRegex = new RegExp(`(${STANDARD_BUTTER_GRAMS})\\s*${gramMarker}`);
+                         measurement = standardButterRegex.test(originalMeasurement) ? originalMeasurement.replace(standardButterRegex, `${scaledButter}${gramMarker}`) : measurement;
+                     } else {
+                         const rangeRegex = new RegExp(`(\\d+(\\.\\d+)?)\\s*-\\s*(\\d+(\\.\\d+)?)\\s*${gramMarker}`);
+                         const rangeMatch = originalMeasurement.match(rangeRegex);
+                         if (rangeMatch && rangeMatch[1] && rangeMatch[3]) {
+                             const scaledMin = Math.round(parseFloat(rangeMatch[1]) * currentScaleFactor);
+                             const scaledMax = Math.round(parseFloat(rangeMatch[3]) * currentScaleFactor);
+                             measurement = originalMeasurement.replace(rangeMatch[0], `${scaledMin}-${scaledMax}${gramMarker}`);
+                         } else {
+                             measurement = originalMeasurement.replace(new RegExp(gramRegexBase, 'g'), (match, p1) => `${Math.round(parseFloat(p1) * currentScaleFactor)}${gramMarker}`);
+                         }
+                     }
+                 } catch (e) { console.error(`Error scaling ingredient '${ing.key}': ${e}. Original: ${originalMeasurement}`); measurement = originalMeasurement; }
+             }
+            ingredientsHtml += `<li data-emoji="${ing.emoji || '🍪'}">${measurement}</li>`;
+        });
+        return ingredientsHtml;
+    }
+
+    /** Populates the Key Differences section (points only) */
+    function populateKeyDifferencePoints(type) { // Renamed for clarity
+        const texts = langData[currentLang];
+        const diffs = texts.diffs?.[type];
+        if (!diffs || !keyDiffPointsContainer) return; // Check points container
+
+        // Find the specific <p> tags within the points container
+        const butterP = keyDiffPointsContainer.querySelector('.butter-diff p');
+        const chillingP = keyDiffPointsContainer.querySelector('.chilling-diff p');
+        const otherP = keyDiffPointsContainer.querySelector('.other-diff p');
+
+        if (butterP) butterP.innerHTML = diffs.butterMethod || '';
+        if (chillingP) chillingP.innerHTML = diffs.chillingMethod || '';
+        if (otherP) otherP.innerHTML = diffs.otherNotes || '';
+    }
+
+    /** Generates complete HTML for Recipe Details section's INNER content */
+     function generateRecipeHTML(type) { /* (Unchanged from previous) */
+        const texts = langData[currentLang]; const recipe = texts.recipes?.[type]; if (!recipe) return '<p>Recipe data not found!</p>';
+        const unitTogglesHtml = createUnitTogglesHTML(); let stepsHtml = ''; let scienceNoteHtml = ''; let toastMethodHtml = '';
+        const toastDescKey = (currentLang === 'ar') ? langData.ar.howToToastMilkPowderDesc : langData.en.howToToastMilkPowderDesc;
+        const toastTitleKey = (currentLang === 'ar') ? langData.ar.howToToastMilkPowderTitle : langData.en.howToToastMilkPowderTitle;
+        toastMethodHtml = `<li class='note step-note'><strong>${toastTitleKey}</strong> ${toastDescKey}</li>`;
+        stepsHtml = recipe.steps.map(step => `<li>${step}</li>`).join('') + toastMethodHtml;
+        let ingredientsHtml = generateIngredientsHTML(type);
+        if (recipe.scienceNote) { scienceNoteHtml = `<div class="science-note"><h4><span class="emoji">🔬</span> <span data-lang-key="scienceNoteTitle">${texts.scienceNoteTitle || 'Science!'}</span></h4><p>${recipe.scienceNote}</p></div>`; }
+        return `
+            <div class="recipe-content-area">
+                <h3>${recipe.title || 'Cookie Recipe'}</h3>
+                ${unitTogglesHtml}
+                <h4 class="list-header" data-lang-key="ingredientsTitle">${texts.ingredientsTitle || 'Ingredients'}</h4>
+                <ul class="ingredient-list">${ingredientsHtml}</ul>
+                <h4 class="list-header" data-lang-key="stepsTitle">${texts.stepsTitle || 'Steps'}</h4>
+                <ol class="steps-list">${stepsHtml}</ol>
+                ${scienceNoteHtml}
+            </div>`;
+    }
+
+    /** Generates complete HTML for Easter Egg section's INNER content */
+    function generateEasterEggHTML(type) { /* (Unchanged from previous) */
+        if (type !== 'thick') return '';
+        const texts = langData[currentLang]; const stuffedImgSrc = IMAGE_PATHS.stuffed || '';
+        return `
+             <h3 data-lang-key="easterEggTitle">${texts.easterEggTitle}</h3>
+             <div class="easter-egg-content">
+                 <p data-lang-key="easterEggIntro">${texts.easterEggIntro}</p>
+                 <strong data-lang-key="easterEggIdea">${texts.easterEggIdea}</strong>
+                 <p data-lang-key="easterEggDesc">${texts.easterEggDesc}</p>
+                 <img id="stuffed-cookie-image" src="${stuffedImgSrc}" alt="${texts.easterEggIdea || 'Stuffed Cookie'}">
+                 <p data-lang-key="easterEggPistachioTip">${texts.easterEggPistachioTip}</p>
+                  <ul><li><span data-lang-key="pistachioReco">${texts.pistachioReco}</span> <a href="https://www.amazon.eg/-/en/Pistachio-spread-Irresistible-Luxurious-Goodness/dp/B0D9C3BDV2/" target="_blank" rel="noopener noreferrer">ASMACUP Pistachio Cream</a> <span data-lang-key="pistachioLinkSource">${texts.pistachioLinkSource}</span></li></ul>
+             </div>`;
+     }
+
+    /** Generates and updates the Pro Tips list */
+    function displayTips() { /* (Unchanged from previous) */
+        const texts = langData[currentLang]; if (!texts?.tips || !tipsList) return;
+        tipsList.innerHTML = texts.tips.map(tip => `<li data-emoji="${tip.emoji || '💡'}">${tip.text}</li>`).join('');
+        const tipBoxTitle = document.querySelector('.tip-box h3[data-lang-key="tipsTitle"]');
+        if (tipBoxTitle && texts.tipsTitle) { tipBoxTitle.innerHTML = `<span class="emoji">💡</span> ${texts.tipsTitle} <span class="emoji">🔬</span>`; }
+    }
+
+    /** Hides dynamic sections and shows the placeholder text inside #recipe-details */
+    function showPlaceholderContent() {
+        // Hide Key Differences, Recipe Details, Easter Egg
+        const sectionsToHide = [keyDifferencesContainer, recipeDetailsContainer, easterEggContainer];
+        sectionsToHide.forEach(section => {
+            if (section) {
+                section.classList.remove('visible');
+                section.classList.add('visually-hidden');
+                // Clear specific content areas if needed, but keep title for KeyDiffs
+                if (section.id === 'recipe-details' || section.id === 'easter-egg-container') {
+                    section.innerHTML = '';
+                } else if (section.id === 'key-differences' && keyDiffPointsContainer) {
+                    keyDiffPointsContainer.innerHTML = ''; // Clear only the points
+                }
+            }
+        });
+
+        // Put placeholder into recipe details container
+        if (recipeDetailsContainer) {
+             recipeDetailsContainer.innerHTML = `<div class="placeholder visible" data-lang-key="placeholderSelect">${langData[currentLang]?.placeholderSelect || 'Select a style!'}</div>`;
+             recipeDetailsContainer.className = 'recipe-container'; // Reset theme
+             // Ensure recipe container itself IS visible to show the placeholder
+             recipeDetailsContainer.classList.remove('visually-hidden');
+             recipeDetailsContainer.classList.add('visible');
+         }
+
+        if(heroCookieImage){ heroCookieImage.src = IMAGE_PATHS.comparison || ''; heroCookieImage.alt = "Comparison of cookie types"; heroCookieImage.classList.remove(IMAGE_CLASS_SELECTED); }
+        cookieTypeButtons.forEach(btn => btn.classList.remove('active'));
+        if(omarsFavText) omarsFavText.classList.add('visually-hidden');
+        selectedCookieType = null;
+    }
+
+
+    /** Main function to display content for a selected cookie type */
+    function displaySelectedCookieContent(type) {
+         if (!type || !langData[currentLang]?.recipes[type]) { console.error("Invalid cookie type:", type); showPlaceholderContent(); return; }
+         selectedCookieType = type;
+
+         // 1. Generate Content (Inner HTML for recipe/easter egg)
+         const recipeContentHTML = generateRecipeHTML(type);
+         const easterEggContentHTML = generateEasterEggHTML(type);
+
+         // 2. Update Key Differences Section (Title and Points)
+         if (keyDifferencesContainer) {
+             const texts = langData[currentLang];
+             const titleBase = texts.keyDifferencesTitleBase || 'Key Differences for';
+             const diffsData = texts.diffs[type];
+             const cookieName = diffsData?.name || type;
+             if (keyDiffTitleH3 && keyDiffNameSpan) { // Check if elements exist
+                 // Update base text (part before span)
+                 keyDiffTitleH3.firstChild.nodeValue = `${titleBase} `;
+                 keyDiffNameSpan.textContent = cookieName; // Update name in span
+             }
+             populateKeyDifferencePoints(type); // Populate the <p> tags
+             // Make visible later in timeout
+         }
+
+         // 3. Update Recipe Details Section
+         if (recipeDetailsContainer) {
+             recipeDetailsContainer.innerHTML = recipeContentHTML; // Inject recipe content
+             const theme = langData[currentLang].recipes[type]?.theme || '';
+             recipeDetailsContainer.className = `recipe-container ${theme}`; // Apply theme
+             // Make visible later in timeout
+         }
+
+         // 4. Update Easter Egg Section
+         if (easterEggContainer) {
+             if (easterEggContentHTML) { easterEggContainer.innerHTML = easterEggContentHTML; }
+             else { easterEggContainer.innerHTML = ''; }
+             // Visibility handled later
+         }
+
+         // 5. Add Event Listeners to dynamic elements within recipe container
+         if (recipeDetailsContainer) {
+             recipeDetailsContainer.removeEventListener('click', handleUnitChangeDelegation);
+             recipeDetailsContainer.addEventListener('click', handleUnitChangeDelegation);
+         }
+
+         // --- Visibility & Transitions ---
+         setTimeout(() => {
+            const sectionsToMakeVisible = [keyDifferencesContainer, recipeDetailsContainer];
+            if (easterEggContainer && easterEggContentHTML) { sectionsToMakeVisible.push(easterEggContainer); }
+
+            sectionsToMakeVisible.forEach(section => {
+                 if (section && (section.id !== 'recipe-details' || section.querySelector('.recipe-content-area')) ) { // Check content exists or is recipe container
+                      section.classList.remove('visually-hidden');
+                      section.classList.add('visible');
+                 } else if (section) { // Hide empty sections
+                     section.classList.remove('visible');
+                     section.classList.add('visually-hidden');
+                 }
+            });
+
+            // Update unit toggles state AFTER recipe container is visible
+            if (recipeDetailsContainer) { updateUnitTogglesState(recipeDetailsContainer); }
+
+         }, 50); // Short delay
+
+         // Update Hero Image
+         if(heroCookieImage){ heroCookieImage.src = IMAGE_PATHS[type] || IMAGE_PATHS.comparison || ''; heroCookieImage.alt = langData[currentLang]?.recipes[type]?.title || `${type} cookie`; heroCookieImage.classList.toggle(IMAGE_CLASS_SELECTED, !!IMAGE_PATHS[type] && IMAGE_PATHS[type] !== IMAGE_PATHS.comparison); }
+
+        // Update Omar's Fave Badge Visibility
+        const isThick = (type === 'thick');
+        if(omarsFavText){ omarsFavText.classList.toggle('visible', isThick); omarsFavText.classList.toggle('visually-hidden', !isThick); }
+     }
+
+
+    // --- EVENT HANDLERS ---
+
+    function handleLanguageChange(event) {
+        const newLang = event.target.dataset.lang; if (newLang === currentLang || !langData[newLang]) return;
+        currentLang = newLang; document.documentElement.lang = currentLang; body.dir = (currentLang === 'ar') ? 'rtl' : 'ltr';
+        updateTextContent(); // Updates static text, scaler text, button text, non-dynamic titles
+        updateYieldDisplay();
+        displayTips(); // Updates tips list and tip box title
+        langButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.lang === currentLang));
+        if (selectedCookieType) {
+             // Refresh dynamic content sections (Key Diffs, Recipe, Easter Egg)
+             displaySelectedCookieContent(selectedCookieType);
+        } else {
+             showPlaceholderContent(); // Update placeholder text
+        }
+    }
+
+    function handleScaleUpdate() { /* (Unchanged from previous) */
+         if (!butterAmountInput) { console.error("Scaler input not found!"); return; }
+         let newButterAmount = parseFloat(butterAmountInput.value);
+         if (isNaN(newButterAmount) || newButterAmount < 50) { newButterAmount = STANDARD_BUTTER_GRAMS; alert(langData[currentLang]?.scalerNoteInvalid || (currentLang === 'ar' ? "كمية الزبدة غير صالحة (أقل حد 50 جرام). الرجوع للوضع الأساسي." : "Invalid butter amount (min 50g). Resetting to default.")); }
+         currentScaleFactor = newButterAmount / STANDARD_BUTTER_GRAMS; butterAmountInput.value = Math.round(newButterAmount);
+         updateYieldDisplay();
+         if (selectedCookieType && recipeDetailsContainer) { const ingredientsList = recipeDetailsContainer.querySelector('.ingredient-list'); if (ingredientsList) { ingredientsList.innerHTML = generateIngredientsHTML(selectedCookieType); } }
+         console.log(`Scale Factor: ${currentScaleFactor.toFixed(3)}`);
+    }
+
+    function handleCookieTypeSelect(event) { /* (Unchanged from previous) */
+         const button = event.currentTarget; if (!button) return; const type = button.dataset.type;
+         if (button.classList.contains('active') && selectedCookieType === type) return;
+         cookieTypeButtons.forEach(btn => btn.classList.remove('active')); button.classList.add('active');
+         displaySelectedCookieContent(type);
+    }
+
+    function handleUnitChangeDelegation(event) { /* (Unchanged from previous) */
+        const button = event.target.closest('.unit-btn'); if (!button || !event.currentTarget.contains(button)) return;
+        const newUnitType = button.dataset.unitType; const buttonLang = button.closest('.unit-selector')?.dataset.lang; if (!buttonLang || !newUnitType) return;
+        const newUnit = ((buttonLang === 'en' && newUnitType === 'imperial') || (buttonLang === 'ar' && newUnitType === 'cups')) ? 'imperial' : 'metric';
+        if (newUnit !== currentUnit) {
+             currentUnit = newUnit; console.log(`Unit changed to: ${currentUnit}`);
+             const ingredientsList = recipeDetailsContainer?.querySelector('.ingredient-list');
+             if (ingredientsList && selectedCookieType) { ingredientsList.innerHTML = generateIngredientsHTML(selectedCookieType); }
+             updateUnitTogglesState(recipeDetailsContainer);
+         }
+     }
+
+    // --- INITIALIZATION ---
+    function initialize() {
+        console.log("Initializing Corrected Hybrid + KeyDiffs Omar's Cookie Lab!");
+        document.documentElement.lang = currentLang; body.dir = (currentLang === 'ar') ? 'rtl' : 'ltr';
+        langButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.lang === currentLang));
+
+        // Add event listeners to STATIC elements
+        langButtons.forEach(btn => btn.addEventListener('click', handleLanguageChange));
+        cookieTypeButtons.forEach(button => { button.addEventListener('click', handleCookieTypeSelect); button.addEventListener('keypress', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCookieTypeSelect(e); } }); });
+        if (updateScaleBtn) { updateScaleBtn.addEventListener('click', handleScaleUpdate); }
+        if (butterAmountInput) {
+            butterAmountInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); handleScaleUpdate();} });
+            butterAmountInput.addEventListener('change', handleScaleUpdate);
+            butterAmountInput.value = STANDARD_BUTTER_GRAMS;
+        }
+
+        // Initial Page Setup
+        updateTextContent(); // Set static text
+        updateYieldDisplay(); // Set initial yield
+        displayTips(); // Display tips
+        showPlaceholderContent(); // Start with placeholder visible & KeyDiffs hidden
+
+        body.classList.add('loaded');
+    }
+
+    // --- RUN INITIALIZATION ---
+    initialize();
+
+}); // --- END OF DOMContentLoaded ---
+
+// ==== END OF CORRECTED HYBRID SCRIPT.JS (with Key Differences restored) ====// ==== START OF CORRECTED HYBRID SCRIPT.JS ====
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- CONFIGURATION ---
