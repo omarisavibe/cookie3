@@ -3,113 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Title will be set by JS -->
-    <title>Omar's Cookie Guide</title>
+    <!-- Updated Title Key -->
+    <title data-lang-key="pageTitle">🍪 Omar's Cookie Lab! 🍪</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Caveat:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <!-- Link the CSS file -->
+    <link rel="stylesheet" href="cookietest_style_merged.css">
 </head>
-<body dir="ltr"> <!-- Direction set by JS -->
+<body dir="ltr">
 
     <div class="container">
-        <header class="main-header">
-            <!-- Main Title - Populated by JS -->
-            <h1 data-lang-key="mainTitle"></h1>
+        <header class="main-header fade-in-on-scroll">
+            <!-- Updated Title Key -->
+            <h1 id="main-title-h1" data-lang-key="mainTitle"><span class="emoji">🍪</span> Omar's Insanely Good Cookie Guide! <span class="emoji">🍪</span></h1>
+
             <div class="controls-master">
                 <div class="language-selector">
                     <button class="lang-btn active" data-lang="en">🌍 English</button>
-                    <button class="lang-btn" data-lang="ar">🌍 العربية</button>
+                    <button class="lang-btn" data-lang="ar">🌍 العربية (مصر)</button>
                 </div>
-                <!-- Yield Info - Populated by JS -->
-                <p class="yield-info" data-lang-key="yieldInfo"></p>
-            </div>
+                <!-- Template for Unit Toggles (remains hidden) -->
+                <div id="unit-toggles-template" style="display: none;">
+                     <div class="unit-selector" data-lang="en">
+                          <!-- Updated Unit Label Keys -->
+                          <span class="unit-label" data-lang-key="unitLabelEn">Units:</span>
+                          <button class="unit-btn" data-unit-type="imperial" data-lang-key="unitImperial">Imperial</button>
+                          <button class="unit-btn" data-unit-type="metric" data-lang-key="unitMetric">Metric</button>
+                     </div>
+                      <div class="unit-selector" data-lang="ar">
+                          <span class="unit-label" data-lang-key="unitLabelAr">الوحدات:</span>
+                          <button class="unit-btn" data-unit-type="cups" data-lang-key="unitCups">أكواب</button>
+                          <button class="unit-btn" data-unit-type="grams" data-lang-key="unitGrams">جرامات</button>
+                      </div>
+                 </div>
+                 <!-- Added ID to yield paragraph -->
+                 <p class="yield-info" id="yield-info-display" data-lang-key="yieldInfoBase">Yield: Select a type</p>
+             </div>
         </header>
 
-        <main>
-            <!-- Cookie Type Selector -->
-            <section class="cookie-type-selector">
-                <h2 data-lang-key="chooseStyle"></h2>
-                <div class="button-group">
-                    <button class="selector-btn" data-type="classic">
-                        <span class="emoji">⚖️</span> <span data-lang-key="typeClassic"></span>
-                    </button>
-                    <button class="selector-btn" data-type="thick">
-                        <span class="emoji">🧱</span> <span data-lang-key="typeThick"></span>
-                        <!-- Omar's Favorite Bubble (Absolutely positioned relative to button or container) -->
-                        <span id="omar-fav-bubble" data-lang-key="omarsFav"></span>
-                    </button>
-                    <button class="selector-btn" data-type="thin">
-                        <span class="emoji">🧇</span> <span data-lang-key="typeThin"></span>
-                    </button>
-                </div>
-            </section>
+         <!-- Header Image Area -->
+         <div id="cookie-image-header" class="fade-in-on-scroll">
+             <img id="selected-cookie-image" src="" alt="Cookie comparison or selected cookie type">
+         </div>
 
-            <!-- Selected Cookie Image Header -->
-            <div id="cookie-image-header">
-                 <img id="selected-cookie-image" src="" alt="Selected cookie image">
-                 <!-- Alt text updated by JS -->
+         <!-- Recipe Scaler Section -->
+         <section id="recipe-scaler" class="recipe-scaler fade-in-on-scroll visually-hidden">
+             <h3 data-lang-key="scalerTitle">🧈 Customize Your Batch Size!</h3>
+             <p data-lang-key="scalerDesc">Enter your starting butter amount (grams) to scale the metric recipe.</p>
+             <div class="scaler-input-group">
+                 <label for="butter-amount-input" data-lang-key="scalerLabel">Starting Butter (g):</label>
+                 <!-- Set default value consistent with baseButterAmount in JS -->
+                 <input type="number" id="butter-amount-input" name="butter-amount" min="50" step="1" placeholder="226" value="226">
+                 <button id="update-scale-btn" data-lang-key="scalerButton">Update Scale</button>
+             </div>
+             <span class="scaler-note" data-lang-key="scalerNote">Note: Only metric (gram) values are scaled. Imperial (cup) units are approximate.</span>
+         </section>
+
+        <!-- Cookie Selection Buttons -->
+        <div class="cookie-type-selector fade-in-on-scroll">
+            <h2 data-lang-key="chooseStyle">Alright, Cookie Boss! Pick Your Poison (aka Style!):</h2>
+             <div class="button-group-container">
+                 <div class="button-group">
+                     <!-- Buttons now use typeClassicShort etc. for button text -->
+                     <button class="selector-btn" data-type="classic" aria-pressed="false">
+                         <span class="emoji">⚖️</span> <span data-lang-key="typeClassicShort">Classic Balanced</span>
+                     </button>
+                     <button class="selector-btn" data-type="thick" aria-pressed="false">
+                         <span class="emoji">🧱</span> <span data-lang-key="typeThickShort">Thick & Gooey</span>
+                     </button>
+                     <button class="selector-btn" data-type="thin" aria-pressed="false">
+                         <span class="emoji">🧇</span> <span data-lang-key="typeThinShort">Thin & Crispy</span>
+                     </button>
+                  </div>
+                  <!-- Omar's Fave Text from original -->
+                  <span class="omars-fav-text visually-hidden" data-lang-key="omarsFavText">Omar's Fave!</span>
+             </div>
+        </div>
+
+        <!-- Key Differences Area -->
+        <div id="key-differences" class="key-differences-container visually-hidden">
+             <!-- Title Structure Adjusted for JS population -->
+             <h3 data-lang-key="keyDifferencesTitleBase">🔑 Key Differences Breakdown!<span class="dynamic-cookie-name"></span></h3>
+             <div class="diff-points">
+                 <!-- Points will be populated by JS -->
+             </div>
+        </div>
+
+        <!-- Recipe Details Area -->
+        <div id="recipe-details" class="recipe-container visually-hidden">
+             <!-- Content (title, toggles, ingredients, steps) will be populated by JS -->
+             <div class="placeholder" data-lang-key="placeholderSelect">👆 Select a cookie style above to load the recipe and details! ✨</div>
+        </div>
+
+        <!-- Easter Egg Area -->
+        <div id="easter-egg-container" class="easter-egg visually-hidden">
+             <!-- Content will be populated by JS when thick is clicked again -->
+        </div>
+
+        <!-- Tips Section -->
+        <div class="lower-sections fade-in-on-scroll">
+            <div class="tip-box">
+                 <!-- Title structure adjusted slightly for emoji handling in JS -->
+                <h3 data-lang-key="tipsTitle"></h3>
+                <ul id="tips-list">
+                    <!-- Tips will be populated by JS -->
+                </ul>
             </div>
+        </div>
 
-             <!-- Key Differences Area -->
-            <section id="key-differences" class="key-differences-container visually-hidden">
-                 <!-- Title updated by JS -->
-                 <h3 data-lang-key="keyDifferencesTitle"></h3>
-                 <div class="diff-points">
-                     <div class="diff-point">
-                         <h4 data-lang-key="butterTitle"></h4>
-                         <p id="butter-method-desc"></p> <!-- Content from recipe.butterMethod -->
-                     </div>
-                     <div class="diff-point">
-                         <h4 data-lang-key="chillingTitle"></h4>
-                         <p id="chilling-method-desc"></p> <!-- Content from recipe.chillingMethod -->
-                     </div>
-                     <div class="diff-point">
-                         <h4 data-lang-key="otherNotesTitle"></h4>
-                         <p id="other-notes-desc"></p> <!-- Content from recipe.otherNotes -->
-                     </div>
-                 </div>
-            </section>
+        <!-- Final Shoutout -->
+        <div class="final-shoutout fade-in-on-scroll">
+            <p data-lang-key="finalTag">Nailed it? Wanna show off? Tag me! <a href="https://www.instagram.com/omarisavibe/" target="_blank">@omarisavibe</a> 😄</p>
+        </div>
 
-             <!-- Recipe Details Area -->
-             <section id="recipe-details" class="recipe-container">
-                  <!-- Content (placeholder or recipe) populated by JS -->
-                  <div class="placeholder" data-lang-key="placeholderSelect"></div>
-             </section>
+         <!-- Content Placeholder (initially visible) -->
+         <div class="content-placeholder visible">
+             <p data-lang-key="placeholderSelect">👆 Select a cookie style above to load the recipe and details! ✨</p>
+         </div>
 
-             <!-- Easter Egg Container (Initially Hidden) -->
-             <section id="easter-egg-container" class="easter-egg visually-hidden">
-                  <h3 data-lang-key="easterEggTitle"></h3>
-                  <p data-lang-key="easterEggIntro"></p>
-                  <h4><strong data-lang-key="easterEggIdea"></strong></h4>
-                  <p data-lang-key="easterEggDesc"></p>
-                  <img id="stuffed-cookie-image" src="" alt="Delicious stuffed cookie">
-                  <p data-lang-key="easterEggPistachioTip"></p>
-                  <p class="pistachio-link">
-                      <span data-lang-key="pistachioReco"></span>
-                       <!-- Link will be added by JS if present in data -->
-                      <a href="#" target="_blank" rel="noopener noreferrer" data-lang-key="pistachioLinkText"></a>
-                      <span data-lang-key="pistachioLinkSource"></span>
-                  </p>
-             </section>
+    </div>
 
-              <!-- Tips Section -->
-             <section class="lower-sections tip-section">
-                 <div class="tip-box">
-                     <!-- Title updated by JS -->
-                     <h3 data-lang-key="tipsTitle"></h3>
-                     <ul id="tips-list">
-                         <!-- Tips populated by JS -->
-                     </ul>
-                 </div>
-             </section>
-
-             <!-- Final Shoutout -->
-             <footer class="final-shoutout" data-lang-key="finalTag"></footer>
-
-        </main>
-    </div> <!-- End container -->
-
-    <script src="script.js"></script>
+    <!-- Link the JS file -->
+    <script src="cookietest_script_merged.js"></script>
 </body>
 </html>
