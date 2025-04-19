@@ -1,157 +1,593 @@
-/* ==== ADD OR MODIFY IN YOUR style.css ==== */
+/* ==== CORE SETUP & VARIABLES ==== */
+:root {
+    --primary-color: #6b4b2b; /* Deep Brown */
+    --secondary-color: #a0522d; /* Sienna */
+    --background-color: #fdfbf7; /* Creamy White */
+    --card-background: #fff;
+    --highlight-bg: #f4eee6; /* Light Parchment */
+    --border-color: #e0d8cc;
+    --text-color: #333;
+    --accent-classic: #f4a261; /* Orange */
+    --accent-thick: #e76f51; /* Red-Orange */
+    --accent-thin: #2a9d8f; /* Teal */
+    --lang-active-bg: #4a4e69; /* Dark bluish grey */
+    --key-diff-bg: #fafafa; /* Very light grey */
+    --easter-egg-bg: #fffde7; /* Light yellow for easter egg */
+    --easter-egg-border: #fbc02d; /* Gold border for easter egg */
 
-/* --- General Visibility & Transitions --- */
+    /* Fonts & Transitions */
+    --font-primary: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-handwriting: 'Caveat', cursive; /* Add if needed */
+    --transition-fast: 0.3s ease;
+    --transition-medium: 0.5s ease;
+    --transition-slow: 0.7s ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; font-size: 16px; /* Base font size */}
+
 body {
+    font-family: var(--font-primary);
+    line-height: 1.7;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    padding: 0;
+    margin: 0;
     opacity: 0; /* Start hidden */
-    transition: opacity 0.5s ease-in-out;
+    transition: opacity var(--transition-medium);
 }
 body.loaded {
     opacity: 1;
 }
 
-.visually-hidden { /* Ensure you have a robust visually-hidden class */
-    position: absolute !important;
-    height: 1px; width: 1px;
-    overflow: hidden;
-    clip: rect(1px, 1px, 1px, 1px);
-    white-space: nowrap; /* added */
-    border: 0; /* added */
-    margin: -1px; /* added */
-    padding: 0; /* added */
-    opacity: 0; /* Add opacity for transition */
+.container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: var(--card-background); /* Give main container a bg */
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+}
+
+a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color var(--transition-fast);
+}
+a:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+h1, h2, h3, h4 { margin-bottom: 0.8em; color: var(--primary-color); }
+h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); }
+h2 { font-size: clamp(1.3rem, 3vw, 1.6rem); }
+h3 { font-size: clamp(1.2rem, 2.5vw, 1.4rem); }
+h4 { font-size: clamp(1.05rem, 2.2vw, 1.2rem); color: var(--secondary-color); }
+
+
+/* --- General helper spans --- */
+.highlight {
+    background-color: rgba(160, 82, 45, 0.1); /* Sienna transparent */
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-weight: 600; /* Make highlights bolder */
+    color: var(--secondary-color);
+}
+.critical {
+     border-bottom: 2px dotted var(--accent-thick);
+     padding-bottom: 1px;
+     font-weight: 700; /* Make critical stand out */
+     color: var(--accent-thick);
+}
+.emoji {
+    display: inline-block;
+    vertical-align: -0.1em;
+    margin-right: 0.3em; /* Add space after emoji */
+}
+
+/* --- Language Direction --- */
+body[dir="rtl"] { text-align: right; }
+body[dir="rtl"] .emoji { margin-left: 0.3em; margin-right: 0;} /* Adjust emoji spacing */
+
+/* --- Header & Controls --- */
+.main-header {
+    text-align: center;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+}
+.main-header h1 { margin-bottom: 15px; }
+
+.controls-master {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Allow wrapping */
+    gap: 15px; /* Spacing between items */
+    margin-top: 15px;
+}
+.language-selector {
+    /* Takes remaining space */
+}
+.lang-btn {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    color: var(--text-color);
+    padding: 8px 15px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin: 0 4px;
+    transition: all var(--transition-fast);
+}
+.lang-btn:hover {
+    background-color: #ddd;
+    transform: translateY(-1px);
+}
+.lang-btn.active {
+    background-color: var(--lang-active-bg);
+    color: white;
+    border-color: var(--lang-active-bg);
+    transform: translateY(0);
+}
+.yield-info {
+    font-style: italic;
+    color: #666;
+    margin: 0; /* Remove default margin */
+    flex-shrink: 0; /* Prevent shrinking */
+}
+
+/* --- Cookie Type Selector --- */
+.cookie-type-selector {
+    background-color: var(--highlight-bg);
+    padding: 20px 25px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border: 1px solid var(--border-color);
+    text-align: center; /* Center heading */
+}
+.cookie-type-selector h2 {
+    margin-bottom: 20px;
+    border: none;
+    font-size: 1.4em;
+    color: var(--primary-color);
+}
+.button-group {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px 20px; /* Row and column gap */
+}
+.selector-btn {
+    background-color: var(--card-background);
+    border: 2px solid var(--secondary-color);
+    color: var(--secondary-color);
+    padding: 12px 25px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: all var(--transition-fast);
+    display: inline-flex; /* Use inline-flex */
+    align-items: center;
+    gap: 8px;
+    position: relative; /* Needed for absolute positioning of fav bubble */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.selector-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+.selector-btn .emoji {
+    font-size: 1.2em;
+}
+.selector-btn.active {
+    color: white;
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+/* Active state colors */
+.selector-btn[data-type="classic"].active { background-color: var(--accent-classic); border-color: var(--accent-classic); }
+.selector-btn[data-type="thick"].active { background-color: var(--accent-thick); border-color: var(--accent-thick); }
+.selector-btn[data-type="thin"].active { background-color: var(--accent-thin); border-color: var(--accent-thin); }
+
+/* Omar's Fav Bubble */
+#omar-fav-bubble {
+    display: inline-block;
+    position: absolute;
+    top: -10px; /* Position above button */
+    right: -10px; /* Position to the right */
+    background-color: var(--accent-thick);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: bold;
+    white-space: nowrap;
+    z-index: 10;
+    opacity: 0;
+    transform: translateY(5px) scale(0.8);
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+    pointer-events: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+#omar-fav-bubble.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+/* RTL adjustments for bubble */
+body[dir="rtl"] #omar-fav-bubble {
+    right: auto;
+    left: -10px;
 }
 
 
-/* --- Cookie Image Header Transition --- */
+/* --- Selected Cookie Image Header --- */
 #cookie-image-header {
-    max-height: 500px; /* Adjust as needed */
+    max-height: 0; /* Start hidden */
     overflow: hidden;
     opacity: 0;
-    transition: opacity 0.6s ease, max-height 0.6s ease, margin-bottom 0.6s ease;
-    margin-bottom: 0; /* Collapse margin when hidden */
-    border-radius: 8px; /* Match other sections */
+    transition: opacity var(--transition-medium), max-height var(--transition-medium), margin-bottom var(--transition-medium);
+    margin-bottom: 0;
+    border-radius: 8px;
 }
 #cookie-image-header.visible {
     opacity: 1;
-    max-height: 500px; /* Should be larger than actual height */
-    margin-bottom: 25px; /* Restore margin when visible */
+    max-height: 45vh; /* Allow space for image */
+    margin-bottom: 30px; /* Add space when visible */
 }
 #cookie-image-header img {
-    display: block; /* Prevent extra space below image */
+    display: block;
     width: 100%;
-    height: auto; /* Maintain aspect ratio */
-    max-height: 40vh; /* Limit height */
-    object-fit: cover; /* Cover the area nicely */
+    height: auto;
+    max-height: 45vh; /* Limit height */
+    object-fit: cover;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-
-/* --- Key Differences Transition (Ensure these match your provided CSS) --- */
+/* --- Key Differences Area --- */
 .key-differences-container {
     background-color: var(--key-diff-bg);
     border: 1px dashed var(--secondary-color);
     border-radius: 8px;
-    padding: 20px;
+    padding: 25px;
     margin-bottom: 30px;
     opacity: 1;
-    transition: opacity 0.5s ease, max-height 0.5s ease, padding 0.5s ease, margin 0.5s ease, border 0.5s ease; /* Added more properties */
+    transition: opacity var(--transition-medium), max-height var(--transition-medium), padding var(--transition-medium), margin var(--transition-medium), border var(--transition-medium);
     max-height: 1000px; /* Generous max-height for content */
     overflow: hidden;
 }
 .key-differences-container.visually-hidden {
-    opacity: 0 !important; /* Use important if needed to override */
+    opacity: 0 !important;
     max-height: 0 !important;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
-    border-width: 0 !important; /* Hide border smoothly */
-    /* Keep position: static or relative as needed by layout */
-     overflow: hidden; /* Ensure content clip */
+    border-width: 0 !important;
+    overflow: hidden;
 }
-
-
-/* --- Omar's Fav Bubble Transition --- */
-#omar-fav-bubble {
-    display: inline-block; /* Or block depending on desired layout */
-    position: absolute; /* Example positioning */
-    top: 10px;
-    right: 10px; /* Adjust as needed */
-    background-color: var(--accent-thick); /* Match theme */
-    color: white;
-    padding: 5px 12px;
-    border-radius: 15px 0 0 15px;
-    font-size: 0.85em;
-    font-weight: bold;
-    opacity: 0;
-    transform: translateX(20px) scale(0.8);
-    transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    z-index: 10; /* Keep above other elements */
-     pointer-events: none; /* Prevent interaction unless needed */
+.key-differences-container h3 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: var(--primary-color);
+    font-size: 1.5em; /* Larger title */
 }
-#omar-fav-bubble.visible {
-    opacity: 1;
-    transform: translateX(0) scale(1);
+.key-differences-container h3 .dynamic-cookie-name {
+     /* Style the appended name */
+     color: var(--secondary-color); /* Example */
+     font-weight: bold;
 }
-
-
-/* --- Easter Egg Transition --- */
-#easter-egg-container {
-    background-color: var(--highlight-bg); /* Match other sections or use unique style */
-    border: 2px dashed var(--accent-thick); /* Example border */
-    border-radius: 8px;
+.diff-points {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); /* Responsive */
+    gap: 20px;
+}
+.diff-point {
+    background-color: var(--card-background);
     padding: 20px;
-    margin-top: 30px; /* Spacing from recipe */
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.diff-point h4 {
+    font-size: 1.15em;
+    color: var(--secondary-color);
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--border-color); /* Add separator */
+    padding-bottom: 8px;
+}
+.diff-point p {
+    font-size: 0.98em;
+    color: #444;
+    margin: 0;
+    line-height: 1.6;
+}
+
+
+/* --- Recipe Details Container --- */
+.recipe-container {
+    padding: 30px;
+    margin-top: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    min-height: 150px;
+    background-color: var(--card-background); /* Default */
+    transition: background-color var(--transition-medium), border-color var(--transition-medium);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+}
+.recipe-container h3 { /* Recipe Title */
+    margin-bottom: 25px;
+    text-align: center;
+    font-size: 1.6em;
+    color: var(--primary-color);
+}
+/* Theme Backgrounds */
+.recipe-container.classic-theme { background-color: #fef3e6; border-color: var(--accent-classic); }
+.recipe-container.thick-theme { background-color: #fdece8; border-color: var(--accent-thick); }
+.recipe-container.thin-theme { background-color: #e4f5f3; border-color: var(--accent-thin); }
+
+.placeholder {
+    text-align: center;
+    color: #777;
+    font-size: 1.1em;
+    padding: 50px 20px;
+    font-style: italic;
+}
+
+.list-header { /* Common style for Ingredients/Steps headers */
+    font-size: 1.3em;
+    color: var(--primary-color);
+    margin-top: 30px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--secondary-color);
+}
+
+.ingredient-list, .steps-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.ingredient-list li, .steps-list li {
+    margin-bottom: 15px;
+    padding-inline-start: 40px; /* Space for icon/number */
+    position: relative;
+    font-size: 1em;
+    line-height: 1.6;
+}
+
+/* Icons for ingredients list */
+.ingredient-list li::before {
+    content: attr(data-emoji); /* Use emoji from data attribute */
+    position: absolute;
+    inset-inline-start: 5px;
+    top: 1px;
+    font-size: 1.3em;
+    width: 25px; /* Ensure consistent width */
+    text-align: center;
+}
+
+/* Numbering for steps list */
+.steps-list { counter-reset: step-counter; }
+.steps-list li::before {
+    content: counter(step-counter);
+    counter-increment: step-counter;
+    background-color: var(--secondary-color);
+    color: white;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9em;
+    font-weight: bold;
+    position: absolute;
+    inset-inline-start: 0;
+    top: 1px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+/* --- How to Toast Section --- */
+.how-to-toast {
+    background-color: var(--highlight-bg);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--secondary-color);
+    padding: 15px 20px;
+    margin: 25px 0;
+    border-radius: 6px;
+}
+.how-to-toast h4 {
+    margin: 0 0 10px 0;
+    font-size: 1.1em;
+    color: var(--primary-color);
+    border: none; /* Remove inherited border */
+    padding: 0;
+}
+.how-to-toast p {
+    font-size: 0.95em;
+    line-height: 1.6;
+    color: #444;
+    margin: 0;
+}
+
+/* --- Science Note Section --- */
+.science-note {
+     background-color: #f8f9fa; /* Light grey */
+     border: 1px solid #e9ecef;
+     padding: 20px 25px;
+     margin: 30px 0;
+     border-radius: 6px;
+     border-left: 4px solid var(--primary-color);
+}
+.science-note h4 {
+    margin: 0 0 15px 0;
+    font-size: 1.2em;
+    color: var(--primary-color);
+    text-align: center;
+    border: none; padding: 0;
+}
+.science-note h4 .emoji { font-size: 1.1em; }
+.science-note p {
+    font-size: 1em;
+    line-height: 1.7;
+    color: #343a40;
+    margin: 0;
+}
+
+/* --- Tips Section --- */
+.lower-sections { margin-top: 40px; }
+.tip-box {
+     background-color: #eef3ff; /* Light blueish */
+     border: 1px solid #d5e0ff;
+     padding: 25px;
+     border-radius: 8px;
+     margin-top: 40px; /* Added margin top */
+}
+.tip-box h3 {
+    color: #004085; /* Dark blue */
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.5em;
+    border-bottom: 1px dashed #b8daff;
+    padding-bottom: 10px;
+}
+.tip-box h3 .emoji { vertical-align: middle; }
+
+#tips-list {
+    list-style: none;
+    padding: 0;
+    column-count: 1; /* Default to 1 column */
+    column-gap: 30px;
+}
+@media (min-width: 768px) {
+    #tips-list { column-count: 2; } /* 2 columns on larger screens */
+}
+#tips-list li {
+     padding-inline-start: 35px;
+     position: relative;
+     margin-bottom: 12px;
+     font-size: 0.98em;
+     line-height: 1.6;
+     break-inside: avoid; /* Prevent tips breaking across columns */
+}
+#tips-list li::before {
+     content: attr(data-emoji);
+     position: absolute;
+     inset-inline-start: 0;
+     top: -1px;
+     font-size: 1.4em;
+     width: 25px; /* Consistency */
+     text-align: center;
+}
+
+/* --- Easter Egg Section --- */
+#easter-egg-container {
+    background: var(--easter-egg-bg);
+    border: 2px dashed var(--easter-egg-border);
+    border-radius: 8px;
+    padding: 25px;
+    margin-top: 30px;
+    text-align: center;
     opacity: 0;
     max-height: 0;
     overflow: hidden;
-    transition: opacity 0.6s ease, max-height 0.6s ease, padding 0.6s ease, margin 0.6s ease, border 0.6s ease;
-    /* display: none; /* Initially hidden, JS will change to block */
+    transition: opacity var(--transition-medium), max-height var(--transition-medium), padding var(--transition-medium), margin var(--transition-medium), border var(--transition-medium);
 }
-
 #easter-egg-container.visible {
     opacity: 1;
-    max-height: 1500px; /* Generous height for content */
-    padding: 20px; /* Restore padding */
-    margin-top: 30px; /* Restore margin */
-    border-width: 2px; /* Restore border */
-     /* display: block; JS should handle this */
+    max-height: 1500px; /* Allow ample space */
+    padding: 25px;
+    margin-top: 30px;
+    border-width: 2px;
+}
+#easter-egg-container h3 {
+    color: var(--accent-thick); /* Use accent color */
+    font-family: var(--font-handwriting); /* Fun font */
+    font-size: 1.8em;
+    margin-bottom: 15px;
+}
+#easter-egg-container h4 {
+    color: var(--primary-color);
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 1.3em;
+}
+#easter-egg-container p {
+    font-size: 1.05em;
+    color: #555;
+    line-height: 1.7;
+    margin-bottom: 15px;
+    max-width: 600px; /* Limit width for readability */
+    margin-left: auto;
+    margin-right: auto;
 }
 #easter-egg-container img#stuffed-cookie-image {
     display: block;
-    max-width: 90%; /* Responsive */
-    width: 350px; /* Max width */
+    max-width: 90%;
+    width: 380px;
     height: auto;
-    margin: 15px auto; /* Center */
-    border-radius: 6px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    margin: 20px auto;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
 }
-/* Add other styles for Easter Egg content (h4, p, links) as needed */
+.pistachio-link {
+    font-size: 0.95em;
+    margin-top: 10px;
+}
 .pistachio-link a {
     font-weight: bold;
-    color: #4CAF50; /* Greenish for pistachio */
-}
-.pistachio-link a:hover {
+    color: #4CAF50; /* Greenish */
     text-decoration: underline;
 }
-
-/* --- Adjust List Paddings for RTL --- */
-body[dir="rtl"] .ingredient-list li,
-body[dir="rtl"] .steps-list li,
-body[dir="rtl"] #tips-list li {
-    padding-inline-start: initial; /* Reset default */
-    padding-inline-end: 35px; /* Apply padding to the right */
+.pistachio-link a:hover {
+    color: #388E3C;
 }
 
-body[dir="rtl"] .ingredient-list li::before,
-body[dir="rtl"] .steps-list li::before,
-body[dir="rtl"] #tips-list li::before {
-    inset-inline-start: initial; /* Reset default */
-    inset-inline-end: 5px; /* Position icon/counter to the right */
+/* --- Final Shoutout --- */
+.final-shoutout {
+    margin-top: 40px;
+    padding-top: 25px;
+    border-top: 2px dotted var(--border-color);
+    text-align: center;
+    font-size: 1.2em;
+    color: #555;
+    line-height: 1.6;
+}
+.final-shoutout a {
+    font-weight: bold;
 }
 
-/* Ensure highlight/critical spans work in RTL */
-body[dir="rtl"] .highlight, body[dir="rtl"] .critical {
-    /* Usually display:inline or inline-block, should work fine */
+
+/* --- Media Queries --- */
+@media (max-width: 768px) {
+    .container { padding: 15px; margin: 15px; width: auto; }
+    .controls-master { flex-direction: column; align-items: center; gap: 15px;}
+    .yield-info { order: 1; } /* Put yield below buttons on mobile */
+    .language-selector { order: 2; }
+    .diff-points { grid-template-columns: 1fr; } /* Stack difference points */
+    h1 { font-size: 1.8em; }
+    .button-group { gap: 10px; }
+    .selector-btn { padding: 10px 18px; font-size: 0.95em;}
+    #tips-list { column-count: 1; } /* Single column tips */
+    .recipe-container, .key-differences-container, .tip-box, #easter-egg-container { padding: 20px; }
+}
+
+@media (max-width: 480px) {
+     html { font-size: 15px; } /* Adjust base font slightly */
+     .container { padding: 10px; margin: 10px; }
+     .main-header h1 { font-size: 1.6em; }
+     .selector-btn { width: 100%; justify-content: center; } /* Full width buttons */
+     .diff-point { padding: 15px; }
+     .recipe-container h3 { font-size: 1.4em; }
+     .list-header { font-size: 1.2em; }
+     .ingredient-list li, .steps-list li { font-size: 0.95em; padding-inline-start: 35px;}
+     .steps-list li::before { width: 24px; height: 24px; font-size: 0.8em;}
+     #easter-egg-container img#stuffed-cookie-image { width: 95%; max-width: 300px;}
 }
