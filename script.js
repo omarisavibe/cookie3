@@ -1,4 +1,161 @@
-document.addEventListener('DOMContentLoaded', () => {
+// --- START OF RELEVANT JS CHANGES ---
+
+// ... (Keep existing code before this function) ...
+
+function updateYieldDisplay() {
+    // console.log('--- Updating Yield Display ---'); // Keep for debugging if needed
+    // console.log('Current Scale Factor:', currentScaleFactor);
+    const yieldElement = document.querySelector('[data-lang-key="yieldInfo"]');
+    // console.log('Yield Element Found:', yieldElement);
+
+    if (!yieldElement) {
+         console.error('Yield element not found! Cannot update display.');
+         return;
+    }
+
+    // Calculate scaled yield, rounding to nearest whole cookie
+    const scaledMin = Math.round(BASE_YIELD_MIN * currentScaleFactor);
+    const scaledMax = Math.round(BASE_YIELD_MAX * currentScaleFactor);
+
+    // Prevent weird displays like "0 cookies" - ensure minimum is at least 1
+    const displayMin = Math.max(1, scaledMin);
+    const displayMax = Math.max(1, scaledMax); // Max should also be at least 1
+
+    // console.log('Base Yield:', BASE_YIELD_MIN, BASE_YIELD_MAX);
+    // console.log('Scaled Yield:', displayMin, displayMax);
+
+    // === FIX: Reconstruct the string instead of replacing parts ===
+    let newText = "";
+    if (currentLang === 'en') {
+        const cookieWord = displayMax === 1 ? 'cookie' : 'cookies';
+        newText = `Whips up about ${displayMin}-${displayMax} ${cookieWord} 🍪`;
+    } else if (currentLang === 'ar') {
+        // Basic Arabic structure - Adjust grammar/pluralization if needed for Arabic specifics
+        newText = `بتعمل حوالي ${displayMin}-${displayMax} قطعة كوكيز 🍪`;
+    } else {
+        // Fallback or add other languages
+        newText = `Yields approx. ${displayMin}-${displayMax} cookies 🍪`;
+    }
+    // ==============================================================
+
+    // console.log('Final Yield Text:', newText);
+
+    yieldElement.innerHTML = newText; // Use innerHTML to render the cookie emoji
+    // console.log('--- Yield Display Update Complete ---');
+}
+
+// ... (Keep existing code between functions) ...
+
+function generateIngredientsHTML(type) {
+    const texts = langData[currentLang];
+    const recipe = texts.recipes[type];
+    if (!recipe?.ingredients) return '';
+
+    const unitSystemKeyForMetric = (currentLang === 'ar') ? 'grams' : 'metric';
+    const unitKey = (currentUnit === 'imperial')
+                      ? (currentLang === 'ar' ? 'cups' : 'imperial')
+                      : unitSystemKeyForMetric;
+
+    let ingredientsHtml = '';
+    recipe.ingredients.forEach(ing => {
+        // Get the base measurement string for the selected unit system
+        let measurement = ing[unitKey] || ing.metric || ing.grams || ing.imperial || ing.cups || 'N/A';
+
+        // Apply scaling ONLY if the current unit is metric AND scale factor is not 1
+        if (unitKey === unitSystemKeyForMetric && currentScaleFactor !== 1) {
+            const gramMarker = (currentLang === 'ar') ? 'جرام' : 'g';
+            const gramMarkerOptionalSpace = `\\s*${gramMarker}`; // Allow optional space before unit
+
+            try { // Add a try-catch block for safety during complex string manipulation
+                // --- REFINED SCALING LOGIC ---
+
+                // 1. Handle Butter Specifically (using STANDARD_BUTTER_GRAMS as the base)
+                if (ing.key === 'butter') {
+                    const scaledButterAmount = Math.round(STANDARD_BUTTER_GRAMS * currentScaleFactor);
+                    // Regex to find the standard butter amount followed by 'g' or 'جرام'
+                    const butterRegex = new RegExp(`(${STANDARD_BUTTER_GRAMS})${gramMarkerOptionalSpace}`);
+                    if (butterRegex.test(measurement)) {
+                         measurement = measurement.replace(butterRegex, `${scaledButterAmount}${gramMarker}`);
+                    } else {
+                         // Fallback: if the standard amount isn't found, try replacing the *first* number+gram combo
+                         // This is less ideal but provides a backup
+                         const firstGramRegex = new RegExp(`(\\d+(\\.\\d+)?)${gramMarkerOptionalSpace}`);
+                         measurement = measurement.replace(firstGramRegex, `${scaledButterAmount}${gramMarker}`);
+                         console.warn(`Butter scaling fallback used for: ${ing.key}. Original: ${ing[unitKey]}`);
+                    }
+                } else {
+                    // 2. Handle Ranges (e.g., "15-20g", "٥٠-١٠٠ جرام")
+                    // Regex: number(s) - number(s) g/جرام
+                    const rangeRegex = new RegExp(`(\\d+)\\s*-\\s*(\\d+)${gramMarkerOptionalSpace}`);
+                    const rangeMatch = measurement.match(rangeRegex);
+
+                    if (rangeMatch && rangeMatch[1] && rangeMatch[2]) {
+                        const minGrams = parseFloat(rangeMatch[1]);
+                        const maxGrams = parseFloat(rangeMatch[2]);
+                        if (!isNaN(minGrams) && !isNaN(maxGrams)) {
+                            const scaledMinGrams = Math.round(minGrams * currentScaleFactor);
+                            const scaledMaxGrams = Math.round(maxGrams * currentScaleFactor);
+                            // Replace the entire matched range part
+                            measurement = measurement.replace(rangeMatch[0], `${scaledMinGrams}-${scaledMaxGrams}${gramMarker}`);
+                        } else {
+                             console.warn(`Scaling failed for range: ${rangeMatch[0]} in ${ing.key}`);
+                        }
+                    } else {
+                        // 3. Handle Single Numbers (e.g., "100g", "٢٥٠ جرام")
+                        // Regex: number(s) (potentially float) g/جرام
+                        // Make this specific - look for digits followed by the gram marker.
+                        // Use a capturing group for the number. Search globally initially.
+                        const singleGramRegex = new RegExp(`(\\d+(\\.\\d+)?)${gramMarkerOptionalSpace}`, 'g'); // Global search
+                        let match;
+                        let lastMeasurement = measurement; // Store original for comparison if needed
+                        let replacementMade = false;
+
+                        // Iterate through all matches (though usually there's just one primary amount)
+                        while ((match = singleGramRegex.exec(lastMeasurement)) !== null) {
+                             if (match[1]) { // Check if the number part was captured
+                                 const originalGrams = parseFloat(match[1]);
+                                 if (!isNaN(originalGrams)) {
+                                     const scaledGrams = Math.round(originalGrams * currentScaleFactor);
+                                     // Replace only the FIRST occurrence found in the original string
+                                     // This avoids accidentally scaling numbers in notes like "bake at 180g..." if that was possible
+                                     if (!replacementMade) {
+                                        const specificMatchRegex = new RegExp(`(${match[1]})${gramMarkerOptionalSpace}`); // Non-global for replacement
+                                        measurement = measurement.replace(specificMatchRegex, `${scaledGrams}${gramMarker}`);
+                                        replacementMade = true;
+                                        // OPTIONAL: break here if you are sure only the first number needs scaling
+                                        // break;
+                                     }
+                                 } else {
+                                      console.warn(`Scaling failed for single value: ${match[0]} in ${ing.key} (NaN)`);
+                                 }
+                             }
+                        }
+                         if (!replacementMade && !rangeMatch && ing.key !== 'butter') {
+                             // If it's not butter, wasn't a range, and no single number was scaled, log a warning.
+                             // Exclude keys that might not have grams (like eggs, vanilla ml). Adjust as needed.
+                             if (!['eggs', 'vanilla', 'extra_liquid', 'leavening_soda', 'leavening_powder'].includes(ing.key)) { // Example keys to exclude
+                                console.warn(`No metric value scaled for: ${ing.key}. Original: ${ing[unitKey]}`);
+                             }
+                         }
+                    }
+                }
+                 // --- END REFINED SCALING LOGIC ---
+            } catch (error) {
+                 console.error(`Error scaling ingredient ${ing.key}:`, error);
+                 // Keep original measurement if scaling fails
+                 measurement = ing[unitKey] || ing.metric || ing.grams || 'Scaling Error';
+            }
+        }
+        // Append the (potentially scaled) measurement to the list
+        ingredientsHtml += `<li data-emoji="${ing.emoji || '🍪'}">${measurement}</li>`;
+    });
+    return ingredientsHtml;
+}
+
+
+// ... (Rest of your script.js code) ...
+
+// --- END OF RELEVANT JS CHANGES ---document.addEventListener('DOMContentLoaded', () => {
     // --- CONFIGURATION ---
     const DEFAULT_LANG = 'en';
     const DEFAULT_UNIT = 'metric';
