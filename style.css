@@ -9,6 +9,9 @@
     --shadow-light: rgba(138, 90, 68, 0.1);
     --shadow-medium: rgba(138, 90, 68, 0.15);
     --shadow-dark: rgba(138, 90, 68, 0.2);
+    /* Color for Omar's Fave Tag */
+    --fav-tag-color: var(--primary-color); /* Changed text/border color */
+    --fav-tag-bg: rgba(138, 90, 68, 0.1); /* Changed background color */
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
@@ -20,7 +23,6 @@ body.loaded { opacity: 1; }
 .main-header { text-align: center; border-bottom: 3px double var(--border-color); margin-bottom: 30px; padding-bottom: 20px; }
 h1 { color: var(--primary-color); margin-bottom: 10px; font-size: 2.4em; font-weight: 700; line-height: 1.2; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 5px 10px; }
 h1 .emoji { vertical-align: middle; font-size: 0.85em; display: inline-block; }
-/* Omar's Fav Text - Moved out of H1, styled separately */
 h2 { border-bottom: 1px solid var(--secondary-color); padding-bottom: 10px; margin-bottom: 25px; font-size: 1.8em; color: var(--primary-color); font-weight: 600; }
 h3 { font-size: 1.5em; margin-bottom: 20px; color: var(--secondary-color); font-weight: 600; margin-top: 0; }
 h4 { font-size: 1.2em; color: var(--primary-color); margin-bottom: 12px; font-weight: 600; margin-top: 0;}
@@ -40,37 +42,63 @@ a:hover { color: var(--primary-color); border-bottom: 1px solid var(--primary-co
 .yield-info { font-style: italic; color: #777; font-size: 0.95em; text-align: center; flex-basis: 100%; order: 3; }
 @media (min-width: 600px) { .yield-info { flex-basis: auto; order: 0; text-align: right; margin-left: auto; } }
 
-/* ** Unit Toggles Styling (Inside Recipe Area) ** */
-.recipe-unit-toggle {
+/* ** Unit Toggles Styling (Integrated Look) ** */
+/* Wrapper for positioning toggles within the recipe container */
+.unit-toggle-wrapper {
     text-align: center;
-    background-color: var(--highlight-bg); /* Use highlight background */
-    padding: 12px 15px; /* Slightly more padding */
-    margin-bottom: 30px; /* More space before ingredients */
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    border-left: 4px solid var(--secondary-color); /* Accent border */
+    padding: 0px 0px 15px 0px; /* Padding below for spacing */
+    margin-bottom: 15px; /* Margin below for spacing */
+    border-bottom: 1px dashed var(--border-color); /* Subtle separator */
     transition: all 0.4s ease-out;
     opacity: 1; /* Ensure visible */
 }
-/* Add transition for appearance/disappearance */
-.recipe-unit-toggle.hidden {
+.unit-toggle-wrapper.hidden { /* Hide smoothly */
     opacity: 0;
     max-height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    margin-bottom: 0;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
     overflow: hidden;
-    border: none;
 }
-.unit-selector { display: inline-block; margin: 0 10px; opacity: 1; transition: opacity 0.3s ease;}
+/* Individual language selectors */
+.unit-selector {
+    display: inline-block; /* Allows hiding via display:none from JS */
+    margin: 0 10px;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
 .unit-selector[style*="display: none"] { /* Hide smoothly */
     opacity: 0;
     pointer-events: none; /* Prevent clicking when hidden */
 }
 .unit-label { margin-inline-end: 8px; font-weight: 600; font-size: 0.95em;}
-.unit-btn { background-color: #fff; border: 1px solid #ccc; color: var(--text-color); padding: 6px 14px; border-radius: 15px; cursor: pointer; font-size: 0.9em; margin: 0 3px; transition: all 0.3s ease; }
-.unit-btn:hover { background-color: #eee; border-color: #bbb; transform: translateY(-1px); }
-.unit-btn.active { background-color: var(--secondary-color); color: white; border-color: var(--secondary-color); font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+/* Buttons */
+.unit-btn {
+    background-color: #fff;
+    border: 1px solid var(--border-color); /* Match card border */
+    color: var(--text-color);
+    padding: 6px 14px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin: 0 3px;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 2px var(--shadow-light);
+}
+.unit-btn:hover {
+    background-color: var(--highlight-bg); /* Use highlight bg on hover */
+    border-color: var(--secondary-color);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px var(--shadow-medium);
+}
+.unit-btn.active {
+    background-color: var(--secondary-color);
+    color: white;
+    border-color: var(--secondary-color);
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
 
 /* Cookie Selection */
 .cookie-type-selector { background-color: transparent; padding: 15px 0; border: none; margin-bottom: 30px; }
@@ -85,63 +113,63 @@ a:hover { color: var(--primary-color); border-bottom: 1px solid var(--primary-co
 .selector-btn[data-type="thick"].active { background-color: var(--accent-thick); border-color: var(--accent-thick); }
 .selector-btn[data-type="thin"].active { background-color: var(--accent-thin); border-color: var(--accent-thin); }
 
-/* Omar's Fave Text Styling */
+/* Omar's Fave Text Styling - REFINED */
 .omars-fav-text {
     font-family: var(--font-handwriting);
-    font-size: 1.1em; /* Make it a bit larger */
-    color: var(--accent-thick);
+    font-size: 1.15em; /* Slightly larger */
+    color: var(--fav-tag-color); /* Use variable */
     font-weight: 500;
-    background-color: rgba(231, 111, 81, 0.1);
-    padding: 4px 10px;
+    background-color: var(--fav-tag-bg); /* Use variable */
+    padding: 5px 12px; /* Adjusted padding */
     border-radius: 15px 15px 15px 0; /* Tag shape */
-    border: 1px dashed var(--accent-thick);
+    border: 1px dashed var(--fav-tag-color); /* Use variable */
     position: absolute;
-    top: -15px; /* Adjust positioning */
-    right: 10%; /* Adjust positioning */
-    transform: rotate(10deg); /* Tilted! */
+    top: -10px; /* Adjusted positioning */
+    right: 5%; /* Adjusted positioning */
+    transform: rotate(8deg) scale(0.8); /* Start smaller and rotated */
+    transform-origin: bottom right;
     z-index: 10;
-    transition: all 0.4s ease-out;
-    opacity: 0; /* Hidden initially */
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy transition */
+    opacity: 0;
     white-space: nowrap;
+    pointer-events: none; /* Prevent blocking button hover */
 }
 .omars-fav-text.visible {
     opacity: 1;
-    top: -20px; /* Animate position slightly */
+    top: -22px; /* Animate position */
+    transform: rotate(10deg) scale(1); /* Animate to full size */
 }
 /* Adjust position on smaller screens */
 @media (max-width: 768px) {
-    .omars-fav-text { right: 5%; top: -10px; font-size: 1em;}
-    .omars-fav-text.visible { top: -15px; }
+    .omars-fav-text { right: 2%; top: -8px; font-size: 1.05em;}
+    .omars-fav-text.visible { top: -18px; }
 }
 @media (max-width: 480px) {
+    /* Position centered below when buttons stack */
+    .button-group-container { padding-bottom: 30px; } /* Add space for the tag below */
     .omars-fav-text {
-        /* Position it differently when buttons stack */
-        top: auto;
-        bottom: -15px;
+        top: auto; /* Reset top */
+        bottom: -10px; /* Position below */
         left: 50%;
-        transform: translateX(-50%) rotate(0deg); /* Center below */
+        right: auto; /* Reset right */
+        transform: translateX(-50%) rotate(0deg) scale(0.8); /* Center below, start small */
+        transform-origin: center center;
         border-radius: 15px;
-        font-size: 0.9em;
+        font-size: 0.95em;
     }
-     .omars-fav-text.visible { bottom: -20px; }
-     .button-group-container { padding-bottom: 25px; } /* Add space for the tag below */
+     .omars-fav-text.visible {
+        bottom: -20px; /* Animate downwards */
+        transform: translateX(-50%) rotate(-2deg) scale(1); /* Add slight tilt */
+    }
 }
 
-
-/* Header Image Section - Softer Shadow */
-#cookie-image-header { text-align: center; margin: 0 auto 30px auto; min-height: 150px; transition: opacity 0.5s ease-out; background: none; /* Ensure no background */ }
-#selected-cookie-image {
-    max-width: 90%; width: 500px; height: auto; border-radius: 12px;
-    /* Softer, slightly inset shadow */
-    box-shadow: 0 5px 15px var(--shadow-light), 0 2px 5px rgba(0,0,0,0.05) inset;
-    display: block; margin: 0 auto; transition: opacity 0.4s ease-in-out, box-shadow 0.3s;
-    border: 1px solid rgba(0,0,0,0.05); /* Subtle border can help definition */
-    background: none; /* Ensure no background */
-}
-#selected-cookie-image[src=""] { opacity: 0; /* Hide if src is empty */ }
+/* Header Image Section */
+#cookie-image-header { text-align: center; margin: 0 auto 30px auto; min-height: 150px; transition: opacity 0.5s ease-out; background: none; }
+#selected-cookie-image { max-width: 90%; width: 500px; height: auto; border-radius: 12px; box-shadow: 0 5px 15px var(--shadow-light), 0 2px 5px rgba(0,0,0,0.05) inset; display: block; margin: 0 auto; transition: opacity 0.4s ease-in-out, box-shadow 0.3s; border: 1px solid rgba(0,0,0,0.05); background: none; }
+#selected-cookie-image[src=""] { opacity: 0; }
 
 /* Key Differences Section */
-.key-differences-container { background-color: var(--key-diff-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 25px; margin-bottom: 30px; max-height: 0; opacity: 0; overflow: hidden; transition: all 0.6s ease-out; border-style: dashed; border-color: transparent; /* Start transparent */ }
+.key-differences-container { background-color: var(--key-diff-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 25px; margin-bottom: 30px; max-height: 0; opacity: 0; overflow: hidden; transition: all 0.6s ease-out; border-style: dashed; border-color: transparent; }
 .key-differences-container.visible { max-height: 600px; opacity: 1; padding: 25px; margin-bottom: 30px; border-color: var(--secondary-color); }
 .key-differences-container h3 { text-align: center; margin-bottom: 25px; font-size: 1.4em; }
 .diff-points { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 25px; }
@@ -151,18 +179,18 @@ a:hover { color: var(--primary-color); border-bottom: 1px solid var(--primary-co
 .diff-point h4 .emoji { font-size: 1.3em; }
 .diff-point p { font-size: 1em; color: #555; }
 
-/* Recipe Details */
+/* Recipe Details Container */
 .recipe-container {
-    padding: 0; /* Padding applied to inner content area */
+    padding: 0; /* Inner elements have padding */
     margin-top: 0px;
     border-radius: 12px;
     border: 1px solid var(--border-color);
     background-color: var(--card-background);
     transition: background-color 0.5s ease, border-color 0.5s ease;
     box-shadow: 0 5px 15px var(--shadow-light);
-    min-height: 250px; /* Ensure enough space for toggles+content */
-    position: relative; /* Needed if absolutely positioning anything inside */
-    overflow: hidden; /* Clip potential overflow during transitions */
+    min-height: 250px;
+    position: relative;
+    overflow: hidden;
 }
 .recipe-container.classic-theme { background-color: #fff8f0; border-color: var(--accent-classic); }
 .recipe-container.thick-theme { background-color: #feedeb; border-color: var(--accent-thick); }
@@ -170,28 +198,35 @@ a:hover { color: var(--primary-color); border-bottom: 1px solid var(--primary-co
 
 /* Inner content area for recipe text */
 .recipe-content-area {
-    padding: 30px; /* Add padding here */
+    padding: 30px; /* Padding moved here */
     opacity: 1;
-    transition: opacity 0.4s ease-in-out 0.1s; /* Fade in slightly after container */
+    transition: opacity 0.4s ease-in-out 0.1s;
 }
-.recipe-content-area.hidden {
-    opacity: 0;
-}
+.recipe-content-area.hidden { opacity: 0; }
 
 .recipe-content-area > h3 { margin-top: 0px; margin-bottom: 25px; text-align: center; font-size: 1.6em; }
 .placeholder { text-align: center; color: #888; font-size: 1.2em; padding: 70px 15px; font-style: italic; transition: opacity 0.4s ease; }
 h4.list-header { border-bottom: 2px dotted var(--border-color); padding-bottom: 8px; margin-top: 30px; margin-bottom: 20px; font-size: 1.3em; color: var(--secondary-color); }
-.how-to-toast { background-color: rgba(253, 245, 230, 0.7); padding: 15px; border-radius: 8px; margin: 25px 0; border-left: 4px solid var(--secondary-color); }
+.how-to-toast { background-color: rgba(253, 245, 230, 0.8); /* Slightly more opaque */ padding: 15px; border-radius: 8px; margin: 25px 0; border-left: 4px solid var(--secondary-color); box-shadow: 0 2px 5px var(--shadow-light); }
 .how-to-toast h4 { margin-bottom: 8px; color: var(--primary-color); font-size: 1.1em; }
 .how-to-toast p { font-size: 0.95em; }
 
 /* Lists (Ingredients & Steps) */
 .ingredient-list, .steps-list { list-style: none; padding: 0; margin: 25px 0; }
-.ingredient-list li, .steps-list li { margin-bottom: 16px; /* Slightly more space */ padding-inline-start: 40px; position: relative; font-size: 1.05em; line-height: 1.65; /* Slightly more line height */ }
-.ingredient-list li::before { content: attr(data-emoji); position: absolute; inset-inline-start: 5px; top: 3px; /* Adjust alignment */ font-size: 1.4em; width: 25px; text-align: center; }
+.ingredient-list li, .steps-list li { margin-bottom: 16px; padding-inline-start: 40px; position: relative; font-size: 1.05em; line-height: 1.65; }
+.ingredient-list li::before { content: attr(data-emoji); position: absolute; inset-inline-start: 5px; top: 3px; font-size: 1.4em; width: 25px; text-align: center; }
+/* Ingredient note styling */
+.ingredient-list .note {
+    display: block;
+    font-size: 0.85em; /* Smaller */
+    color: #777; /* Lighter text */
+    padding-inline-start: 0; /* Align with main text */
+    font-style: italic;
+    margin-top: 4px; /* Space from ingredient */
+    line-height: 1.4;
+}
 .steps-list { counter-reset: step-counter; }
-.steps-list li::before { content: counter(step-counter); counter-increment: step-counter; background-color: var(--secondary-color); color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; justify-content: center; align-items: center; font-size: 0.9em; font-weight: 700; position: absolute; inset-inline-start: 0; top: 4px; /* Adjust alignment */ box-shadow: 0 2px 5px var(--shadow-light); }
-.note { display: block; font-size: 0.9em; color: #666; padding-inline-start: 40px; font-style: italic; margin-top: 6px; }
+.steps-list li::before { content: counter(step-counter); counter-increment: step-counter; background-color: var(--secondary-color); color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; justify-content: center; align-items: center; font-size: 0.9em; font-weight: 700; position: absolute; inset-inline-start: 0; top: 4px; box-shadow: 0 2px 5px var(--shadow-light); }
 .ingredient-list .highlight, .steps-list .highlight { background-color: rgba(244, 162, 97, 0.25); color: #c26c1a; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
 .ingredient-list .critical, .steps-list .critical { font-weight: bold; color: var(--accent-thick); border-bottom: 2px dotted var(--accent-thick); padding-bottom: 1px; background: transparent; }
 
@@ -218,8 +253,8 @@ h4.list-header { border-bottom: 2px dotted var(--border-color); padding-bottom: 
 .tip-box { background-color: #f0f4f8; border: 1px solid #d6e2f0; padding: 25px; border-radius: 10px; box-shadow: 0 4px 12px rgba(214, 226, 240, 0.5); }
 .tip-box h3 { color: #1e3a56; margin-bottom: 25px; text-align: center; font-size: 1.6em; border: none; padding: 0; font-weight: 600; display: flex; justify-content: center; align-items: center; gap: 8px;}
 .tip-box h3 .emoji { vertical-align: middle;}
-#tips-list { list-style: none; padding: 0; column-count: 2; column-gap: 35px; /* More gap */ }
-#tips-list li { padding-inline-start: 35px; position: relative; margin-bottom: 18px; /* More space */ font-size: 1em; line-height: 1.65; break-inside: avoid; }
+#tips-list { list-style: none; padding: 0; column-count: 2; column-gap: 35px; }
+#tips-list li { padding-inline-start: 35px; position: relative; margin-bottom: 18px; font-size: 1em; line-height: 1.65; break-inside: avoid; }
 #tips-list li::before { content: attr(data-emoji); position: absolute; inset-inline-start: 0; top: 1px; font-size: 1.5em; width: 25px; text-align: center; }
 
 /* Final Shoutout */
@@ -228,9 +263,9 @@ h4.list-header { border-bottom: 2px dotted var(--border-color); padding-bottom: 
   .final-shoutout a:hover { color: var(--primary-color); border-bottom-style: solid; }
 
 /* Utility */
-.visually-hidden { border: 0 !important; clip: rect(1px, 1px, 1px, 1px) !important; clip-path: inset(50%) !important; height: 1px !important; margin: -1px !important; overflow: hidden !important; padding: 0 !important; position: absolute !important; width: 1px !important; white-space: nowrap !important; opacity: 0 !important; /* Add opacity for transitions */ }
+.visually-hidden { border: 0 !important; clip: rect(1px, 1px, 1px, 1px) !important; clip-path: inset(50%) !important; height: 1px !important; margin: -1px !important; overflow: hidden !important; padding: 0 !important; position: absolute !important; width: 1px !important; white-space: nowrap !important; opacity: 0 !important; }
 /* Adjust utility class for transitions - applied to containers */
-.key-differences-container.visually-hidden, .easter-egg.visually-hidden, .omars-fav-text.visually-hidden {
+.key-differences-container.visually-hidden, .easter-egg.visually-hidden {
     max-height: 0 !important;
     opacity: 0 !important;
     padding-top: 0 !important;
@@ -239,13 +274,17 @@ h4.list-header { border-bottom: 2px dotted var(--border-color); padding-bottom: 
     margin-bottom: 0 !important;
     border-width: 0 !important;
     overflow: hidden !important;
-    /* Allow position: absolute for fav text */
-    position: absolute;
-    /* Reset position for containers */
-    &.key-differences-container, &.easter-egg { position: static; }
-    pointer-events: none; /* Prevent interaction when hidden */
+    position: static !important; /* Ensure these don't interfere with layout */
+    pointer-events: none;
 }
-
+/* Fav text needs position absolute */
+.omars-fav-text.visually-hidden {
+    opacity: 0 !important;
+    /* Keep position absolute from its own styles */
+    transform: rotate(8deg) scale(0.8) !important; /* Ensure start state */
+    pointer-events: none;
+    /* Don't force height/width/clip */
+}
 
 /* Media Queries */
 @media (max-width: 900px) { #tips-list { column-count: 1; } .container { padding: 25px 30px; } }
