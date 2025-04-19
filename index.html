@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🍪 Omar's Insanely Good Cookie Guide! 🍪</title> <!-- Title updated by JS -->
+    <title>🍪 Omar's Insanely Good Cookie Guide! 🍪</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Caveat:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body dir="ltr"> <!-- Direction & loaded class managed by JS -->
+<body dir="ltr">
 
     <div class="container">
         <header class="main-header">
@@ -20,7 +20,6 @@
                     <button class="lang-btn active" data-lang="en">🌍 English</button>
                     <button class="lang-btn" data-lang="ar">🌍 العربية (مصر)</button>
                 </div>
-                <!-- Unit toggle TEMPLATE area (remains hidden) -->
                 <div id="unit-toggles-template" style="display: none;">
                      <div class="unit-selector" data-lang="en">
                           <span class="unit-label" data-lang-key="unitLabelEn">Units:</span>
@@ -40,13 +39,25 @@
          <!-- Header Image Area -->
          <div id="cookie-image-header">
              <img id="selected-cookie-image" src="" alt="Cookie comparison or selected cookie type">
-             <!-- JS adds/removes .selected-type-image class here -->
          </div>
+
+         <!-- == NEW: Recipe Scaler Section == -->
+         <section class="recipe-scaler">
+             <h3 data-lang-key="scalerTitle">🧈 Customize Your Batch Size!</h3>
+             <p data-lang-key="scalerDesc">Enter your starting butter amount (grams) to scale the metric recipe.</p>
+             <div class="scaler-input-group">
+                 <label for="butter-amount-input" data-lang-key="scalerLabel">Starting Butter (g):</label>
+                 <input type="number" id="butter-amount-input" name="butter-amount" min="50" step="1" placeholder="226" value="226">
+                 <button id="update-scale-btn" data-lang-key="scalerButton">Update Scale</button>
+             </div>
+             <span class="scaler-note" data-lang-key="scalerNote">Note: Only metric (gram) values are scaled. Imperial (cup) units are approximate.</span>
+         </section>
+         <!-- ================================ -->
 
         <!-- Cookie Selection Buttons -->
         <div class="cookie-type-selector">
             <h2 data-lang-key="chooseStyle">Alright, Cookie Boss! Pick Your Poison (aka Style!):</h2>
-             <div class="button-group-container"> <!-- Still relative for positioning tag -->
+             <div class="button-group-container">
                  <div class="button-group">
                      <button class="selector-btn" data-type="classic">
                          <span class="emoji">⚖️</span> <span data-lang-key="typeClassic">Classic: The Crowd-Pleaser</span>
@@ -58,7 +69,6 @@
                          <span class="emoji">🧇</span> <span data-lang-key="typeThin">Thin & Crispy: The Snapper</span>
                      </button>
                   </div>
-                  <!-- Omar's Fave Text -->
                   <span class="omars-fav-text visually-hidden" data-lang-key="omarsFavText">Omar's Fave!</span>
              </div>
         </div>
@@ -67,22 +77,18 @@
         <div id="key-differences" class="key-differences-container visually-hidden">
              <h3 data-lang-key="keyDifferencesTitleBase">🔑 Key Differences for <span class="dynamic-cookie-name">Cookie</span></h3>
              <div class="diff-points">
-                 <!-- Structure example (content replaced by JS): -->
                  <div class="diff-point butter-diff"><h4><span class="emoji">🧈</span> <span data-lang-key="butterTitle">Brown Butter State & Mixing</span></h4><p></p></div>
                  <div class="diff-point chilling-diff"><h4><span class="emoji">🥶</span> <span data-lang-key="chillingTitle">Chilling Method</span></h4><p></p></div>
                  <div class="diff-point other-diff"><h4><span class="emoji">📝</span> <span data-lang-key="otherNotesTitle">Other Key Notes</span></h4><p></p></div>
              </div>
         </div>
 
-
-        <!-- Recipe Details Area - Toggles and Content dynamically added here -->
+        <!-- Recipe Details Area -->
         <div id="recipe-details" class="recipe-container">
-             <!-- Placeholder initially -->
              <div class="placeholder" data-lang-key="placeholderSelect">👈 Click a cookie style above! ✨</div>
-             <!-- JS will insert .recipe-content-area (including toggles) here -->
         </div>
 
-        <!-- Easter Egg (Stuffed Cookie) Area -->
+        <!-- Easter Egg Area -->
         <div id="easter-egg-container" class="easter-egg visually-hidden">
              <h3 data-lang-key="easterEggTitle">🏆 You Legend! Picked GOOEY! 🏆</h3>
              <div class="easter-egg-content">
@@ -99,9 +105,7 @@
         <div class="lower-sections">
             <div class="tip-box">
                 <h3 data-lang-key="tipsTitle"><span class="emoji">💡</span> Omar's Pro Tips! (Level Up Your Cookie Game) <span class="emoji">🔬</span></h3>
-                <ul id="tips-list">
-                    <!-- Tips generated by JS -->
-                </ul>
+                <ul id="tips-list"></ul>
             </div>
         </div>
 
@@ -109,8 +113,7 @@
         <div class="final-shoutout">
             <p data-lang-key="finalTag">Nailed it? Wanna show off? Tag me! <a href="https://www.instagram.com/omarisavibe/" target="_blank">@omarisavibe</a> 😄</p>
         </div>
-
-    </div> <!-- End Container -->
+    </div>
 
     <script src="script.js"></script>
 </body>
