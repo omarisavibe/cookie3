@@ -1,642 +1,528 @@
-// ==== JAVASCRIPT LOGIC STARTS HERE ====
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM Content Loaded - Initializing Cookie Guide V2");
+/* ==== CSS STYLES ==== */
+:root { /* Color variables etc. */
+    --primary-color: #6b4b2b; /* Deep Brown */
+    --secondary-color: #a0522d; /* Sienna */
+    --background-color: #fdfbf7; /* Creamy White */
+    --card-background: #fff;
+    --highlight-bg: #f4eee6; /* Light Parchment */
+    --border-color: #e0d8cc;
+    --text-color: #333; /* Darker text for better readability */
+    --accent-classic: #f4a261; /* Orange */
+    --accent-thick: #e76f51; /* Red-Orange */
+    --accent-thin: #2a9d8f; /* Teal */
+    --lang-active-bg: #4a4e69; /* Dark bluish grey */
+    --key-diff-bg: #fafafa; /* Very light grey */
+    --easter-egg-bg: linear-gradient(135deg, #fffde7, #fff9c4); /* Slightly adjusted gradient */
+    --font-primary: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Added Poppins */
+    --font-handwriting: 'Caveat', cursive;
+    --shadow-light: rgba(107, 75, 43, 0.1); /* Slightly softer light shadow */
+    --shadow-medium: rgba(107, 75, 43, 0.15); /* Slightly stronger medium */
+    --shadow-dark: rgba(107, 75, 43, 0.22); /* Slightly stronger dark */
+    /* Color for Omar's Fave Tag */
+    --fav-tag-color: var(--primary-color);
+    --fav-tag-bg: rgba(138, 90, 68, 0.1);
+    /* Animation timing */
+    --anim-fast: 0.2s;
+    --anim-medium: 0.4s;
+    --anim-slow: 0.6s;
+    /* ADDED: Easter Egg Image Path */
+    --easter-egg-image: url('stuffed_cookie.webp'); /* Default path */
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+    font-family: var(--font-primary);
+    line-height: 1.7;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    padding: 0;
+    margin: 0;
+    opacity: 0; /* Start hidden for fade-in */
+    transition: opacity 0.7s ease-in-out;
+    font-size: 16.5px; /* Slightly larger base font */
+}
+body.loaded { opacity: 1; }
 
-    // --- DOM Elements ---
-    const body = document.body;
-    const langButtons = document.querySelectorAll('.lang-btn');
-    const typeSelectorButtons = document.querySelectorAll('.selector-btn'); // Uses class .selector-btn
-    const recipeDetailsContainer = document.getElementById('recipe-details');
-    const keyDifferencesContainer = document.getElementById('key-differences');
-    const butterMethodDesc = document.getElementById('butter-method-desc');
-    const chillingMethodDesc = document.getElementById('chilling-method-desc');
-    const otherNotesDesc = document.getElementById('other-notes-desc');
-    const tipsListContainer = document.getElementById('tips-list');
-    const keyDiffTitleElement = document.querySelector('#key-differences [data-lang-key="keyDifferencesTitle"]'); // Target title inside key diff
-    const omarFavBubble = document.getElementById('omar-fav-bubble');
-    const cookieImageHeader = document.getElementById('cookie-image-header');
-    const selectedCookieImage = document.getElementById('selected-cookie-image');
-    const easterEggContainer = document.getElementById('easter-egg-container');
-    const stuffedCookieImage = document.getElementById('stuffed-cookie-image');
-    const yieldInfoP = document.querySelector('.yield-info'); // Get yield element
+/* Structure & Typography */
+.container {
+    width: 100%;
+    max-width: 1200px; /* Added max-width for larger screens */
+    min-height: 100vh;
+    margin: 0 auto;
+    background-color: var(--card-background);
+    padding: 35px 6vw; /* Slightly more padding */
+    border-radius: 12px; /* Added slight rounding to container */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08); /* Added subtle overall shadow */
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px; /* Space from top */
+    margin-bottom: 20px; /* Space from bottom */
+}
+.main-header {
+    text-align: center;
+    border-bottom: 3px double var(--border-color);
+    margin-bottom: 35px; /* More space */
+    padding-bottom: 25px; /* More space */
+    width: 100%;
+}
+h1 { color: var(--primary-color); margin-bottom: 18px; font-size: 2.7em; font-weight: 700; line-height: 1.25; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 5px 12px; }
+h1 .emoji { vertical-align: middle; font-size: 0.85em; display: inline-block; animation: pulse 2s infinite ease-in-out alternate; } /* Added subtle pulse */
+@keyframes pulse { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
 
-    // --- State ---
-    let currentLanguage = 'en'; // Default language
-    let currentCookieType = null; // 'classic', 'thick', 'thin'
-
-    // --- IMAGE PATHS (!! IMPORTANT: Use YOUR actual filenames here !!) ---
-    const IMAGE_PATHS = {
-        classic: 'classic.webp',
-        thick: 'thick_and_gooey.webp',
-        thin: 'thin_and_crispy.webp',
-        stuffed: 'stuffed_cookie.webp' // Make sure you have this image
-        // 'comparison' key seems unused in this version's logic
-    };
-
-    // --- Content Data Store (Using the structure you provided) ---
-    const contentData = {
-         en: {
-             // UI Text
-             mainTitle: "<span class='emoji'>🍪</span> Omar's Insanely Good Cookie Guide! <span class='emoji'>🍪</span>",
-             yieldInfo: "Whips up about 18-24 cookies 🍪", // Default yield, can be updated if recipes vary
-             chooseStyle: "Alright, Cookie Boss! Pick Your Poison (aka Style!):",
-             typeClassic: "Classic: The Crowd-Pleaser",
-             typeThick: "Thick & Gooey: The Big Softie",
-             typeThin: "Thin & Crispy: The Snapper",
-             omarsFav: "Omar's Favorite! 😉",
-             keyDifferencesTitle: "🔑 Key Differences Breakdown!", // Base title, name appended by JS
-             butterTitle: "Butter & Mixing Mojo",
-             chillingTitle: "To Chill or Not to Chill?",
-             otherNotesTitle: "Quick Cheat Sheet",
-             placeholderSelect: "👈 Waiting for your command! Click a cookie style above... Let's bake something amazing! ✨",
-             tipsTitle: "<span class='emoji'>💡</span> Omar's Top Secret Tips & Brainy Bits! <span class='emoji'>🔬</span>",
-             recipeTitlePrefix: "Alright, let's bake some",
-             ingredientsHeader: "Grab This Stuff:",
-             stepsHeader: "Let's Do This! Your Steps:",
-             howToToastMilkPowderTitle: "🤔 So, How *Do* You Toast Milk Powder?",
-             howToToastMilkPowder: "Super easy! Spread 3-4 Tbsp milk powder (the regular kind!) in a <span class='highlight'>dry skillet</span> (no oil!). Put it on <span class='highlight'>LOW heat</span> and <span class='critical'>STIR CONSTANTLY</span>. Seriously, don't even blink. It'll start smelling nutty and turn a light golden brown in 3-5 minutes. Whip it off the heat IMMEDIATELY (it burns fast!) and let it cool completely. BOOM. Flavor unlocked.",
-             scienceHeader: "<span class='emoji'>🤓</span> Nerd Corner: Why This Cookie is Awesome...",
-             // Easter Egg Content (Ensure keys match HTML data-lang-key attributes)
-             easterEggTitle: "🏆 You Legend! You Picked GOOEY! 🏆",
-             easterEggIntro: "Okay, since you obviously have impeccable taste (like me!), ready to unlock a secret level?",
-             easterEggIdea: "🔥 STUFFED COOKIE TIME! 🔥",
-             easterEggDesc: "It's easy: Flatten a dough ball slightly, make a dent, stuff about <span class='highlight'>1 generous teaspoon</span> of Nutella OR... you guessed it... Pistachio Spread! Yep, because apparently everything needs pistachio now... but hey, it's actually <span class=\"critical\">SO GOOD</span> here! 😉 Seal it up, roll gently, bake as usual (maybe +1 min).",
-             easterEggPistachioTip: "Trust the pistachio process. You won't regret it.",
-             pistachioReco: "Best Spread I've Tried (Seriously):",
-             pistachioLinkText: "Kamel El Sham Pistachio Cream", // Text for the link
-             pistachioLinkHref: "https://www.amazon.eg/-/en/Kamel-El-Sham-Pistachio-Cream/dp/B0BCDJ211M/", // Actual link
-             pistachioLinkSource: "(Amazon EG)",
-             finalTag: "Hope you nail it! Show me your results & tag me!<br><a href=\"https://www.instagram.com/omarisavibe/\" target=\"_blank\" rel=\"noopener noreferrer\">@omarisavibe</a> on Insta! Yalla, bake happy! 😄",
-             // Cookie Specific Data (NEW STRUCTURE)
-             cookies: {
-                 classic: {
-                      name: "Classic Balanced Cookies",
-                      theme: "classic-theme",
-                      imageSrcKey: 'classic', // Maps to IMAGE_PATHS
-                      butterMethod: "Use <span class='highlight'>COOOLED but LIQUID</span> Brown Butter. We're whisking, not creaming, folks. Keep it simple.",
-                      chillingMethod: "<span class='highlight'>Chill RECOMMENDED:</span> Min 30 mins, up to 24 hrs fridge. Helps flavors deepen & prevents sad, flat cookies.",
-                      otherNotes: "Flour: ~2 1/2 cups. <span class='highlight'>Yes</span> to 1/2 tsp Baking Powder.",
-                      ingredients: [ // Use your ingredient structure
-                          { emoji: '🧈', text: 'Brown Butter: 1 cup, <span class="critical">COOLED but LIQUID</span> (vital!)' },
-                          { emoji: '🍬', text: 'Sugars: 1 1/4 cups Light Brown Sugar (packed!), 1/2 cup White Granulated Sugar' },
-                          { emoji: '🍚', text: 'Flour: ~2 1/2 cups All-Purpose (spoon & level, don\'t scoop!)' },
-                          { emoji: '✨', text: 'Leaveners: 1 tsp Baking Soda + <span class="highlight">1/2 tsp Baking Powder</span>' },
-                          { emoji: '🍫', text: 'Chocolate: 1 1/2 to 2 cups! (Good quality chips or chunks. Try <a href="https://www.facebook.com/NAZEH.ElATAR/posts/%D8%B4%D9%8A%D9%83%D9%88%D9%84%D8%A7%D8%AA%D8%A9-%D8%AF%D8%B1%D9%88%D8%A8%D8%B3-%D9%87%D8%AA%D8%AE%D9%84%D9%8A-%D8%AD%D9%84%D9%88%D9%8A%D8%A7%D8%AA%D9%83-%D8%A3%D8%AD%D9%84%D9%89-%D9%88%D8%A3%D9%84%D8%B0-%D9%85%D8%AB%D8%A7%D9%84%D9%8A%D9%87-%D9%84%D9%84%D8%AA%D8%B2%D9%8A%D9%8A%D9%86-%D9%88%D8%B3%D9%87%D9%84%D9%87-%D8%A7%D9%84%D8%AA%D8%AD%D8%B6%D9%8A%D8%B1-%D9%88%D9%85%D8%AA%D9%88%D9%81%D8%B1%D9%87-%D8%A8%D8%B3%D8%B9%D8%B1/824531546557774/" target="_blank" rel="noopener noreferrer">Dropsy MILK Chocolate Chips</a> if you can find \'em - Egyptian & amazing!)'},
-                          { emoji: '🥚', text: 'Eggs: 2 Large (room temp if you\'re fancy)'},
-                          { emoji: '🏺', text: 'Vanilla: 2 tsp Good Stuff (not imitation!)'},
-                          { emoji: '🧂', text: 'Salt: 1 tsp Kosher (or 1/2 tsp fine table salt)'},
-                          { emoji: '🥛', text: 'Optional Flavor Bomb: 3-4 Tbsp Toasted Milk Powder (See how above!)'}
-                      ],
-                       steps: [
-                          'Prep your dry stuff: Whisk flour, baking soda, baking powder, salt, & toasted milk powder (if using). Set aside.',
-                          'Make sure your glorious brown butter is <span class="critical">cool but still liquid</span>.',
-                          'In a big bowl, <span class="highlight">WHISK</span> the liquid brown butter and both sugars together. Won\'t be fluffy, that\'s okay!',
-                          'Whisk in eggs one by one, then the vanilla. Mix till just combined.',
-                          'Dump the dry ingredients into the wet. Mix on low or by hand until *just* combined. Seriously, <span class="critical">STOP MIXING</span> when you don\'t see dry flour!',
-                          'Gently fold in those lovely chocolate chips/chunks.',
-                          'Cover the dough & <span class="highlight">CHILL</span> it! <span class="critical">Min 30 mins</span> fridge, longer (up to 24 hrs) is better. Patience pays off!',
-                          'Oven time! Preheat to <span class="highlight">375°F (190°C)</span>. Line baking sheets with parchment (don\'t skip!).',
-                          'Scoop dough (~2 Tbsp size balls). Space \'em out. Flaky salt sprinkle now if you wanna be extra.',
-                          'Bake for <span class="highlight">10-12 minutes</span>. Edges should look set & golden, centers might still look a lil soft.',
-                          'The hardest part: Let cookies cool on the baking sheet for 5-10 mins before moving to a wire rack. They need this time to firm up! Enjoy! 🎉'
-                      ],
-                       customScienceNote: "Using liquid butter here means less air gets trapped compared to creaming solid butter, leading to a denser, chewier cookie that spreads a bit more. The baking powder gives it just enough lift to keep it from being *too* flat. Chilling is key to control that spread and let flavors meld. Brown butter + toasted milk = Maillard reaction party for nutty depth!"
-                  },
-                  thick: {
-                       name: "Thick & Gooey Giants",
-                       theme: "thick-theme",
-                       imageSrcKey: 'thick', // Maps to IMAGE_PATHS
-                       butterMethod: "Use <span class='critical'>CHILLED SOLID</span> Brown Butter (like, fridge-cold but you can dent it). Fire up that mixer – we're gonna <span class='critical'>CREAM</span> this with the sugars 'til light and fluffy!",
-                       chillingMethod: "<span class='critical'>CHILLING IS MANDATORY!</span> Choice: <span class='highlight'>5 hours+ in the FREEZER</span> (speed run!) OR <span class='highlight'>24-72 hours in the FRIDGE</span> (peak flavor/texture!). Skipping this = sadness.",
-                       otherNotes: "We need <span class='highlight'>MORE flour</span> (~2 1/2 to 2 3/4 cups). Keep the 1/2 tsp Baking Powder. <span class='highlight'>Optional but nice: 1-2 Tbsp Cornstarch</span> with the flour for ultimate tenderness.",
-                       ingredients: [ // Use your ingredient structure
-                          { emoji: '🧈', text: 'Brown Butter: 1 cup, <span class="critical">CHILLED SOLID</span> (but slightly soft like clay)' },
-                          { emoji: '🍬', text: 'Sugars: Go heavy on Brown? (Maybe 1 1/2 cups Brown / 1/4 cup White)' },
-                          { emoji: '🍚', text: 'Flour: <span class="highlight critical">MORE ~2 1/2 to 2 3/4 cups</span> All-Purpose' },
-                          { emoji: '⭐', text: 'Optional Softness Booster: 1-2 Tbsp Cornstarch'},
-                          { emoji: '✨', text: 'Leaveners: 1 tsp Baking Soda + <span class="highlight">1/2 tsp Baking Powder</span>' },
-                          { emoji: '🍫', text: 'Chocolate: <span class="highlight">Be generous! 2 cups or MORE</span> Chips/Chunks'},
-                          { emoji: '🥚', text: 'Eggs: 2 Large'},
-                          { emoji: '🏺', text: 'Vanilla: 2 tsp Good Stuff'},
-                          { emoji: '🧂', text: 'Salt: 1 tsp Kosher (or 1/2 tsp table)'},
-                          { emoji: '🥛', text: 'Optional Flavor Bomb: 3-4 Tbsp Toasted Milk Powder'}
-                      ],
-                       steps: [
-                          'Prep dry team: Whisk flour (the larger amount!), cornstarch (if using), soda, powder, salt, & toasted milk powder (if using). Set it aside.',
-                          'Make absolutely sure your brown butter is <span class="critical">chilled solid</span> but scoopable.',
-                          'In a stand mixer (or bowl with strong hand mixer!), <span class="critical">CREAM</span> the solid butter and sugars on medium-high speed for a good 3-5 minutes until significantly lighter and fluffier.',
-                          'Beat in eggs one at a time on low, then the vanilla. Don\'t overdo it.',
-                          'Slowly add the dry mix to the wet mix. Mix on low <span class="critical">ONLY until just combined</span>. Please, no tough cookies!',
-                          'Fold in that glorious mountain of chocolate.',
-                          '<span class="critical">COVER & CHILL (MUST DO!)</span>: EITHER <span class="highlight">5+ hrs FREEZER</span> OR <span class="highlight">24-72 hrs FRIDGE</span>. Longer = better flavor.',
-                          'Finally! Preheat oven to <span class="highlight">375°F (190°C)</span>. Line baking sheets.',
-                          'Scoop <span class="critical">LARGE dough balls</span> (~3-4 Tbsp). Roll \'em tall, <span class="highlight">don\'t flatten!</span> Flaky salt time!',
-                          'Bake for <span class="highlight">12-15 minutes</span>. Edges set, but centers <span class="critical">WILL LOOK SOFT & UNDERDONE!</span> This is key for gooeyness. Pull them out!',
-                          'Crucial Wait: Let cookies cool on the baking sheet for <span class="critical">10-15 solid minutes</span>. They finish baking here. THEN move to rack. Patience = Perfect Gooeyness! 😍'
-                      ],
-                      customScienceNote: "Creaming SOLID cold butter traps loads of air, giving lift. Extra flour provides structure. Chilling solidifies that fat like concrete (almost!) so it melts slower, preventing spread. The long chill lets flour fully hydrate and enzymes work flavor magic. Cornstarch? It slightly weakens gluten, adding incredible tenderness. It's a cookie miracle!"
-                  },
-                   thin: {
-                       name: "Thin & Crispy Snappers",
-                       theme: "thin-theme",
-                       imageSrcKey: 'thin', // Maps to IMAGE_PATHS
-                       butterMethod: "Use <span class='critical'>WARM LIQUID</span> Brown Butter. No workout needed, just a simple whisk with the sugars.",
-                       chillingMethod: "<span class='critical'>NO CHILLING ALLOWED!</span> Seriously, skip it. We *want* maximum spread for crispiness.",
-                       otherNotes: "Go light on flour (<span class='highlight'>~2 1/4 to 2 1/2 cups</span>). <span class='critical'>ZERO Baking Powder!</span> More <span class=\"highlight\">WHITE sugar</span> = crisp factor up! <span class='highlight'>Optional: 1-2 Tbsp Milk</span> for paper-thin results.",
-                       ingredients: [ // Use your ingredient structure
-                          { emoji: '🧈', text: 'Brown Butter: 1 cup, <span class="critical">WARM & LIQUID</span>' },
-                          { emoji: '🍬', text: 'Sugars: More WHITE! (e.g., 1 1/4 cups White / 1/2 cup Brown, or all White!)' },
-                          { emoji: '🍚', text: 'Flour: <span class="highlight critical">LESS ~2 1/4 to 2 1/2 cups</span> All-Purpose' },
-                          { emoji: '✨', text: 'Leaveners: 1 tsp Baking Soda <span class="critical">ONLY</span> (No Baking Powder!)' },
-                          { emoji: '💧', text: 'Optional Thinness Helper: 1-2 Tbsp Milk (add w/ eggs)'},
-                          { emoji: '🍫', text: 'Chocolate: ~1 1/2 cups Chips (smaller ones work well here)'},
-                          { emoji: '🥚', text: 'Eggs: 2 Large'},
-                          { emoji: '🏺', text: 'Vanilla: 2 tsp Good Stuff'},
-                          { emoji: '🧂', text: 'Salt: 1 tsp Kosher (or 1/2 tsp table)'},
-                          { emoji: '🥛', text: 'Optional Flavor Bomb: 3-4 Tbsp Toasted Milk Powder'}
-                      ],
-                      steps: [
-                           'Dry stuff first: Whisk flour (less amount!), baking soda <span class="critical">(ONLY soda!)</span>, salt, & toasted milk powder (if using).',
-                           'Make sure brown butter is <span class="critical">warm liquid</span> but not crazy hot (don\'t scramble eggs!).',
-                           'In a bowl, <span class="highlight">WHISK</span> warm butter with sugars (<span class="highlight">higher white sugar ratio!</span>) until combined.',
-                           'Whisk in eggs one at a time, then vanilla (and optional milk).',
-                           'Add dry to wet, mix <span class="critical">just until combined</span>. Overmixing = bad.',
-                           'Stir in the chocolate chips.',
-                           '<span class="critical">NO CHILLING!</span> Straight to the oven!',
-                           'Preheat oven to <span class="highlight">350°F (175°C)</span>. Line baking sheets.',
-                           'Scoop <span class="highlight">smaller balls (~1.5-2 Tbsp)</span>. Space FAR apart! You can flatten them slightly if you want extra spread.',
-                           'Bake <span class="highlight">12-15 minutes</span>, until nicely golden brown all over. We want crisp!',
-                           'Let cool on sheet for just 2-5 mins, then move to wire rack. They get crispier as they cool completely. Snap! ✨'
-                       ],
-                       customScienceNote: "Warm liquid butter = instant melt & spread in the oven! Less flour means less structure holding it back. More white sugar caramelizes beautifully for that snap. No baking powder means no extra lift to fight the spread. Baking soda mostly just encourages browning and a little reaction here. It's all about unleashing the spread!"
-                  }
-             },
-              // Tips Data (Copied from previous functional version - Add keys if needed for structure)
-             tips: [
-                 { key: 'tip1', emoji: '💎', text: 'Quality Counts: Use good chocolate (like Dropsy!) & REAL vanilla.' },
-                 { key: 'tip2', emoji: '⚖️', text: 'Spoon & Level Flour: Don\'t pack the measuring cup! (Or use a scale for ultra-precision, about 120-125g per cup if you must know!)' },
-                 { key: 'tip3', emoji: '🤫', text: 'The Mixing Secret: Stop AS SOON as the flour disappears. Tender cookies thank you.' },
-                 { key: 'tip4', emoji: '🧊', text: 'Chill Isn\'t Just Waiting: It deepens flavor, controls spread & texture. Respect the chill (when needed!).' },
-                 { key: 'tip5', emoji: '🥄', text: 'Scoop Smart: Use a cookie scoop for evenly baked beauties.' },
-                 { key: 'tip6', emoji: '🧂', text: 'Flaky Salt Finish: A little sprinkle *before* baking makes chocolate pop! So fancy.' },
-                 { key: 'tip7', emoji: '💥', text: 'Want Ripples? Try Pan Banging! Firmly bang the sheet on the counter 2-3 times during the last few mins of baking. Cool!' },
-                 { key: 'tip8', emoji: '⏳', text: 'Cooling IS Part of Baking: Let cookies set on the hot pan for 5-10 mins (10-15 for Thick!) - vital!' },
-                 { key: 'tip9', emoji: '❄️', text: 'Freeze Like a Pro: Scoop dough balls onto a tray, freeze solid, then bag \'em. Bake straight from frozen! Just add 1-2 mins baking time (maybe lower temp slightly ~350F/175C). Fresh cookies ANYTIME! YES!' },
-                 { key: 'sci1', emoji: '🔥', text: 'Brown Butter = Flavor Gold: It\'s toasted milk solids & nutty goodness!' },
-                 { key: 'sci2', emoji: '🥛', text: 'Toasted Milk Powder = Extra Credit Flavor: More nutty, caramelly notes? Sign me up.' }
-             ]
-         },
-         ar: { // ** Using the Arabic data from the previous complete script **
-             mainTitle: "<span class='emoji'>🍪</span> دليل عمر الرهيب لـ<span class='highlight'>أحلى كوكيز</span>! <span class='emoji'>🍪</span>",
-             yieldInfo: "بتطلع حوالي 18-24 كوكي 🍪",
-             chooseStyle: "يلا يا كبير، اختار النوع اللي هيدمرنا (يعني الشكل!)",
-             typeClassic: "الكلاسيكي: ده بيفرح الجمهور",
-             typeThick: "السميك والليّن: دبلة Soft",
-             typeThin: "الرفيع والمقرمش: الكوكي الكرنش",
-             omarsFav: "الاختيار المفضل لـ عمر! 😉",
-             keyDifferencesTitle: "🔑 الفروقات الأساسية بين الأنواع!", // Base title
-             butterTitle: "الزبدة وطريقة الخلط",
-             chillingTitle: "تبريد العجين ولا لأ؟",
-             otherNotesTitle: "ملحوظات سريعة",
-             placeholderSelect: "👈 انتظر إشارتك! دوس على أي شكل فوق... تعالى نخبز حاجة جامدة! ✨",
-             tipsTitle: "<span class='emoji'>💡</span> نصايح عمر السرية وحاجات علمية جامدة! <span class='emoji'>🔬</span>",
-             recipeTitlePrefix: "يلا نخبز",
-             ingredientsHeader: "المكونات:",
-             stepsHeader: "الخطوات:",
-             howToToastMilkPowderTitle: "🤔 إزاي نحمس بودرة اللبن؟",
-             howToToastMilkPowder: "سهلة أوي! انشر 3-4 ملاعق بودرة لبن (عادية) في <span class='highlight'>مقلاة جافة</span> (من غير زيت!). شغلها على <span class='highlight'>نار هادية</span> و<span class='critical'>قلّب باستمرار</span>. بجد متغمضش عينك. هتبدأ ريحتها تطلع وميبقى لونها دهبي فاتحانة في 3-5 دقايق. شيلها من النار فوراً (عشان بتحترق بسرعة!) واتركها تبرد. يا سلام على الطعم!",
-             scienceHeader: "<span class='emoji'>🤓</span> زاوية الفهمان: ليه الكوكيز دي جامدة...", // Adjusted translation slightly
-             easterEggTitle: "🏆 يا بطل! اخترت النوع الجووي! 🏆",
-             easterEggIntro: "طبعًا إحنا عارفين أن ذوقك تحفة (زيي!)، جاهز للlevel السري؟",
-             easterEggIdea: "🔥 وقت الكوكيز المحشية! 🔥", // Adjusted translation
-             easterEggDesc: "سهلة: افرد كرة العجين شوية، اعمل حفرة صغيرة، وحط فيها <span class='highlight'>ملعقة صغيرة مليانة</span> نوتيلا أو... صح... معجون الفستق! أيوة، لأن كل حاجة محتاجة فستق دلوقتي... لكن بصراحة الطعم <span class='critical'>جامد قوي</span> هنا! 😉 اغلقها كويس، كورها بالراحة، واخبزها زي العادي (يمكن +1 دقيقة).", // Adjusted to teaspoon based on EN
-             easterEggPistachioTip: "ثق في الفستق. مش هتندم.", // Adjusted translation
-             pistachioReco: "أحلى معجون فستق جربته (بجد):", // Adjusted translation
-             pistachioLinkText: "كريمة الفستق من كامل الشام", // Translated link text
-             pistachioLinkHref: "https://www.amazon.eg/-/en/Kamel-El-Sham-Pistachio-Cream/dp/B0BCDJ211M/", // Keep same link
-             pistachioLinkSource: "(أمازون مصر)",
-             finalTag: "بالتوفيق! صور النتيجة ووريهالي واعملي تاج!<br><a href=\"https://www.instagram.com/omarisavibe/\" target=\"_blank\" rel=\"noopener noreferrer\">@omarisavibe</a> على الانستجرام! يلا، اخبزوا وانتوا مبسوطين! 😄", // Adjusted phrasing
-              cookies: { // NESTED COOKIE DATA FOR ARABIC
-                 classic: {
-                     name: "الكوكيز الكلاسيكي المتوازن",
-                     theme: "classic-theme",
-                     imageSrcKey: 'classic',
-                     butterMethod: "استخدم <span class='highlight'>زبدة بنية سائلة وباردة</span>. بنخفق مش بنضرب، خليها سهلة.",
-                     chillingMethod: "<span class='highlight'>التبريد مفضل:</span> 30 دقيقة لـ 24 ساعة في التلاجة. بيخلي الطعم أعمق ويمنع الكوكي من التسطح.", // Adjusted phrasing
-                     otherNotes: "الدقيق: ~2 ½ كوب. <span class='highlight'>استخدم</span> ½ ملعقة بيكنج باودر.", // Adjusted phrasing
-                     ingredients: [
-                         {"emoji": "🧈", "text": "زبدة بنية: كوب واحد، <span class='critical'>باردة ولكن سائلة</span> (مهم!)"},
-                         {"emoji": "🍬", "text": "سكر: 1 ¼ كوب سكر بني فاتح (مكبوس!)، ½ كوب سكر أبيض حبيبات"},
-                         {"emoji": "🍚", "text": "دقيق: ~2 ½ كوب دقيق لجميع الأغراض (بالملعقة وممسوح، مش مغروف!)"},
-                         {"emoji": "✨", "text": "مواد رافعة: 1 ملعقة صغيرة بيكنج صودا + <span class='highlight'>½ ملعقة صغيرة بيكنج باودر</span>"},
-                         {"emoji": "🍫", "text": "شوكولاتة: 1 ½ لـ 2 كوب! (شيبس أو قطع نوعية جيدة. جرب <a href='https://www.facebook.com/NAZEH.ElATAR/posts/%D8%B4%D9%8A%D9%83%D9%88%D9%84%D8%A7%D8%AA%D8%A9-%D8%AF%D8%B1%D9%88%D8%A8%D8%B3-%D9%87%D8%AA%D8%AE%D9%84%D9%8A-%D8%AD%D9%84%D9%88%D9%8A%D8%A7%D8%AA%D9%83-%D8%A3%D8%AD%D9%84%D9%89-%D9%88%D8%A3%D9%84%D8%B0-%D9%85%D8%AB%D8%A7%D9%84%D9%8A%D9%87-%D9%84%D9%84%D8%AA%D8%B2%D9%8A%D9%8A%D9%86-%D9%88%D8%B3%D9%87%D9%84%D9%87-%D8%A7%D9%84%D8%AA%D8%AD%D8%B6%D9%8A%D8%B1-%D9%88%D9%85%D8%AA%D9%88%D9%81%D8%B1%D9%87-%D8%A8%D8%B3%D8%B9%D8%B1/824531546557774/' target='_blank' rel='noopener noreferrer'>شيبس دروبسي بالحليب</a> لو لقيتها - مصرية وتحفة!)"},
-                         {"emoji": "🥚", "text": "بيض: 2 بيضة كبيرة (بحرارة الغرفة لو بتحب الشياكة)"},
-                         {"emoji": "🏺", "text": "فانيليا: 2 ملعقة صغيرة نوع كويس (مش تقليد!)"},
-                         {"emoji": "🧂", "text": "ملح: 1 ملعقة صغيرة ملح كوشر (أو ½ ملعقة صغيرة ملح طعام ناعم)"},
-                         {"emoji": "🥛", "text": "قنبلة نكهة اختيارية: 3-4 ملاعق كبيرة بودرة لبن محمصة (شوف الطريقة فوق!)"}
-                     ],
-                     steps: [
-                         "جهز الجاف: اخفق الدقيق، بيكنج صودا، بيكنج باودر، ملح، وبودرة اللبن (لو هتستخدم). سيبه على جنب.",
-                         "تأكد إن زبدتك البنية العظيمة <span class='critical'>باردة لكن لسة سائلة</span>.",
-                         "في طبق كبير، <span class='highlight'>اخفق بالسلك</span> الزبدة السائلة والسكرين مع بعض. مش هتبقى هشة، عادي!",
-                         "اخفق البيض واحدة واحدة، بعدين الفانيليا. اخلط يا دوب يتجانسوا.",
-                         "نزل المكونات الجافة على السائلة. اخلط على سرعة واطية أو بإيدك لحد ما *يا دوب* يختلطوا. بجد، <span class='critical'>وقف خلط</span> أول ما تشوفش دقيق ناشف!",
-                         "قلب بالراحة قطع/شيبس الشوكولاتة الحلوة دي.",
-                         "غطي العجينة و<span class='highlight'>بردها</span>! <span class='critical'>على الأقل 30 دقيقة</span> في التلاجة، ولو أكتر (لحد 24 ساعة) أحسن. الصبر حلو!",
-                         "وقت الفرن! سخنه على <span class='highlight'>190°م (375°ف)</span>. افرش الصواني بورق زبدة (متفوتهاش!).",
-                         "كور العجين (كرات بحجم ~2 ملعقة كبيرة). سيب مسافة بينهم. رشة ملح قشاري دلوقتي لو عايز تبقى روش.",
-                         "اخبز لمدة <span class='highlight'>10-12 دقيقة</span>. الحروف المفروض تبقى ثابتة ودهبية، والقلب ممكن يبان طري شوية.",
-                         "أصعب جزء: سيب الكوكيز تبرد على الصينية 5-10 دقايق قبل ما تنقلها على شبكة. محتاجين الوقت ده عشان يتماسكوا! استمتع! 🎉"
-                     ],
-                     customScienceNote": "استخدام الزبدة السايلة بيحبس هوا أقل مقارنة بخفق الزبدة الجامدة، وده بيخلي الكوكيز أكتر كثافة ومضغاً وبتفرش شوية. البيكنج باودر بيديها يا دوب نفخة عشان متلزقش أوي. التبريد أساسي للتحكم في الفرشة دي ولدمج النكهات. زبدة بنية + لبن محمص = حفلة تفاعل ميلارد لعمق طعم المكسرات!"
-                 },
-                  thick: {
-                      name: "الكوكيز السميكة والجووي العملاقة", // Kept Giants here
-                      theme: "thick-theme",
-                      imageSrcKey: 'thick',
-                     butterMethod: "استخدم <span class='critical'>زبدة بنية مجمدة وصلبة</span> (يعني من التلاجة بس تعرف تعلم فيها). شغل العجان – إحنا هن<span class='critical'>خفق</span> دي مع السكر لحد ما تبقى خفيفة وهشة!", // Adjusted phrasing
-                      chillingMethod: "<span class='critical'>التبريد إجبااااري!</span> اختار: <span class='highlight'>5 ساعات أو أكتر في الفريزر</span> (لو مستعجل!) أو <span class='highlight'>24-72 ساعة في التلاجة</span> (قمة الطعم والقوام!). لو فوتت الخطوة دي = زعل.",
-                      otherNotes: "محتاجين <span class='highlight'>دقيق أكتر</span> (~2 ½ لـ 2 ¾ كوب). خلي معاك الـ ½ ملعقة بيكنج باودر. <span class='highlight'>اختياري بس حلو: 1-2 ملعقة كبيرة نشا</span> مع الدقيق للطراوة القصوى.",
-                      ingredients: [
-                          {"emoji": "🧈", "text": "زبدة بنية: كوب واحد، <span class='critical'>مجمدة وصلبة (بس قابلة للغرف)</span>"},
-                          {"emoji": "🍬", "text": "سكر: نزود البني؟ (مثلا 1 ½ كوب بني / ¼ كوب أبيض)"},
-                          {"emoji": "🍚", "text": "دقيق: <span class='highlight critical'>أكتر ~2 ½ لـ 2 ¾ كوب</span> دقيق لجميع الأغراض"},
-                          {"emoji": "⭐", "text": "معزز طراوة اختياري: 1-2 ملعقة كبيرة نشا"},
-                          {"emoji": "✨", "text": "مواد رافعة: 1 ملعقة صغيرة بيكنج صودا + <span class='highlight'>½ ملعقة صغيرة بيكنج باودر</span>"},
-                          {"emoji": "🍫", "text": "شوكولاتة: <span class='highlight'>خليك كريم! 2 كوب أو أكتر</span> شيبس/قطع"},
-                          {"emoji": "🥚", "text": "بيض: 2 بيضة كبيرة"},
-                          {"emoji": "🏺", "text": "فانيليا: 2 ملعقة صغيرة نوع كويس"},
-                          {"emoji": "🧂", "text": "ملح: 1 ملعقة صغيرة ملح كوشر (أو ½ ملعقة صغيرة ملح طعام)"},
-                          {"emoji": "🥛", "text": "قنبلة نكهة اختيارية: 3-4 ملاعق كبيرة بودرة لبن محمصة"}
-                      ],
-                      steps: [
-                          "جهز فريق الجاف: اخفق الدقيق (الكمية الأكبر!)، النشا (لو هتستخدم)، الصودا، الباودر، الملح، وبودرة اللبن المحمصة (لو هتستخدم). سيبه على جنب.",
-                         "اتأكد مليون في المية ان زبدتك البنية <span class='critical'>مجمدة وصلبة</span> بس تعرف تغرف منها.",
-                          "في العجان (أو طبق بمضرب كهربا قوي!)، <span class='critical'>اخفق</span> الزبدة الصلبة والسكر على سرعة متوسطة-عالية لمدة محترمة 3-5 دقايق لحد ما تبقى أخف وهشة بفرق واضح.",
-                          "اخفق البيض واحدة واحدة على سرعة واطية، بعدين الفانيليا. متزودش.",
-                          "ضيف بالتدريج <span class='highlight'>الكمية الأكبر</span> من الخليط الجاف على الخليط السايل. اخلط على <span class='critical'>أبطأ سرعة يا دوب لحد ما يتجانسوا</span>. أرجوك، مش عايزين كوكيز ناشفة!",
-                          "قلب جبل الشوكولاتة العظيم ده.",
-                         "<span class='critical'>غطي وبرد (لازم يتعمل!)</span>: يا إما <span class='highlight'>5+ ساعات فريزر</span> أو <span class='highlight'>24-72 ساعة تلاجة</span>. كل ما المدة تطول = الطعم أحلى.",
-                         "أخيراً! سخن الفرن على <span class='highlight'>190°م (375°ف)</span>. افرش الصواني.",
-                         "كور <span class='critical'>كرات عجين كبيرة</span> (~3-4 ملاعق كبيرة). كورها عالية لفوق، <span class='highlight'>متفردهاش!</span> وقت الملح القشاري!",
-                         "اخبز لمدة <span class='highlight'>12-15 دقيقة</span>. الحروف هتستوي، لكن القلب <span class='critical'>هيبان طري أوي ومش مستوي!</span> ده سر الطراوة والجووي. طلعها!",
-                         "الانتظار الحاسم: سيب الكوكيز تبرد على الصينية <span class='critical'>10-15 دقيقة كاملة</span>. بتكمل سوا هنا. بعدين انقلها لشبكة. الصبر = طراوة مثالية! 😍"
-                      ],
-                     customScienceNote": "خفق الزبدة الصلبة الباردة بيحبس هوا كتير، وده بيدي رفع. الدقيق الزيادة بيدي قوام. التبريد بيجمد الدهون دي زي الأسمنت (تقريباً!) فبتسيح أبطأ، وده بيمنع الفرشة. التبريد الطويل بيخلي الدقيق يترطب بالكامل والإنزيمات تعمل سحر النكهة. النشا؟ بيضعف الجلوتين شوية، وبيدي طراوة لا تصدق. دي معجزة كوكيز!"
-                  },
-                  thin: {
-                      name: "الكوكيز الرفيعة والمقرمشة",
-                      theme: "thin-theme",
-                      imageSrcKey: 'thin',
-                     butterMethod: "استخدم <span class='critical'>زبدة بنية دافئة وسائلة</span>. مش محتاجين مجهود، يا دوب خفقة بسيطة بالسلك مع السكر.",
-                      chillingMethod: "<span class='critical'>ممنوع التبريد نهائياً!</span> بجد، فوتها. إحنا *عايزين* أقصى فرشة للقرمشة.",
-                      otherNotes: "استخدم دقيق أقل (<span class='highlight'>~2 ¼ لـ 2 ½ كوب</span>). <span class='critical'>شيل البيكنج باودر خالص!</span> سكر <span class='highlight'>أبيض</span> أكتر = قرمشة أعلى! <span class='highlight'>اختياري: 1-2 ملعقة كبيرة حليب</span> عشان تبقى أرق ورقة.",
-                      ingredients: [
-                          {"emoji": "🧈", "text": "زبدة بنية: كوب واحد، <span class='critical'>دافئة وسائل</span>"},
-                          {"emoji": "🍬", "text": "سكر: <span class='highlight'>زود الأبيض</span> (مثلا 1 ¼ كوب أبيض / ½ كوب بني) للقرمشة."}, // Simplified AR text
-                          {"emoji": "🍚", "text": "دقيق: <span class='highlight critical'>أقل ~2 ¼ لـ 2 ½ كوب</span> دقيق لجميع الأغراض"},
-                          {"emoji": "✨", "text": "مواد رافعة: 1 ملعقة صغيرة بيكنج صودا فقط. <span class='highlight critical'>لا بيكنج باودر</span>"},
-                          {"emoji": "💧", "text": "سائل زيادة اختياري: 1-2 ملعقة كبيرة حليب (للفرشة)"},
-                          {"emoji": "🍫", "text": "شوكولاتة: ~1 ½ كوب (255 جم)"},
-                          {"emoji": "🥚", "text": "بيض: 2 بيضة كبيرة (+ صفار زيادة اختياري)"},
-                          {"emoji": "🏺", "text": "فانيليا: 2 ملعقة صغيرة"},
-                          {"emoji": "🧂", "text": "ملح: 1 ملعقة صغيرة ملح كوشر (أو ½ ملعقة صغيرة ملح طعام)"},
-                          {"emoji": "🥛", "text": "قنبلة نكهة اختيارية: 3-4 ملاعق كبيرة بودرة لبن محمصة"}
-                      ],
-                      steps: [
-                          "جهز الجاف الأول: اخفق الدقيق (الكمية الأقل!)، البيكنج صودا <span class='highlight'>(فقط!)</span>، الملح، بودرة اللبن (لو هتستخدم).",
-                         "اتأكد إن الزبدة البنية <span class='critical'>دافية سائلة</span> (بس مش سخنة أوي).",
-                          "في طبق كبير، <span class='highlight'>اخفق بالسلك</span> الزبدة الدافية مع السكر (<span class='highlight'>بالنسبة المعدلة</span>) لحد ما يختلطوا.",
-                          "اخفق البيض، الفانيليا، و<span class='highlight'>الحليب/الصفار الاختياري</span>.",
-                          "ضيف بالتدريج <span class='highlight'>الكمية الأقل</span> من المكونات الجافة لحد ما يا دوب يختلطوا. <span class='critical'>متخلطش زيادة!</span>",
-                          "قلب الشوكولاتة الشيبس/القطع.",
-                         "<span class='highlight critical'>مفيش تبريد.</span> كمل خبز على طول.",
-                         "سخن الفرن على <span class='highlight'>175°م (350°ف)</span>. افرش الصواني.",
-                          "كور <span class='highlight'>كرات أصغر (~1.5-2 ملعقة كبيرة)</span>. حطهم بعيد عن بعض أوي. ممكن تبططهم شوية.",
-                          "اخبز لمدة <span class='highlight'>12-15 دقيقة</span> لحد ما يبقى لونها دهبي غامق من كل حتة للقرمشة.",
-                          "سيبها تبرد على الصينية 5 دقايق، بعدين انقلها لشبكة. بتقرمش وهي بتبرد." // Simplified ending
-                      ],
-                      customScienceNote": "الزبدة السايلة الدافية = تسيح وتفرش فوراً في الفرن! الدقيق الأقل يعني قوام أضعف يمسكها. السكر الأبيض الكتير بيتكرمل بشكل جميل عشان القرمشة دي. مفيش بيكنج باودر يعني مفيش رفع زيادة يقاوم الفرشة. البيكنج صودا بتشجع اللون البني وشوية تفاعل هنا. الموضوع كله إننا نطلق العنان للفرشة!"
-                  }
-              },
-              // Tips in Arabic
-              tips: [
-                  {"key": "tip1", "emoji": "💎", "text": "الجودة مهمة: استخدم شوكولاتة كويسة (زي دروبسي!) وفانيلا حقيقية."},
-                  {"key": "tip2", "emoji": "⚖️", "text": "الدقيق: املأ الكوب بالملعقة مش تغرفه (أو استخدم ميزان لو عايز دقة متناهية!)."},
-                  {"key": "tip3", "emoji": "🤫", "text": "سر الخلط: قف فور ما الدقيق يختفي. الكوكيز هتبقى طرية وحلوة."},
-                  {"key": "tip4", "emoji": "🧊", "text": "التبريد مش مجرد انتظار: بيعمق الطعم ويتحكم في الشكل والقوام. احترم التبريد (لما نحتاجه!)."},
-                  {"key": "tip5", "emoji": "🥄", "text": "استخدم معلقة آيس كريم عشان الكوكيز تطلع قد بعض وشكلها حلو."},
-                  {"key": "tip6", "emoji": "🧂", "text": "رشة ملح خشن ع الوش *قبل* الخبز بتظهر طعم الشوكولاتة! وشياكة."},
-                  {"key": "tip7", "emoji": "💥", "text": "عايز الكوكيز فيها تجاعيد شكلها حلو؟ اخبط الصينية ع الرخامة مرتين تلاتة آخر كام دقيقة خبز."},
-                  {"key": "tip8", "emoji": "⏳", "text": "التبريد ع الصينية جزء مهم: سيب الكوكيز 5-10 دقايق (السميكة 10-15) قبل ما تنقلها!"},
-                  {"key": "tip9", "emoji": "❄️", "text": "فرزن زي المحترفين: كور العجين وحطها ع صينية تتجمد، بعدين شيلها في كيس. اخبزها مجمدة! زود دقيقة أو اتنين للخبز (وقلل الحرارة شوية 175°م). كوكيز طازة أي وقت! ياااس!"},
-                  {"key": "sci1", "emoji": "🔥", "text": "الزبدة البنية = كنز نكهات: دي خلاصة الحليب المحمصة وطعم المكسرات."},
-                  {"key": "sci2", "emoji": "🥛", "text": "بودرة الحليب المحمصة = نكهة زيادة: عايز طعم مكرمل ومكسرات زيادة؟ هو ده."}
-              ]
-          } // *** END ARABIC ***
-     };
-
-    // --- Helper Functions ---
-    function getLangData(lang = currentLanguage) {
-        return contentData[lang] || contentData.en; // Fallback to English
-    }
-
-    // --- Core Update Functions ---
-
-     function updateTextContent() {
-         const langData = getLangData();
-         const elements = document.querySelectorAll('[data-lang-key]');
-         console.log(`Updating text content for language: ${currentLanguage}`);
-
-         elements.forEach(el => {
-             const key = el.dataset.langKey;
-             let text = langData[key]; // Get base text
-
-             if (text === undefined) {
-                 // console.warn(`Missing lang key "${key}" for lang "${currentLanguage}"`);
-                 text = ''; // Assign empty string if key is missing
-             }
-
-             // --- Handle specific elements / dynamic content ---
-             if (el === yieldInfoP) {
-                 // Yield info might be specific per cookie later, for now use general one
-                 text = langData.yieldInfo || '';
-             } else if (el === keyDiffTitleElement) {
-                 const baseTitle = langData.keyDifferencesTitle || 'Key Differences';
-                 const cookieName = currentCookieType && langData.cookies && langData.cookies[currentCookieType]
-                                   ? langData.cookies[currentCookieType].name
-                                   : '';
-                 text = cookieName ? `${baseTitle} <span class='dynamic-cookie-name'>${cookieName}!</span>` : baseTitle;
-             } else if (key === 'recipeTitlePrefix') {
-                 const prefix = langData.recipeTitlePrefix || 'Recipe for:';
-                 const cookieName = currentCookieType && langData.cookies && langData.cookies[currentCookieType]
-                                   ? langData.cookies[currentCookieType].name
-                                   : '';
-                 text = cookieName ? `${prefix} ${cookieName}!` : ''; // Only show if cookie selected
-             } else if (key === 'pistachioLinkText') { // Handle the pistachio link
-                 const linkElement = el; // It's the <a> tag itself
-                 const linkHref = langData.pistachioLinkHref;
-                 if (linkElement && linkHref) {
-                     linkElement.href = linkHref;
-                     linkElement.style.display = 'inline'; // Make sure it's visible
-                     linkElement.previousElementSibling.style.display = 'inline'; // Show "Best Spread..." text
-                     linkElement.nextElementSibling.style.display = 'inline'; // Show "(Amazon EG)"
-                 } else if (linkElement) {
-                     linkElement.style.display = 'none'; // Hide if no link provided
-                     linkElement.previousElementSibling.style.display = 'none';
-                     linkElement.nextElementSibling.style.display = 'none';
-                 }
-                 // Text is already set from langData[key]
-             }
-             // --- End specific element handling ---
+h2 { border-bottom: 1px solid var(--secondary-color); padding-bottom: 12px; margin-top: 20px; margin-bottom: 30px; font-size: 1.9em; color: var(--primary-color); font-weight: 600; }
+h3 { font-size: 1.6em; margin-bottom: 22px; color: var(--secondary-color); font-weight: 600; margin-top: 0; }
+h4 { font-size: 1.25em; color: var(--primary-color); margin-bottom: 14px; font-weight: 600; margin-top: 0;}
+p, li { font-size: 1.05em; color: var(--text-color); } /* Slightly larger paragraph/list font */
+a { color: var(--secondary-color); text-decoration: none; font-weight: 600; border-bottom: 2px dashed var(--secondary-color); transition: color var(--anim-fast), border-color var(--anim-fast), transform var(--anim-fast); display: inline-block; /* Needed for transform */ }
+a:hover { color: var(--primary-color); border-bottom: 2px solid var(--primary-color); transform: translateY(-1px); }
+.highlight, .critical { padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+.highlight { background-color: rgba(244, 162, 97, 0.25); color: #c26c1a; } /* Slightly stronger highlight */
+.critical { background-color: rgba(231, 111, 81, 0.2); color: #c13e1b; border-bottom: 2px solid var(--accent-thick); padding-bottom: 1px; }
+li .note { /* Style notes within list items */
+    display: block; /* Ensure it's on its own line */
+    font-size: 0.9em;
+    font-style: italic;
+    color: #777;
+    margin-top: 4px; /* Space from the main ingredient text */
+    padding-left: 0; /* Reset padding if inherited */
+}
+em.note { /* Style for inline optional notes */
+    font-style: italic;
+    color: #888;
+    font-size: 0.95em;
+    margin-left: 5px;
+}
 
 
-             // Update element content only if it differs
-             if (el.innerHTML !== text) {
-                 el.innerHTML = text;
-             }
-         });
-
-          // Update document title (strip HTML tags)
-          document.title = langData.mainTitle ? langData.mainTitle.replace(/<[^>]*>?/gm, '') : "Omar's Cookie Guide";
-
-         // Update Tips List
-         if (tipsListContainer && langData.tips) {
-             tipsListContainer.innerHTML = ''; // Clear existing tips
-             langData.tips.forEach(tip => {
-                  const li = document.createElement('li');
-                  li.dataset.emoji = tip.emoji || '💡';
-                  li.innerHTML = tip.text; // Use innerHTML for potential formatting
-                  tipsListContainer.appendChild(li);
-              });
-          } else if (tipsListContainer) {
-              tipsListContainer.innerHTML = ''; // Clear if no tips data
-          }
-         console.log(`Text content updated for ${currentLanguage}.`);
-     }
+/* --- Language Direction --- */
+body[dir="rtl"] { text-align: right; }
+body[dir="rtl"] .ingredient-list li, body[dir="rtl"] .steps-list li, body[dir="rtl"] #tips-list li { padding-inline-start: initial; padding-inline-end: 45px; } /* More space */
+body[dir="rtl"] .ingredient-list li::before { inset-inline-start: auto; inset-inline-end: 8px; } /* More space */
+body[dir="rtl"] .steps-list li::before { inset-inline-start: auto; inset-inline-end: 0; }
+body[dir="rtl"] #tips-list li::before { inset-inline-start: auto; inset-inline-end: 0; }
+/* body[dir="rtl"] .note { padding-inline-start: initial; padding-inline-end: 40px; } */ /* Removed general note padding, handled within li */
+body[dir="rtl"] .recipe-scaler label { margin-inline-start: initial; margin-inline-end: 10px;}
+body[dir="rtl"] .unit-label { margin-inline-start: 10px; margin-inline-end: 0; } /* RTL label spacing */
+body[dir="rtl"] li .note { padding-right: 0; } /* RTL note padding */
 
 
-    function updateRecipeView() {
-        const langData = getLangData();
-        console.log(`Updating recipe view for type: ${currentCookieType || 'None'}, lang: ${currentLanguage}`);
+/* Controls */
+.controls-master { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-top: 25px; gap: 18px; padding-bottom: 18px; border-bottom: 1px dashed var(--border-color);}
+.language-selector { margin-bottom: 10px; }
+.lang-btn { background-color: #fff; border: 2px solid var(--border-color); color: var(--secondary-color); padding: 9px 20px; border-radius: 22px; cursor: pointer; font-size: 0.95em; font-weight: 600; margin: 0 5px; transition: all var(--anim-medium) ease; box-shadow: 0 2px 4px var(--shadow-light); }
+.lang-btn:hover { background-color: var(--highlight-bg); border-color: var(--secondary-color); transform: translateY(-2px) scale(1.02); box-shadow: 0 4px 8px var(--shadow-medium); }
+.lang-btn.active { background-color: var(--lang-active-bg); color: white; border-color: var(--lang-active-bg); transform: translateY(0); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+.yield-info { font-style: italic; color: #666; font-size: 1em; text-align: center; flex-basis: 100%; order: 3; transition: color 0.3s; } /* Added transition */
+@media (min-width: 600px) { .yield-info { flex-basis: auto; order: 0; text-align: right; margin-left: auto; } }
 
-        // --- Reset View if No Cookie Selected ---
-        if (!currentCookieType || !langData.cookies || !langData.cookies[currentCookieType]) {
-            console.log("No cookie selected or data missing, showing placeholder.");
-            if (recipeDetailsContainer) {
-                recipeDetailsContainer.innerHTML = `<div class="placeholder">${langData.placeholderSelect || 'Select a cookie style above!'}</div>`;
-                recipeDetailsContainer.className = 'recipe-container'; // Reset theme
-            }
-            if (keyDifferencesContainer) keyDifferencesContainer.classList.add('visually-hidden');
-            if (cookieImageHeader) cookieImageHeader.classList.remove('visible');
-            if (easterEggContainer) easterEggContainer.classList.remove('visible');
-            if (omarFavBubble) omarFavBubble.classList.remove('visible');
 
-            // Reset key difference title correctly
-            if (keyDiffTitleElement) keyDiffTitleElement.innerHTML = langData.keyDifferencesTitle || 'Key Differences!';
-            return; // Stop execution
-        }
+/* --- Recipe Scaler Section --- */
+.recipe-scaler {
+    background-color: var(--highlight-bg);
+    border: 1px dashed var(--secondary-color);
+    border-radius: 10px; /* Slightly rounder */
+    padding: 25px 30px; /* More padding */
+    margin: 30px auto 35px auto; /* More space */
+    max-width: 650px; /* Slightly wider */
+    text-align: center;
+    box-shadow: 0 4px 12px var(--shadow-light); /* Softer shadow */
+    /* Visibility handled by JS */
+    max-height: 0; opacity: 0; overflow: hidden;
+    transition: all 0.7s ease-out;
+    border-color: transparent; /* Start border transparent */
+}
+.recipe-scaler.visible {
+    max-height: 500px; /* Adjust as needed */
+    opacity: 1; padding: 25px 30px; margin-bottom: 35px;
+    border-color: var(--secondary-color);
+}
+.recipe-scaler.updated { /* Style for update confirmation */
+    animation: flashBackground var(--anim-medium) ease-out;
+}
+@keyframes flashBackground {
+    0% { background-color: var(--highlight-bg); }
+    50% { background-color: #ffe8cc; } /* Flash color */
+    100% { background-color: var(--highlight-bg); }
+}
 
-        // --- Valid Cookie Selected - Proceed ---
-        const recipe = langData.cookies[currentCookieType];
-        if (!recipe) {
-            console.error(`Recipe data not found for type "${currentCookieType}" in lang "${currentLanguage}"`);
-            return;
-        }
+.recipe-scaler h3 {
+    font-size: 1.4em;
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 18px;
+}
+.recipe-scaler p {
+    font-size: 1em;
+    color: #555;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+.scaler-input-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px 18px; /* Spacing */
+}
+.recipe-scaler label {
+    font-weight: 600;
+    margin-inline-end: 10px;
+    font-size: 1.05em;
+}
+.recipe-scaler input[type="number"] {
+    padding: 9px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1em;
+    width: 110px;
+    text-align: right;
+    box-shadow: inset 0 1px 4px var(--shadow-light);
+}
+.recipe-scaler input[type="number"]::-webkit-inner-spin-button,
+.recipe-scaler input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none; margin: 0;
+}
+.recipe-scaler input[type="number"] { -moz-appearance: textfield; }
 
-        console.log(`Rendering recipe: ${recipe.name}`);
+.recipe-scaler button {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 6px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--anim-fast) ease, transform var(--anim-fast) ease, box-shadow var(--anim-fast) ease;
+    box-shadow: 0 3px 6px var(--shadow-medium);
+}
+.recipe-scaler button:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 5px 10px var(--shadow-dark);
+}
+.scaler-note {
+    font-size: 0.9em;
+    font-style: italic;
+    color: #777;
+    margin-top: 18px;
+    display: block;
+}
 
-        // Update Omar's Fav Bubble Visibility
-        if (omarFavBubble) {
-            omarFavBubble.classList.toggle('visible', currentCookieType === 'thick');
-        }
+/* Unit Toggles (Inside Recipe Details) */
+.recipe-unit-toggle { /* Specific class for toggles inside recipe */
+    text-align: center;
+    padding: 15px 0px 20px 0px; /* Spacing around toggles */
+    margin-bottom: 15px;
+    border-bottom: 1px dashed var(--border-color);
+    opacity: 1;
+    transition: opacity var(--anim-fast) ease;
+    display: block; /* Ensure it's displayed when cloned */
+}
+.unit-selector {
+    display: inline-block;
+    margin: 0 12px;
+    opacity: 1;
+    transition: opacity var(--anim-fast) ease;
+ }
+.unit-selector[style*="display: none"] { /* Handles JS hiding */
+    opacity: 0;
+    pointer-events: none;
+    display: none !important; /* Ensure it stays hidden */
+}
+.unit-label { margin-inline-end: 10px; font-weight: 600; font-size: 1em;}
+.unit-btn { background-color: #fff; border: 1px solid var(--border-color); color: var(--text-color); padding: 7px 16px; border-radius: 18px; cursor: pointer; font-size: 0.95em; margin: 0 4px; transition: all var(--anim-fast) ease; box-shadow: 0 1px 3px var(--shadow-light); }
+.unit-btn:hover { background-color: var(--highlight-bg); border-color: var(--secondary-color); transform: translateY(-1px) scale(1.02); box-shadow: 0 2px 5px var(--shadow-medium); }
+.unit-btn.active { background-color: var(--secondary-color); color: white; border-color: var(--secondary-color); font-weight: bold; box-shadow: 0 2px 6px rgba(0,0,0,0.18); }
 
-        // Update Top Image Header
-        if (selectedCookieImage && cookieImageHeader) {
-            const imageKey = recipe.imageSrcKey; // Use the key from data
-            const imagePath = imageKey ? IMAGE_PATHS[imageKey] : ''; // Get path from IMAGE_PATHS
-            if (imagePath) {
-                selectedCookieImage.src = imagePath;
-                selectedCookieImage.alt = `Delicious ${recipe.name || currentCookieType} cookie`; // Update alt text
-                cookieImageHeader.classList.add('visible');
-                console.log(`Set image to: ${imagePath}`);
-            } else {
-                cookieImageHeader.classList.remove('visible'); // Hide if no image path found
-                console.log(`No image path found for key: ${imageKey}`);
-            }
-        }
 
-        // Update Key Differences Section
-        if (keyDifferencesContainer) {
-            if (butterMethodDesc) butterMethodDesc.innerHTML = recipe.butterMethod || '-';
-            if (chillingMethodDesc) chillingMethodDesc.innerHTML = recipe.chillingMethod || '-';
-            if (otherNotesDesc) otherNotesDesc.innerHTML = recipe.otherNotes || '-';
-            keyDifferencesContainer.classList.remove('visually-hidden'); // Make sure it's visible
-             // Title updated in updateTextContent
-            console.log("Updated key differences section.");
-        }
+/* Cookie Selection */
+.cookie-type-selector { background-color: transparent; padding: 20px 0; border: none; margin-bottom: 35px; }
+.cookie-type-selector h2 { font-size: 1.6em; margin-bottom: 30px; text-align: center; border: none;}
+.button-group-container { position: relative; }
+.button-group { display: flex; justify-content: center; flex-wrap: wrap; gap: 18px 25px; }
+.selector-btn { background-color: var(--card-background); border: 2px solid var(--secondary-color); color: var(--secondary-color); padding: 16px 28px; border-radius: 35px; cursor: pointer; font-size: 1.1em; font-weight: 600; transition: all var(--anim-medium) ease; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 8px var(--shadow-light); }
+.selector-btn:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 8px 16px var(--shadow-medium); border-color: var(--primary-color); color: var(--primary-color);}
+.selector-btn .emoji { font-size: 1.35em; }
+.selector-btn.active { color: white; transform: translateY(0px) scale(1.01); box-shadow: 0 5px 10px rgba(0,0,0,0.15); }
+.selector-btn[data-type="classic"].active { background-color: var(--accent-classic); border-color: var(--accent-classic); }
+.selector-btn[data-type="thick"].active { background-color: var(--accent-thick); border-color: var(--accent-thick); }
+.selector-btn[data-type="thin"].active { background-color: var(--accent-thin); border-color: var(--accent-thin); }
 
-        // Build and Update Recipe Details Section
-        if (recipeDetailsContainer) {
-            recipeDetailsContainer.className = `recipe-container ${recipe.theme || ''}`; // Apply theme class
+/* Omar's Fave Tag Animation (Original from cookietest) */
+@keyframes favePop {
+    0% { transform: rotate(8deg) scale(0.8); opacity: 0; }
+    60% { transform: rotate(12deg) scale(1.1); opacity: 1; }
+    100% { transform: rotate(10deg) scale(1); opacity: 1; }
+}
+.omars-fav-text { font-family: var(--font-handwriting); font-size: 1.2em; color: var(--fav-tag-color); font-weight: 500; background-color: var(--fav-tag-bg); padding: 6px 14px; border-radius: 18px 18px 18px 0; border: 1px dashed var(--fav-tag-color); position: absolute; top: -10px; right: 5%; transform: rotate(8deg) scale(0.8); transform-origin: bottom right; z-index: 10; opacity: 0; white-space: nowrap; pointer-events: none; }
+.omars-fav-text.visible { animation: favePop var(--anim-slow) cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
-            let ingredientsHtml = `<h4 class="list-header" data-lang-key="ingredientsHeader">${langData.ingredientsHeader || 'Ingredients:'}</h4><ul class="ingredient-list">`;
-            if (recipe.ingredients && Array.isArray(recipe.ingredients)) {
-                recipe.ingredients.forEach(ing => {
-                    // Add class based on optional 'key' for better styling maybe?
-                    ingredientsHtml += `<li class="${ing.key || ''}" data-emoji="${ing.emoji || '🍪'}">${ing.text}</li>`;
-                });
-            } else {
-                ingredientsHtml += `<li>No ingredients listed.</li>`; // Fallback
-            }
-            ingredientsHtml += '</ul>';
 
-            let howToToastHtml = '';
-            if (langData.howToToastMilkPowderTitle && langData.howToToastMilkPowder) {
-                howToToastHtml = `<div class="how-to-toast">
-                                    <h4 data-lang-key="howToToastMilkPowderTitle">${langData.howToToastMilkPowderTitle}</h4>
-                                    <p data-lang-key="howToToastMilkPowder">${langData.howToToastMilkPowder}</p>
-                                  </div>`;
-            }
+/* Header Image Section */
+#cookie-image-header { text-align: center; margin: 0 auto 35px auto; min-height: 150px; transition: opacity var(--anim-slow) ease-out; background: none; overflow: hidden; }
+#selected-cookie-image {
+    display: block; margin: 0 auto; width: 100%;
+    max-width: min(90vw, 1000px);
+    height: auto; border-radius: 14px; /* Rounder */
+    box-shadow: 0 6px 18px var(--shadow-medium), 0 2px 6px rgba(0,0,0,0.06) inset; /* Stronger shadow */
+    border: 1px solid rgba(0,0,0,0.05); background: none; opacity: 1;
+    transition: max-width var(--anim-medium) ease-in-out, opacity var(--anim-medium) ease-in-out, box-shadow var(--anim-fast);
+}
+#selected-cookie-image.selected-type-image { max-width: 550px; /* Slightly larger small size */ }
+#selected-cookie-image[src=""] { opacity: 0; }
 
-            let stepsHtml = `<h4 class="list-header" data-lang-key="stepsHeader">${langData.stepsHeader || 'Steps:'}</h4>${howToToastHtml}<ol class="steps-list">`;
-            if (recipe.steps && Array.isArray(recipe.steps)) {
-                recipe.steps.forEach(step => stepsHtml += `<li>${step}</li>`);
-            } else {
-                stepsHtml += `<li>No steps listed.</li>`; // Fallback
-            }
-            stepsHtml += '</ol>';
 
-            let scienceHtml = '';
-            if (recipe.customScienceNote && langData.scienceHeader) {
-                scienceHtml = `<div class="science-note">
-                                <h4 data-lang-key="scienceHeader">${langData.scienceHeader}</h4>
-                                <p>${recipe.customScienceNote}</p>
-                               </div>`;
-            }
+/* Key Differences Section */
+.key-differences-container {
+    background-color: var(--key-diff-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 30px; margin-bottom: 35px;
+    max-height: 0; opacity: 0; overflow: hidden;
+    transition: all 0.7s ease-out;
+    border-style: dashed; border-color: transparent;
+}
+.key-differences-container.visible {
+    max-height: 800px; /* Increased max-height */
+    opacity: 1; padding: 30px; margin-bottom: 35px;
+    border-color: var(--secondary-color);
+}
+.key-differences-container h3 { text-align: center; margin-bottom: 30px; font-size: 1.5em; }
+.key-differences-container h3 .dynamic-cookie-name { font-style: italic; color: var(--secondary-color); }
+.diff-points { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; } /* Wider minmax, more gap */
+.diff-point { background-color: var(--card-background); padding: 25px; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 5px 12px var(--shadow-light); transition: transform var(--anim-medium) ease, box-shadow var(--anim-medium) ease; }
+.diff-point:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 9px 18px var(--shadow-medium); }
+/* Adjusted h4 selector for JS population */
+.diff-point h4 { color: var(--secondary-color); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; border: none; padding: 0; font-size: 1.2em;}
+.diff-point h4 .emoji { font-size: 1.35em; }
+.diff-point p { font-size: 1.05em; color: #555; }
 
-            // Use data-lang-key for the recipe title prefix as well
-            const recipeTitle = `<h3 data-lang-key="recipeTitlePrefix">${(langData.recipeTitlePrefix || 'Recipe:')} ${recipe.name || 'Cookies'}!</h3>`;
-            recipeDetailsContainer.innerHTML = recipeTitle + ingredientsHtml + stepsHtml + scienceHtml;
-            console.log("Updated recipe details section.");
-        }
 
-        // Handle Easter Egg Visibility
-        if (easterEggContainer) {
-            const showEasterEgg = (currentCookieType === 'thick');
-            if (showEasterEgg) {
-                console.log("Showing Easter Egg for 'thick' type.");
-                if (stuffedCookieImage) {
-                    stuffedCookieImage.src = IMAGE_PATHS.stuffed || '';
-                    stuffedCookieImage.alt = "Delicious stuffed cookie example"; // Add alt text
-                }
-                // Update Easter Egg Text Fields directly using keys (or let updateTextContent handle it if keys match)
-                // Example: easterEggContainer.querySelector('[data-lang-key="easterEggTitle"]').innerHTML = langData.easterEggTitle || '';
-                updateTextContent(); // Ensure all text inside Easter egg is updated
+/* Recipe Details Container & Content */
+.recipe-container {
+    padding: 0; margin-top: 20px; /* Reduced top margin */
+    border-radius: 14px; border: 1px solid var(--border-color);
+    background-color: var(--card-background);
+    transition: background-color var(--anim-slow) ease, border-color var(--anim-slow) ease, max-height var(--anim-slow) ease-out, opacity var(--anim-slow) ease-out;
+    box-shadow: 0 6px 18px var(--shadow-medium);
+    min-height: 100px; /* Reduced min-height */
+    position: relative; overflow: hidden;
+     /* Visibility handled by JS */
+    max-height: 0; opacity: 0;
+}
+.recipe-container.visible {
+    max-height: 5000px; /* Large max-height when visible */
+    opacity: 1;
+    border-color: var(--border-color); /* Default border */
+}
+.recipe-container.classic-theme.visible { background-color: #fff8f0; border-color: var(--accent-classic); }
+.recipe-container.thick-theme.visible { background-color: #feedeb; border-color: var(--accent-thick); }
+.recipe-container.thin-theme.visible { background-color: #fefcf3; border-color: var(--accent-thin); }
 
-                easterEggContainer.style.display = 'block'; // Ensure it takes up space before animating
-                 requestAnimationFrame(() => { // Delay adding class slightly
-                    easterEggContainer.classList.add('visible');
-                 });
-            } else {
-                console.log("Hiding Easter Egg.");
-                easterEggContainer.classList.remove('visible');
-                 // Let CSS handle hiding via transition. The 'visually-hidden' class might conflict,
-                 // so rely on opacity/max-height in CSS. Setting display:none after transition can be done via event listener if needed.
-                // easterEggContainer.addEventListener('transitionend', function handleTransitionEnd(event) {
-                //     if (event.propertyName === 'opacity' && !easterEggContainer.classList.contains('visible')) {
-                //          easterEggContainer.style.display = 'none';
-                //          easterEggContainer.removeEventListener('transitionend', handleTransitionEnd); // Clean up listener
-                //      }
-                //  });
-                 // For simplicity now, rely on CSS opacity/max-height transition. Add display:none later if needed.
-            }
-        }
-    }
+/* Recipe Content Area */
+.recipe-content-area {
+    padding: 35px; opacity: 1; /* Start visible once container is */
+    /* Remove animation - handled by container visibility */
+}
 
-    // --- Language Switching Function ---
-    function switchLanguage(lang) {
-        if (!contentData[lang]) {
-            console.warn(`Language "${lang}" not found. Defaulting to 'en'.`);
-            lang = 'en';
-        }
-        if (lang === currentLanguage) return; // No change needed
+/* Placeholder Styling (Inside Recipe Container) */
+.recipe-container .placeholder {
+    text-align: center; color: #888; font-size: 1.25em; padding: 80px 20px; font-style: italic;
+    /* No transition needed here, container handles visibility */
+}
 
-        console.log(`Switching language to: ${lang}`);
-        currentLanguage = lang;
-        body.dir = (lang === 'ar') ? 'rtl' : 'ltr'; // Set text direction
+/* General Content Inside Recipe Area */
+.recipe-content-area > h3 { margin-top: 0px; margin-bottom: 18px; text-align: center; font-size: 1.7em; }
+h4.list-header { border-bottom: 2px dotted var(--border-color); padding-bottom: 10px; margin-top: 35px; margin-bottom: 25px; font-size: 1.4em; color: var(--secondary-color); }
+.ingredient-list, .steps-list { list-style: none; padding: 0; margin: 30px 0; }
+.ingredient-list li, .steps-list li { margin-bottom: 18px; padding-inline-start: 45px; position: relative; font-size: 1.1em; line-height: 1.7; }
+.ingredient-list li::before { content: attr(data-emoji); position: absolute; inset-inline-start: 8px; top: 4px; font-size: 1.45em; width: 28px; text-align: center; }
+/* .ingredient-list .note { display: block; font-size: 0.88em; color: #777; padding-inline-start: 0; font-style: italic; margin-top: 5px; line-height: 1.45; } */ /* Handled by general li .note */
+.steps-list { counter-reset: step-counter; }
+.steps-list li::before { content: counter(step-counter); counter-increment: step-counter; background-color: var(--secondary-color); color: white; border-radius: 50%; width: 30px; height: 30px; display: inline-flex; justify-content: center; align-items: center; font-size: 0.95em; font-weight: 700; position: absolute; inset-inline-start: 0; top: 5px; box-shadow: 0 2px 6px var(--shadow-medium); } /* Slightly larger step numbers */
+.ingredient-list .highlight, .steps-list .highlight { background-color: rgba(244, 162, 97, 0.3); color: #c26c1a; padding: 2px 7px; border-radius: 4px; font-weight: bold; }
+.ingredient-list .critical, .steps-list .critical { font-weight: bold; color: var(--accent-thick); border-bottom: 2px dotted var(--accent-thick); padding-bottom: 1px; background: transparent; }
 
-        // Update language button active states
-        langButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
+/* How-to Toast Section Styling */
+.how-to-toast {
+    background-color: var(--highlight-bg);
+    border: 1px dashed var(--secondary-color);
+    border-radius: 8px;
+    padding: 20px 25px;
+    margin: 30px 0 15px 0;
+}
+.how-to-toast h4 {
+    color: var(--primary-color);
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    border: none; padding: 0;
+}
+.how-to-toast p {
+    font-size: 1.0em;
+    color: #555;
+    line-height: 1.6;
+}
 
-        // Update all text content and the recipe view
-        updateTextContent();
-        updateRecipeView(); // Re-render views with the new language
-    }
+/* Science Note Styling */
+.science-note {
+    background-color: #f8f9fa; border: 1px solid #eee; border-radius: 10px; padding: 25px; margin: 35px 0 15px 0;
+}
+.science-note h4 { margin-bottom: 15px; color: var(--primary-color); font-size: 1.3em; text-align: center; border: none; padding: 0; display: flex; justify-content: center; align-items: center; gap: 10px;}
+.science-note h4 .emoji { vertical-align: middle; }
+.science-note p { font-size: 1.05em; color: #444; line-height: 1.75;}
 
-    // --- Event Listeners ---
-    // Language Buttons
-    langButtons.forEach(button => button.addEventListener('click', (e) => {
-        e.preventDefault();
-        switchLanguage(button.dataset.lang);
-    }));
 
-    // Cookie Type Selector Buttons
-    typeSelectorButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            const clickedType = button.dataset.type;
+/* Easter Egg Section */
+.easter-egg {
+    background: var(--easter-egg-bg); border: 3px dashed #fbc02d; border-radius: 12px;
+    padding: 30px; margin-top: 35px; text-align: center;
+    box-shadow: 0 8px 30px rgba(251, 192, 45, 0.35);
+    max-height: 0; opacity: 0; overflow: hidden;
+    transition: all 0.8s ease-out;
+}
+.easter-egg.visible {
+    max-height: 2000px; /* Increased max-height */
+    opacity: 1; padding: 30px; margin-top: 35px;
+}
+.easter-egg h3 { color: #c04f16; margin-bottom: 20px; font-size: 1.7em; font-family: var(--font-handwriting); font-weight: 500; }
+.easter-egg-content { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.easter-egg-content p, .easter-egg-content strong { font-size: 1.15em; color: #6d4c41; line-height: 1.75; }
+.easter-egg-content strong { font-weight: 700; color: var(--primary-color); display: block; margin-bottom: 6px; }
+.easter-egg-content img#stuffed-cookie-image {
+    max-width: 90%; width: 450px; height: auto; border-radius: 10px; margin-top: 15px;
+    box-shadow: 0 5px 15px var(--shadow-medium);
+    /* Use CSS variable for image source if needed, otherwise JS sets src */
+    /* content: var(--easter-egg-image); */
+}
+.easter-egg-content ul { list-style: decimal; padding-left: 40px; margin: 18px 0 0 0; } /* Use decimal for steps */
+.easter-egg-content ul li { margin-bottom: 12px; padding-inline-start: 10px; /* Adjusted padding */ position: relative; text-align: start; }
+/* Removed ::before styling for list items as we use decimal */
 
-            if (clickedType === currentCookieType) {
-                // Optional: Deselect if clicking active button again
-                // currentCookieType = null;
-                // typeSelectorButtons.forEach(btn => btn.classList.remove('active'));
-                // console.log("Deselected cookie type.");
 
-                // Keep it simple for now: Do nothing if clicking active button
-                 console.log(`Cookie type "${clickedType}" already active.`);
-                return;
-            }
+/* Tips Section */
+.lower-sections { margin-top: 45px; }
+.tip-box { background-color: #f0f4f8; border: 1px solid #d6e2f0; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(214, 226, 240, 0.6); }
+/* Adjusted h3 selector for JS population */
+.tip-box h3 { color: #1e3a56; margin-bottom: 30px; text-align: center; font-size: 1.7em; border: none; padding: 0; font-weight: 600; display: flex; justify-content: center; align-items: center; gap: 10px;}
+.tip-box h3 .emoji { vertical-align: middle;}
+#tips-list { list-style: none; padding: 0; column-count: 2; column-gap: 45px; }
+#tips-list li { padding-inline-start: 40px; position: relative; margin-bottom: 20px; font-size: 1.05em; line-height: 1.7; break-inside: avoid; }
+#tips-list li::before { content: attr(data-emoji); position: absolute; inset-inline-start: 0; top: 2px; font-size: 1.55em; width: 28px; text-align: center; }
 
-            console.log(`Cookie type selected: ${clickedType}`);
-            currentCookieType = clickedType;
+/* Final Shoutout */
+.final-shoutout { margin-top: 45px; padding-top: 35px; border-top: 2px dotted var(--border-color); text-align: center; font-family: var(--font-handwriting); font-size: 2.5em; color: var(--primary-color); line-height: 1.45; }
+.final-shoutout a { border-bottom: 2px dashed currentColor; font-weight: 500; color: var(--secondary-color); transition: color var(--anim-fast) ease, border-color var(--anim-fast) ease; }
+.final-shoutout a:hover { color: var(--primary-color); border-bottom-style: solid; }
 
-            // Update active button state
-            typeSelectorButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
+/* Content Placeholder (Outside Recipe Container) */
+.content-placeholder {
+    text-align: center;
+    color: #888;
+    font-size: 1.25em;
+    padding: 80px 20px;
+    font-style: italic;
+    transition: opacity var(--anim-medium) ease, max-height var(--anim-medium) ease-out;
+    max-height: 500px; /* Allow space */
+    opacity: 1;
+    overflow: hidden;
+}
+.content-placeholder:not(.visible) {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+     /* pointer-events: none; */ /* Might not be necessary */
+}
 
-            // Update UI
-            updateTextContent(); // Update general text (especially titles needing the name)
-            updateRecipeView(); // Update the main view
 
-            // Optional: Scroll to the key differences or recipe smoothly
-            if (keyDifferencesContainer && !keyDifferencesContainer.classList.contains('visually-hidden')) {
-                 keyDifferencesContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-             } else if (recipeDetailsContainer) {
-                 recipeDetailsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-             }
-        });
-    });
+/* Utility & Scroll Animation */
+.visually-hidden {
+    border: 0 !important; clip: rect(1px, 1px, 1px, 1px) !important;
+    clip-path: inset(50%) !important; height: 1px !important;
+    margin: -1px !important; overflow: hidden !important;
+    padding: 0 !important; position: absolute !important;
+    width: 1px !important; white-space: nowrap !important;
+    opacity: 0 !important; /* Ensure opacity is 0 */
+    /* Prevent transitions when adding/removing */
+     /* transition: none !important; */
+}
+/* Combine visually-hidden styles for containers */
+.key-differences-container.visually-hidden,
+.easter-egg.visually-hidden,
+.recipe-scaler.visually-hidden,
+.recipe-container.visually-hidden {
+    max-height: 0 !important; opacity: 0 !important;
+    padding-top: 0 !important; padding-bottom: 0 !important;
+    margin-top: 0 !important; margin-bottom: 0 !important;
+    border-width: 0 !important; overflow: hidden !important;
+    position: static !important; /* Overrides absolute positioning */
+    /* pointer-events: none; */
+}
+.omars-fav-text.visually-hidden {
+    opacity: 0 !important; animation: none !important;
+    transform: rotate(8deg) scale(0.8) !important;
+    pointer-events: none;
+}
 
-    // --- Initial Setup ---
-    console.log("Running Initial Setup...");
-    // Set initial language based on default state, render placeholder text & tips
-    switchLanguage(currentLanguage);
+/* Scroll Reveal Base State */
+.fade-in-on-scroll {
+    opacity: 0;
+    transform: translateY(30px); /* Start slightly lower */
+    transition: opacity var(--anim-slow) cubic-bezier(0.645, 0.045, 0.355, 1), /* Ease out quad */
+                transform var(--anim-slow) cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+/* Scroll Reveal Visible State */
+.fade-in-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
 
-    // Hide elements that require a selection initially
-    if (keyDifferencesContainer) keyDifferencesContainer.classList.add('visually-hidden');
-    if (cookieImageHeader) cookieImageHeader.classList.remove('visible');
-    if (easterEggContainer) {
-         easterEggContainer.classList.remove('visible');
-         // easterEggContainer.style.display = 'none'; // Hide completely until needed
-     }
-    if (omarFavBubble) omarFavBubble.classList.remove('visible');
 
-    // Fade in the page after a brief delay
-    setTimeout(() => {
-        body.classList.add('loaded');
-        console.log("Page loaded class added.");
-    }, 100); // 100ms delay
+/* Media Queries (Adjusted slightly) */
+@media (max-width: 1024px) {
+     #selected-cookie-image { max-width: min(90vw, 800px); }
+     .container { padding: 30px 4vw; max-width: 95%; } /* Adjust container padding/width */
+}
+@media (max-width: 900px) {
+    #tips-list { column-count: 1; }
+}
+@media (max-width: 768px) {
+    h1 { font-size: 2.3em; } h2 { font-size: 1.7em; }
+    .container { padding: 30px 5vw; border-radius: 8px; }
+    .diff-points { grid-template-columns: 1fr; }
+    #selected-cookie-image { max-width: min(95vw, 600px); }
+    #selected-cookie-image.selected-type-image { max-width: 480px; }
+    .recipe-scaler { max-width: 90%; padding: 20px 25px; }
+    .recipe-scaler.visible { padding: 20px 25px; } /* Ensure visible padding matches */
+    .key-differences-container.visible { padding: 25px; } /* Adjust padding */
+    .recipe-content-area { padding: 30px; }
+}
+@media (max-width: 480px) {
+    body { font-size: 16px; } /* Adjust base font slightly for small screens */
+    .container { padding: 25px 4vw; border-radius: 0; border: none; box-shadow: none; margin-top: 0; margin-bottom: 0; } /* Full width on small screens */
+    h1 { font-size: 2em; } h2 { font-size: 1.5em; } h3 { font-size: 1.4em; }
+    .button-group { flex-direction: column; align-items: center;}
+    .selector-btn { padding: 14px 25px; font-size: 1.05em; width: 90%; text-align: center; justify-content: center;}
+    .omars-fav-text { right: 10%; top: -18px; font-size: 1.1em; }
+    .omars-fav-text.visible { animation-duration: 0.7s; } /* Slightly faster pop on mobile */
+    #selected-cookie-image { max-width: 95vw; }
+    #selected-cookie-image.selected-type-image { max-width: 90%; }
+    .easter-egg.visible { padding: 20px; }
+    .easter-egg-content img#stuffed-cookie-image { width: 90%; }
+    .recipe-scaler { padding: 20px 20px; }
+    .recipe-scaler.visible { padding: 20px 20px; }
+    .scaler-input-group { flex-direction: column; align-items: stretch; gap: 15px; } /* Stack & stretch */
+    .recipe-scaler input[type="number"] { width: auto; } /* Full width in column */
+    .recipe-scaler label { text-align: center; margin-inline-end: 0; margin-bottom: 5px; }
+    .recipe-content-area { padding: 25px; }
+    .tip-box { padding: 25px; }
+    #tips-list li { padding-inline-start: 35px; }
+    #tips-list li::before { width: 25px; font-size: 1.45em; }
+    .final-shoutout { font-size: 2.2em; }
+}
 
-}); // End DOMContentLoaded
-// ==== JAVASCRIPT LOGIC ENDS HERE ====
+/* ==== CSS STYLES END HERE ==== */
