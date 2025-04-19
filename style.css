@@ -310,4 +310,32 @@ h4.list-header { border-bottom: 2px dotted var(--border-color); padding-bottom: 
     .scaler-input-group { flex-direction: column; } /* Stack scaler inputs */
 }
 
-/* ==== CSS STYLES END HERE ==== */
+/* --- RTL List Bullet Alignment Fix --- */
+
+/* Ensure list items have padding on the correct side (right) for bullets in RTL */
+body[dir="rtl"] .ingredient-list li,
+body[dir="rtl"] .steps-list li,
+body[dir="rtl"] #tips-list li {
+    padding-left: 0;       /* Remove default left padding */
+    padding-right: 40px;   /* Add padding on the right for the bullet */
+    /* text-align: right; should already be inherited */
+}
+
+/* Position Ingredient Emojis to the RIGHT */
+body[dir="rtl"] .ingredient-list li::before {
+    left: auto;              /* Remove any explicit left positioning */
+    inset-inline-start: auto; /* Remove logical start positioning */
+    right: 5px;              /* Position from the right edge */
+    inset-inline-end: 5px;   /* Reinforce logical end positioning */
+}
+
+/* Position Step Numbers and Tip Emojis to the RIGHT */
+body[dir="rtl"] .steps-list li::before,
+body[dir="rtl"] #tips-list li::before {
+    left: auto;              /* Remove any explicit left positioning */
+    inset-inline-start: auto; /* Remove logical start positioning */
+    right: 0;                /* Position from the right edge */
+    inset-inline-end: 0;     /* Reinforce logical end positioning */
+}
+
+/* --- End RTL Fix --- */
